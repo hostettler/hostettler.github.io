@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+<url>
+  <loc>http://www.hostettler.net/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/about-me/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/archives/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/2012/04/16/using-selenium-for-web-integration-testing/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/2012/04/02/how-to-test-a-jsf-named-bean/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/2012/03/25/improve-jsf-applications-startup-time/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/2012/03/22/one-to-one-relations-in-jpa-2-dot-0/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/2012/03/19/testing-jpa-in-java-se/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/interceptor/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/jaas/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/jee6/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/java/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/java-ee-6/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/security/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/tomcat-7/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/integration-testing/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/junit/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/java-ee6/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/selenium/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/web-application/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/test/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/war/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/shrinkwrap/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/cdi/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/injection/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/scopes/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/weld/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/jsf/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/performances/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/jpa-2-0/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/java-se/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/or-mapping/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/derby/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/integration-test/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+<url>
+  <loc>http://www.hostettler.net/blog/categories/java-db/</loc>
+  <lastmod>2012-05-06T23:08:26+00:00</lastmod>
+  <changefreq>weekly</changefreq>
+</url>
+</urlset>

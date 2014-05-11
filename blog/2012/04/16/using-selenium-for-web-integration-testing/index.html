@@ -1,0 +1,457 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Using Selenium for web integration testing - Steve Hostettler</title>
+  <meta name="author" content="Steve Hostettler">
+
+  
+  <meta name="description" content="Following up on my previous posts (here
+and here about integration testing
+of JEE web applications, I will present how to write smoke tests using &hellip;">
+  <meta name="keywords" content="Integration testingtest automationWeb applicationJava EE6JEE6SeleniumJUnit">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://hostettler.github.io/blog/2012/04/16/using-selenium-for-web-integration-testing">
+  <link href="/github/favicon.png" rel="icon">
+  <link href="/github/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/github/javascripts/modernizr-2.0.js"></script>
+  <script src="/github/javascripts/ender.js"></script>
+  <script src="/github/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/github/atom.xml" rel="alternate" title="Steve Hostettler" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30751319-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/github/">Steve Hostettler</a></h1>
+  
+    <h2>JEE and test automation</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/github/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:hostettler.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/github/about-me/">About Me</a></li>
+  <li><a href="http://publicationslist.org/steve.hostettler">Publications</a></li>
+  <li><a href="/github/">Blog</a></li>
+  <li><a href="/github/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Using Selenium for Web Integration Testing</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-16T18:57:00+02:00" pubdate data-updated="true">Apr 16<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Following up on my previous posts (<a href="/github/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">here</a>
+and <a href="/github/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">here</a> about integration testing
+of JEE web applications, I will present how to write smoke tests using Selenium. The idea is to
+detect whether important regressions have been introduced. This is especially useful to detect
+configuration and navigation problems. I&#8217;ve split the test in three parts:</p>
+
+<ol>
+<li>starting and stopping the container. Embedded Tomcat 7 in our case. This is described
+<a href="/github/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7">here</a>;</li>
+<li>building the WAR file to test. To that end, you can look at this
+<a href="/github/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap">post</a> that describes how to
+build such a test archive using Shrinkwrap;</li>
+<li>finally, we must build the test case. This is the goal of this post.</li>
+</ol>
+
+
+<p>Testing a use case requires to be able to:</p>
+
+<ol>
+<li>get a page at a given URL;</li>
+<li>input test data into the web elements;</li>
+<li>assert whether the server answers as expected.</li>
+</ol>
+
+
+<p>Selenium provides an easy API to fetch URLs
+As these are smoke tests, using the <code>HtmlUnitDriver</code> instead of a specific browser is sufficient.
+We do not want to detect minor display problems but rather important functional problems.</p>
+
+<p>Selenium has many different drivers for many different browser. The problem is that it opens the
+browser in a new window. I prefer to have the continuous integration running headless.</p>
+
+<p>The following dependencies are required to run the tests.</p>
+
+<figure class='code'><figcaption><span>Maven dependencies</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;groupId&gt;</span>org.seleniumhq.selenium<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;artifactId&gt;</span>selenium-java<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;version&gt;</span>2.20.0<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;groupId&gt;</span>net.sourceforge.htmlunit<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;artifactId&gt;</span>htmlunit<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;version&gt;</span>2.9<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>First, let&#8217;s build a new headless driver. This object simulates the browser. It manages the HTTP part as
+well as parsing the HTML and the javascript code that is returned.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">WebDriver</span> <span class="n">driver</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HtmlUnitDriver</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next step is to ask the driver to load the home page that we want to test. For
+convenience, in my previous posts I defined a method that returns the current Tomcat port and the
+application context.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;http://localhost:&quot;</span> <span class="o">+</span> <span class="n">getTomcatPort</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">getApplicationId</span><span class="o">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&#8217;s assume that the home page redirects to a login page that has two text boxes (respectively
+called <code>username</code> and password). The following snippet uses XPATH expressions to locate web elements.
+First, it locates a HTML element of type <code>input</code> that has an
+attribute  <code>id</code> set to <code>username</code>. If this web element is not present, the driver will raise an exception.
+This allows to easily detect whether a widget has been accidentally removed.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">WebElement</span> <span class="n">username</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">&quot;//input[contains(@id,&#39;username&#39;)]&quot;</span><span class="o">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Now we can interact with the previous element. For instance, to simulate a user that types in its username (<code>admin</code>).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">username</span><span class="o">.</span><span class="na">sendKeys</span><span class="o">(</span><span class="s">&quot;admin&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>After that, Let&#8217;s do the same for the web element called <code>password</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">WebElement</span> <span class="n">password</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">&quot;//input[contains(@id,&#39;password&#39;)]&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">password</span><span class="o">.</span><span class="na">sendKeys</span><span class="o">(</span><span class="s">&quot;admin&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Finally, we locate a button called <code>login</code>and we simulate a click on it.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">WebElement</span> <span class="n">login</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">&quot;//button[contains(@id,&#39;login&#39;)]&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">login</span><span class="o">.</span><span class="na">click</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>On successful login, our example redirects to a page that contains a list of students.
+The following assertion checks that the string <code>Student list</code> exists somewhere is the returned
+HTML source code.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">&quot;Student list&quot;</span><span class="o">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With this approach, it is also very easy to do trivial security testing. For instance, let&#8217;s check that
+the application redirects (or forwards) the user to the login page upon unsuccessful login.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">WebElement</span> <span class="n">username</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">&quot;//input[contains(@id,&#39;username&#39;)]&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">username</span><span class="o">.</span><span class="na">sendKeys</span><span class="o">(</span><span class="s">&quot;foo&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">WebElement</span> <span class="n">password</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">&quot;//input[contains(@id,&#39;password&#39;)]&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">password</span><span class="o">.</span><span class="na">sendKeys</span><span class="o">(</span><span class="s">&quot;foo&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">WebElement</span> <span class="n">login</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">&quot;//button[contains(@id,&#39;login&#39;)]&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">login</span><span class="o">.</span><span class="na">click</span><span class="o">();</span>
+</span><span class='line'><span class="n">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">&quot;username&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">&quot;password&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">&quot;login&quot;</span><span class="o">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>In this post, we have seen how to write smoke integration tests with Selenium. This is especially
+useful to detect whether an important functionality has been hindered. For instance, a change in the
+navigation or a unexpected change of the status (availability, visibility) of one the buttons or web elements.
+I recommend implementing the three or four major scenarios with this technique. This is usually enough to
+detect major problems. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Steve Hostettler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-16T18:57:00+02:00" pubdate data-updated="true">Apr 16<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/github/blog/categories/integration-testing/'>Integration testing</a>, <a class='category' href='/github/blog/categories/jee6/'>JEE6</a>, <a class='category' href='/github/blog/categories/junit/'>JUnit</a>, <a class='category' href='/github/blog/categories/java-ee6/'>Java EE6</a>, <a class='category' href='/github/blog/categories/selenium/'>Selenium</a>, <a class='category' href='/github/blog/categories/web-application/'>Web application</a>, <a class='category' href='/github/blog/categories/test-automation/'>test automation</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/github/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/" title="Previous Post: Embedded Web Application integration testing using Tomcat 7 and JUnit">&laquo; Embedded Web Application integration testing using Tomcat 7 and JUnit</a>
+      
+      
+        <a class="basic-alignment right" href="/github/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/" title="Next Post: A JEE6 security interceptor for Tomcat 7">A JEE6 security interceptor for Tomcat 7 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/github/blog/2012/12/31/jee6-tutorial/">JEE6 Tutorial</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/12/05/servicelocator/">Context Dependency Injection and the Rich Object Model</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/11/20/multi-tenancy/">Multi-Tenancy with EJB 3.1 and JPA 2.0</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/09/18/fakes-stubs-dummy-mocks-doubles-and-all-that/">Fakes, Stubs, Dummy, Mocks, Doubles and all that...</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/06/10/Sessions-GC-Conversations/">About Sessions, Conversations, and the Garbage Collector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/05/24/moxy/">Object-XML Mapping with JAXB & MOXy</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/05/18/verification-validation-and-all-that/">Verification & Validation</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/">A JEE6 security interceptor for Tomcat 7</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/04/16/using-selenium-for-web-integration-testing/">Using Selenium for web integration testing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">Embedded Web Application integration testing using Tomcat 7 and JUnit</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/116636069211041664299?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Steve Hostettler -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hostettlerblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://hostettler.github.io/blog/2012/04/16/using-selenium-for-web-integration-testing/';
+        var disqus_url = 'http://hostettler.github.io/blog/2012/04/16/using-selenium-for-web-integration-testing/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,743 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>A JEE6 security interceptor for Tomcat 7 - Steve Hostettler</title>
+  <meta name="author" content="Steve Hostettler">
+
+  
+  <meta name="description" content="Security in Java EE is a well-known subject and JAAS, the framework that manages security, is
+stable and reliable. Nevertheless, its API is quite low &hellip;">
+  <meta name="keywords" content="SecurityJava EE 6JEE6JavaJAASInterceptorTomcat 7">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://hostettler.github.io/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7">
+  <link href="/github/favicon.png" rel="icon">
+  <link href="/github/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/github/javascripts/modernizr-2.0.js"></script>
+  <script src="/github/javascripts/ender.js"></script>
+  <script src="/github/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/github/atom.xml" rel="alternate" title="Steve Hostettler" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30751319-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/github/">Steve Hostettler</a></h1>
+  
+    <h2>JEE and test automation</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/github/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:hostettler.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/github/about-me/">About Me</a></li>
+  <li><a href="http://publicationslist.org/steve.hostettler">Publications</a></li>
+  <li><a href="/github/">Blog</a></li>
+  <li><a href="/github/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">A JEE6 Security Interceptor for Tomcat 7</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-02T18:23:00+02:00" pubdate data-updated="true">May 2<span>nd</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Security in Java EE is a well-known subject and JAAS, the framework that manages security, is
+stable and reliable. Nevertheless, its API is quite low level and not always very convenient. For
+that reason, there exist a number of frameworks that have been built on top of JAAS that provide
+nice abstractions and convenient tools. This is especially true for the JEE application servers such as <a href="http://glassfish.java.net/">Glassfish</a>, <a href="http://www.jboss.org/">JBoss</a> and the like.</p>
+
+<p>In servlet containers such as <a href="http://tomcat.apache.org/">Tomcat</a> or <a href="http://jetty.codehaus.org/jetty/">Jetty</a> however, only the web components are secured and it is not trivial to secure services and the data access layer. This can be solved by integrating framework such as <a href="http://static.springsource.org/spring-security/site/">Spring Security</a>, <a href="http://shiro.apache.org/">Apache Shiro</a>.</p>
+
+<p>As always it is not always possible to put a new framework or library in place. I will not
+discuss whether it is a good or a bad idea to develop a new security mechanism. Nevertheless, a good
+rule of thumb is to reuse existing components and not reinvent the wheel &#8230; when possible. If for
+let&#8217;s say licensing reasons, it is not possible: here is a way to provide a simple declarative
+authorisation procedure based on JAAS and the JEE6 interceptors. The objective is to propagate the
+authorisation to non-web layers such as services or data access layer through a thread-local
+variable.</p>
+
+<p>The goal is to be able to write something similar to the following snippet. The idea is to annotate
+a method (or a class) with a list of roles that are authorised. If the method executes in a context
+in which a user has not enough rights, it raises an exception.</p>
+
+<figure class='code'><figcaption><span>Example of a service layer protected by JEE6 interceptor</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Secure</span><span class="o">(</span><span class="n">roles</span> <span class="o">=</span> <span class="o">{</span> <span class="s">&quot;user&quot;</span> <span class="o">})</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Student</span><span class="o">&gt;</span> <span class="nf">getAll</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span><span class="err"></span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Secure</span><span class="o">(</span><span class="n">roles</span> <span class="o">=</span> <span class="o">{</span> <span class="s">&quot;admin&quot;</span> <span class="o">})</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">add</span><span class="o">(</span><span class="kd">final</span> <span class="n">Student</span> <span class="n">student</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Java Authentication and Authorisation System</h3>
+
+<p>Java Authentication and Authorisation System (JAAS) provides a security infrastructure for JAVA.
+Both <strong>authentication</strong> (are you who you pretend to be?) and <strong>authorisation</strong> (are you allowed to do something you would like to do?) are covered. JAAS relies on the concept of principal.
+A principal is a particular identity of a user (e.g. social security id, driver licence id, &#8230;).
+By default, in JAVA SE, there is no easy way to have the list of roles granted to a given user.
+To solve that problem, we need a bean that knows to which role a given Principal is authorised.
+This is the role of <code>MyPrincipal</code>.</p>
+
+<figure class='code'><figcaption><span>A custom principal that contains the roles</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyPrincipal</span> <span class="kd">implements</span> <span class="n">Principal</span><span class="o">,</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">MyPrincipal</span><span class="o">(</span><span class="kd">final</span> <span class="n">Principal</span> <span class="n">pPrincipal</span><span class="o">,</span> <span class="kd">final</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">pRoles</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">principal</span> <span class="o">=</span> <span class="n">pPrincipal</span><span class="o">;</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">roles</span> <span class="o">=</span> <span class="n">pRoles</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">isUserInRole</span><span class="o">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">pRole</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">roles</span><span class="o">.</span><span class="na">contains</span><span class="o">(</span><span class="n">pRole</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>JEE6 Interceptors</h3>
+
+<p>Since JEE6, a feature called interceptors enables simple
+<a href="http://en.wikipedia.org/wiki/Aspect-oriented_programming">Aspect Oriented Programming</a> without
+using any specific framework. It works, of course, only on managed classes. Namely, classes that are instantiated by <a href="http://docs.oracle.com/javaee/6/tutorial/doc/giwhb.html">CDI</a> through dependency injection.</p>
+
+<p>Just to fix the vocabulary, here some definition about Aspect Oriented Programming:</p>
+
+<ul>
+<li>Advice: code at it executed at a certain point in the code. This point is called a join point;</li>
+<li>Join point: place in the code at which a given advice is executed.;</li>
+<li>Pointcut: set of join point, usually described by a meta data that can be internal or external to the program (xml, annotations);</li>
+<li>Aspect: advice + its pointcut;</li>
+</ul>
+
+
+<p>In Java EE6, an interceptor is made of an annotation that characterizes an aspect and an
+implementation for that annotation. The annotation is placed at a join point, that is a place in the code where a specific advice must be executed. Usually around a method call. However, JEE6
+interceptors are not as powerful as advanced AOP frameworks such as AspectJ, it provides enough
+facility to decouple non-functional behaviors from the business code. That is exactly what we want
+to achieve here. Let us now illustrate JEE6 interceptors through the implementation of a declarative security annotation that protects calls to the service layer.</p>
+
+<h4>A meta data that asks for security</h4>
+
+<p>The first thing is to declare an annotation that is parametrized by an array of <code>String</code> that
+represents roles. This is presented in the following snippet. The annotation <code>InterceptorBinding</code>
+is required to mark the annotation as a pointcut. The <code>@Retention(RetentionPolicy.RUNTIME)</code>
+declares that Then <code>@Target({ ElementType.METHOD, ElementType.TYPE })</code> tells that the annotation
+can be applied at both method level and type level. Finally, the member <code>String[] roles();</code>
+declares that the annotation has a parameter called <code>roles</code>.</p>
+
+<figure class='code'><figcaption><span>Secure.java</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@InterceptorBinding</span>
+</span><span class='line'><span class="nd">@Retention</span><span class="o">(</span><span class="n">RetentionPolicy</span><span class="o">.</span><span class="na">RUNTIME</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@Target</span><span class="o">({</span> <span class="n">ElementType</span><span class="o">.</span><span class="na">METHOD</span><span class="o">,</span> <span class="n">ElementType</span><span class="o">.</span><span class="na">TYPE</span> <span class="o">})</span>
+</span><span class='line'><span class="kd">public</span> <span class="nd">@interface</span> <span class="n">Secure</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Nonbinding</span>
+</span><span class='line'>    <span class="n">String</span><span class="o">[]</span> <span class="nf">roles</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>The interceptor (advice) that check the authorisation</h4>
+
+<p>The next step is to program an advice. To that end, a
+simple class must be annotated by the annotation <code>@Interceptor</code> and by the annotation that it
+implements <code>@Secure(roles = { })</code> (i.e. the pointcut). The method that is annotated by
+<code>@AroundInvoke</code> is executed by the container when it encounters a method annotated by <code>@Secure</code>
+(i.e. join point). The name of the method (e.g. <code>invoke</code> ) does not matter as long as it returns an
+<code>Object</code> and it accepts an <code>InvocationContext</code> as a parameter. This context contains information
+about the intercepted method.</p>
+
+<p>About the method itself, <code>getRoles</code> is a private method (given hereafter) that extract the list
+of roles that are authorised to this method. The <code>SecurityContext</code> is described below and is
+container for the <code>ThreadLocal</code> variable that contains the principal of the current user. The
+method <code>principal.isUserInRoles(roles)</code> returns true if one the roles matches the expected
+authorisation. If it is not the case an exception is raised and the interceptor stops there without
+having executed the intercepted method. Otherwise, the interceptor goes on and executes the
+intercepted method and finally returns its return value by executing <code>return context.proceed()</code> .</p>
+
+<figure class='code'><figcaption><span>SecurityInterceptor.java CDI Interceptor</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Secure</span><span class="o">(</span><span class="n">roles</span> <span class="o">=</span> <span class="o">{</span> <span class="o">})</span>
+</span><span class='line'><span class="nd">@Interceptor</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityInterceptor</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span><span class="err"></span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@AroundInvoke</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">Object</span> <span class="nf">invoke</span><span class="o">(</span><span class="kd">final</span> <span class="n">InvocationContext</span> <span class="n">context</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">String</span><span class="o">[]</span> <span class="n">roles</span> <span class="o">=</span> <span class="n">getRoles</span><span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="na">getMethod</span><span class="o">());</span>
+</span><span class='line'>        <span class="n">MyPrincipal</span> <span class="n">principal</span> <span class="o">=</span> <span class="n">SecurityContext</span><span class="o">.</span><span class="na">getPrincipal</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(!</span><span class="n">principal</span><span class="o">.</span><span class="na">isUserInRoles</span><span class="o">(</span><span class="n">roles</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalAccessException</span><span class="o">(</span><span class="s">&quot;Current user not autorised!&quot;</span><span class="o">);</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="na">proceed</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span><span class="o">[]</span> <span class="nf">getRoles</span><span class="o">(</span><span class="kd">final</span> <span class="n">Method</span> <span class="n">method</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="o">...</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The private method getRoles scans the class of the method that has been intercepted in order to
+discover the list of roles. First it scans at method level (<code>method.isAnnotationPresent</code> ) to
+find the annotation <code>Secure.class</code> that has been described above. If it does not find the proper
+annotation then it scans at class level (<code>method.getDeclaringClass().isAnnotationPresent</code> ).
+Remember that we allow to put the annotation at the method level AND at the class level.</p>
+
+<figure class='code'><figcaption><span>Method that scans the caller for annotation parameters</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="n">String</span><span class="o">[]</span> <span class="nf">getRoles</span><span class="o">(</span><span class="kd">final</span> <span class="n">Method</span> <span class="n">method</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">method</span><span class="o">.</span><span class="na">isAnnotationPresent</span><span class="o">(</span><span class="n">Secure</span><span class="o">.</span><span class="na">class</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">method</span><span class="o">.</span><span class="na">getAnnotation</span><span class="o">(</span><span class="n">Secure</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">roles</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span><span class="err"></span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">method</span><span class="o">.</span><span class="na">getDeclaringClass</span><span class="o">().</span><span class="na">isAnnotationPresent</span><span class="o">(</span><span class="n">Secure</span><span class="o">.</span><span class="na">class</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">method</span><span class="o">.</span><span class="na">getDeclaringClass</span><span class="o">().</span><span class="na">getAnnotation</span><span class="o">(</span><span class="n">Secure</span><span class="o">.</span><span class="na">class</span><span class="o">).</span><span class="na">roles</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>The last step to activate the interceptor is to declare it in the <code>beans.xml</code> file. Remember that it works
+thanks to CDI and only for the beans managed by CDI. By default, interceptors are disabled.</p>
+
+<figure class='code'><figcaption><span>beans.xml CDI descriptor</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>    <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;interceptors&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;class&gt;</span>ch.demo.business.interceptors.SecurityInterceptor<span class="nt">&lt;/class&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/interceptors&gt;</span>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>How to populate the ThreadLocal variable with principal information</h4>
+
+<p>So far, we did intercept the method call and check whether the current principal associated with
+the thread is authorised to access to a the intercepted method. The problem is that in servlet
+containers the security is at web level and we would to propagate this information. To that end, we
+will use the concept of <a href="http://en.wikipedia.org/wiki/Thread-local_storage">thread local</a>
+variables.</p>
+
+<p>The following class contains a thread-local variable <code>principalHolder</code> that holds the current
+(thread-local) principal. This assumes that a thread is processed by one and only one thread from A
+to Z. This is the case for servlet engines but not always for application servers. In the latter
+case, the vendor-specific security mechanism is much better as it takes things such as clustering
+into account. The method <code>setPrincipal</code> is invoked at the beginning of a new request when it is
+authenticated and authorised at the web level. <code>removePrincipal</code> cleans up the Thread-Local value
+at the end of the request processing.</p>
+
+<figure class='code'><figcaption><span>SecurityContext.java Thread-local container for the principal</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">SecurityContext</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span><span class="err"></span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="n">InheritableThreadLocal</span><span class="o">&lt;</span><span class="n">MyPrincipal</span><span class="o">&gt;</span> <span class="n">principalHolder</span> <span class="o">=</span>
+</span><span class='line'>                <span class="k">new</span> <span class="n">InheritableThreadLocal</span><span class="o">&lt;</span><span class="n">MyPrincipal</span><span class="o">&gt;();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="nf">SecurityContext</span><span class="o">()</span> <span class="o">{</span> <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="n">MyPrincipal</span> <span class="nf">getPrincipal</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">principalHolder</span><span class="o">.</span><span class="na">get</span><span class="o">()</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">principalHolder</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="k">new</span> <span class="n">MyPrincipal</span><span class="o">(</span><span class="kc">null</span><span class="o">,</span> <span class="kc">null</span><span class="o">));</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="o">(</span><span class="n">MyPrincipal</span><span class="o">)</span> <span class="n">principalHolder</span><span class="o">.</span><span class="na">get</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">setPrincipal</span><span class="o">(</span><span class="kd">final</span> <span class="n">MyPrincipal</span> <span class="n">principal</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">principalHolder</span><span class="o">.</span><span class="na">set</span><span class="o">(</span><span class="n">principal</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">removePrincipal</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">principalHolder</span><span class="o">.</span><span class="na">remove</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The last step is to populate the principal and its associated roles to the thread-local container
+when the request is initialized. For that purpose, we use a request listener that is invoked when a new
+request has been submit and just before its destruction. On initialization, the method
+<code>getMyPrincipal</code> extracts the principal from the request <code>request.getUserPrincipal()</code>. The
+resulting principal is put in the thread-local by <code>SecurityContext.setPrincipal</code>.</p>
+
+<p><code>getMyPrincipal</code> also goes through the list of roles and adds the authorised roles using <code>request.isUserInRole</code> from <code>HttpServletRequest</code>.</p>
+
+<figure class='code'><figcaption><span>SecurityListener.java</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">SecurityListener</span> <span class="kd">implements</span> <span class="n">ServletRequestListener</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">roles</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">requestInitialized</span><span class="o">(</span><span class="kd">final</span> <span class="n">ServletRequestEvent</span> <span class="n">sre</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">SecurityContext</span><span class="o">.</span><span class="na">setPrincipal</span><span class="o">(</span><span class="n">getMyPrincipal</span><span class="o">((</span><span class="n">HttpServletRequest</span><span class="o">)</span> <span class="n">sre</span><span class="o">.</span><span class="na">getServletRequest</span><span class="o">()));</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">requestDestroyed</span><span class="o">(</span><span class="kd">final</span> <span class="n">ServletRequestEvent</span> <span class="n">sre</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">SecurityContext</span><span class="o">.</span><span class="na">removePrincipal</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="n">MyPrincipal</span> <span class="nf">getMyPrincipal</span><span class="o">(</span><span class="kd">final</span> <span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">roles</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">roles</span> <span class="o">=</span> <span class="n">getSecurityRoles</span><span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">getServletContext</span><span class="o">());</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">Principal</span> <span class="n">principal</span> <span class="o">=</span> <span class="o">(</span><span class="n">Principal</span><span class="o">)</span> <span class="n">request</span><span class="o">.</span><span class="na">getUserPrincipal</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">currentRoles</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
+</span><span class='line'>        <span class="k">for</span> <span class="o">(</span><span class="n">String</span> <span class="n">role</span> <span class="o">:</span> <span class="n">roles</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="k">if</span> <span class="o">(</span><span class="n">request</span><span class="o">.</span><span class="na">isUserInRole</span><span class="o">(</span><span class="n">role</span><span class="o">))</span> <span class="o">{</span>
+</span><span class='line'>                <span class="n">currentRoles</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">role</span><span class="o">);</span>
+</span><span class='line'>            <span class="o">}</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="k">new</span> <span class="nf">MyPrincipal</span><span class="o">(</span><span class="n">principal</span><span class="o">,</span> <span class="n">currentRoles</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">static</span> <span class="kd">synchronized</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="nf">getSecurityRoles</span><span class="o">(</span><span class="kd">final</span> <span class="n">ServletContext</span> <span class="n">ctx</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="o">...</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next method is not very elegant but this is the only way that have found to extract the role
+list that is required by the current web application. It parses the <code>web.xml</code>, looking for
+<code>role-name</code> elements that describe a role.</p>
+
+<figure class='code'><figcaption><span>Extract the role list from web.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kd">synchronized</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="nf">getSecurityRoles</span><span class="o">(</span><span class="kd">final</span> <span class="n">ServletContext</span> <span class="n">ctx</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">r</span> <span class="o">=</span> <span class="k">new</span> <span class="n">ArrayList</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;();</span>
+</span><span class='line'>    <span class="n">InputStream</span> <span class="n">is</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="s">&quot;/WEB-INF/web.xml&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">DocumentBuilderFactory</span> <span class="n">dbFactory</span> <span class="o">=</span> <span class="n">DocumentBuilderFactory</span><span class="o">.</span><span class="na">newInstance</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">dbFactory</span><span class="o">.</span><span class="na">setNamespaceAware</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">DocumentBuilder</span> <span class="n">dBuilder</span> <span class="o">=</span> <span class="n">dbFactory</span><span class="o">.</span><span class="na">newDocumentBuilder</span><span class="o">();</span>
+</span><span class='line'>        <span class="n">Document</span> <span class="n">doc</span> <span class="o">=</span> <span class="n">dBuilder</span><span class="o">.</span><span class="na">parse</span><span class="o">(</span><span class="n">is</span><span class="o">);</span>
+</span><span class='line'>        <span class="n">doc</span><span class="o">.</span><span class="na">getDocumentElement</span><span class="o">().</span><span class="na">normalize</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="n">NodeList</span> <span class="n">elements</span> <span class="o">=</span> <span class="n">doc</span><span class="o">.</span><span class="na">getElementsByTagName</span><span class="o">(</span><span class="s">&quot;role-name&quot;</span><span class="o">);</span>
+</span><span class='line'>        <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">elements</span><span class="o">.</span><span class="na">getLength</span><span class="o">();</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">r</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="n">elements</span><span class="o">.</span><span class="na">item</span><span class="o">(</span><span class="n">i</span><span class="o">).</span><span class="na">getTextContent</span><span class="o">().</span><span class="na">trim</span><span class="o">());</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">Exception</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">new</span> <span class="nf">IllegalAccessException</span><span class="o">(</span><span class="n">e</span><span class="o">.</span><span class="na">getMessage</span><span class="o">());</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">r</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Finally, the listener is enabled by putting the following lines in <code>web.xml</code>.</p>
+
+<figure class='code'><figcaption><span>web.xml</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;listener&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;listener-class&gt;</span>ch.demo.web.SecurityListener<span class="nt">&lt;/listener-class&gt;</span>
+</span><span class='line'><span class="nt">&lt;/listener&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Whenever there is not redirect (that triggers a new request) after login or there is a manual call to JAAS, the
+principal must be manually set into thread-local right after the login. This is because if the
+security is checked right after authentication and the listener has already been called (at the beginning of the
+request) it has been set to an invalid principal.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">request</span><span class="o">.</span><span class="na">login</span><span class="o">(</span><span class="n">user</span><span class="o">,</span> <span class="n">password</span><span class="o">);</span>
+</span><span class='line'><span class="n">SecurityContext</span><span class="o">.</span><span class="na">setPrincipal</span><span class="o">(</span><span class="n">SecurityListener</span><span class="o">.</span><span class="na">getMyPrincipal</span><span class="o">(</span><span class="n">request</span><span class="o">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>In this post, we have seen how to write a JEE6 interceptor to authorise access to service level methods in servlet containers. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Steve Hostettler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-02T18:23:00+02:00" pubdate data-updated="true">May 2<span>nd</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/github/blog/categories/interceptor/'>Interceptor</a>, <a class='category' href='/github/blog/categories/jaas/'>JAAS</a>, <a class='category' href='/github/blog/categories/jee6/'>JEE6</a>, <a class='category' href='/github/blog/categories/java/'>Java</a>, <a class='category' href='/github/blog/categories/java-ee-6/'>Java EE 6</a>, <a class='category' href='/github/blog/categories/security/'>Security</a>, <a class='category' href='/github/blog/categories/tomcat-7/'>Tomcat 7</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/github/blog/2012/04/16/using-selenium-for-web-integration-testing/" title="Previous Post: Using Selenium for web integration testing">&laquo; Using Selenium for web integration testing</a>
+      
+      
+        <a class="basic-alignment right" href="/github/blog/2012/05/18/verification-validation-and-all-that/" title="Next Post: Verification & Validation">Verification & Validation &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/github/blog/2012/12/31/jee6-tutorial/">JEE6 Tutorial</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/12/05/servicelocator/">Context Dependency Injection and the Rich Object Model</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/11/20/multi-tenancy/">Multi-Tenancy with EJB 3.1 and JPA 2.0</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/09/18/fakes-stubs-dummy-mocks-doubles-and-all-that/">Fakes, Stubs, Dummy, Mocks, Doubles and all that...</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/06/10/Sessions-GC-Conversations/">About Sessions, Conversations, and the Garbage Collector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/05/24/moxy/">Object-XML Mapping with JAXB & MOXy</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/05/18/verification-validation-and-all-that/">Verification & Validation</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/">A JEE6 security interceptor for Tomcat 7</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/04/16/using-selenium-for-web-integration-testing/">Using Selenium for web integration testing</a>
+      </li>
+    
+      <li class="post">
+        <a href="/github/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">Embedded Web Application integration testing using Tomcat 7 and JUnit</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/116636069211041664299?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Steve Hostettler -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hostettlerblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://hostettler.github.io/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/';
+        var disqus_url = 'http://hostettler.github.io/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
