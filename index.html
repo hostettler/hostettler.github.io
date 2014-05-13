@@ -2047,392 +2047,6 @@ a significant overhead.</p>
       
   <header>
     
-      <h1 class="entry-title"><a href="/blog/2012/09/18/fakes-stubs-dummy-mocks-doubles-and-all-that/">Fakes, Stubs, Dummy, Mocks, Doubles and All That&#8230;</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-09-18T10:58:00+02:00" pubdate data-updated="true">Sep 18<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/09/18/fakes-stubs-dummy-mocks-doubles-and-all-that/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>In this post, I  look at the at the different kind of objects used for test purposes. By this, I mean objects that are used to make a test running. This article focuses on component testing, a.k.a. unit testing (I do not like the term unit testing because it is too often misunderstood with the technology behind, e.g., JUnit, testNG).
-Although there already exists a great number of resources on that subjects, it was very difficult to me to understand the differences between the different kind of test objects. This is partly due to the fact that different authors use different terms for the same object and the same term for different objects.
-This post is in no way an exhaustive state of the art, I only tried to select the terms that, in my opinion, are clear and are consensual enough. To that end I used a number of sources that can be found in the bibliography section.</p>
-
-<p>Here are the main reasons to use different objects during tests than in production:</p>
-
-<ul>
-<li><p>Performances: the actual object contains slow algorithms and heavy calculation that may impair the test performances. A test should always be fast to not discourage regular run and therefore to identify problems as soon as possible.</p></li>
-<li><p>States: sometimes the constellation under test happens rarely. This is for instance of low probability event such as race conditions, network failure, etc..</p></li>
-<li><p>Non-deterministic: this is the case of components that have interactions with the real-world such as sensors.</p></li>
-<li><p>The actual object does not exist: for instance, another team is working on it and is not yet ready.</p></li>
-<li><p>To instrument the actual dependency: for instance to spy the calls of the CUT to one of its dependencies.</p></li>
-</ul>
-
-
-<h2>Doubles objects</h2>
-
-<p>Test double is the generic term that groups all the categories of objects that are used to fulfill one or several of the previous requirements.
-The term comes has been coined by&#8230;.. in &#8230;.
-In rough terms, test doubles look like the actual object they double. They satisfy, to different extends the original interface and propose a sub-set of the behaviors that is expected by the specification. This helps to isolate the problem and reduce the double implementation to the strict minimum.</p>
-
-<p>There exists different kind of test doubles. Objects such as dummy, stubs, spies, fakes, and mocks are all objects that replace objects that would normally be used in the actual application.</p>
-
-<p>The next figure describes a simple test setup that do not use test doubles. To test the Component Under Test (CUT), the following test setup uses its actual dependencies (another component). This setup phase is trivial as there nothing to do. The exercise phase calls the CUT with the proper parameters (direct inputs) which in turn calls it dependency (indirect outputs). Another Component returns its result to the CUT (indirect inputs) that uses it to complete the work and then finally returns the overall result (direct outputs).</p>
-
-<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestSetup.png' width='' height='' alt='Overview of a test setup' title='Overview of a test setup'><span class='caption-text'>Overview of a test setup</span></span></p>
-
-<p>Now let us say that &#8220;AnotherComponent&#8221; is either to complex, not already implemented or has a non-deterministic behavior. In those cases, it is easier to use another implementation of another component that behaves exactly has expected for a specific scenario.</p>
-
-<p>Hereafter, an simple example to illustrate the rest of the post. The component under test is implemented by the class <code>CUTImpl</code> that realizes the contract <code>CUT</code>. The CUT uses a component that realizes the interface <code>AnotherComponent</code>.
-For the sake of clarity, the following example injects the dependencies through the constructor.
-To improve loose coupling, it is possible to rely on dependency injection.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CUTImpl</span> <span class="kd">implements</span> <span class="n">CUT</span> <span class="o">{</span>
-</span><span class='line'>  
-</span><span class='line'>  <span class="n">AnotherComponent</span> <span class="n">component</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="nf">CUTImpl</span><span class="o">(</span><span class="n">AnotherComponent</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">component</span> <span class="o">=</span> <span class="n">c</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>  <span class="nd">@Override</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">doBusiness</span><span class="o">(</span><span class="n">String</span> <span class="n">param</span><span class="o">,</span> <span class="n">Integer</span> <span class="n">delta</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>      <span class="k">return</span> <span class="n">component</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">param</span><span class="o">)).</span><span class="na">toString</span><span class="o">();</span>
-</span><span class='line'>  <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">CUT</span> <span class="o">{</span>
-</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">doBusiness</span><span class="o">(</span><span class="n">String</span> <span class="n">string</span><span class="o">,</span> <span class="n">Integer</span> <span class="n">delta</span><span class="o">);</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">AnotherComponent</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">Integer</span> <span class="nf">inc</span><span class="o">(</span><span class="n">Integer</span> <span class="n">param</span><span class="o">);</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AnotherComponentImpl</span> <span class="kd">implements</span> <span class="n">AnotherComponent</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="n">Integer</span> <span class="nf">inc</span><span class="o">(</span><span class="n">Integer</span> <span class="n">param</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">param</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">&quot;Param must be not null!&quot;</span><span class="o">);</span>
-</span><span class='line'>        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">param</span> <span class="o">==</span> <span class="n">Integer</span><span class="o">.</span><span class="na">MAX_INTEGER</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="s">&quot;Incrementing MAX_INTEGER will result in overflow!&quot;</span><span class="o">);</span>
-</span><span class='line'>        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
-</span><span class='line'>            <span class="k">return</span> <span class="n">param</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The following test uses real implementations of the the different components.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CUTTest</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testInc</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">&quot;inc(3) != 4&quot;</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="k">new</span> <span class="n">CUTImpl</span><span class="o">(</span><span class="k">new</span> <span class="n">AnotherComponentImpl</span><span class="o">()).</span><span class="na">inc</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The question is what if:
-1) <code>AnotherComponentImpl</code> is not ready yet
-2) <code>AnotherComponentImpl</code> depends itself on external services or specific hardware resources
-3) <code>AnotherComponentImpl</code> has non-deterministic behaviors</p>
-
-<h2>Dummy objects</h2>
-
-<p>Dummy objects are meant to satisfy compile-time check and runtime execution. Dummies do not take part to the test scenario.
-Some method signatures of the CUT may require objects as parameters. If neither the test nor the CUT care about these objects, we may choose to pass in a Dummy Object. This can be a null reference, an empty object or a constant. Dummy objects are passed around (to dependencies for instance) but never actually used. Usually they are just used to fill parameter lists. They are meant to replace input/output parameters not components the CUT interacts with.</p>
-
-<p>In the current example, the parameter <code>delta</code> of the <code>doBusiness</code> method can be set to <code>null</code> or any <code>Integer</code> value without inteferring with the test. Of course, this might be different for another test.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CUTTest</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testInc</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">&quot;inc(3) != 4&quot;</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="k">new</span> <span class="n">CUTImpl</span><span class="o">(</span><span class="k">new</span> <span class="n">AnotherComponentImpl</span><span class="o">()).</span><span class="na">inc</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="kc">null</span><span class="o">));</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Stub objects</h2>
-
-<p>Stub objects provide simple answers to the CUT invocations. It does answers to scenarii that are not foreseen by the current test. In other terms it is a simplified fake object. Stub objects may trigger paths in the CUT that would otherwise not been executed.</p>
-
-<p>The next figure presents a test that relies on a test stub. First, the test case setups a stub object that responds to the expected CUT invokation in order to enact a given scenario. This is very useful to check indirect inputs with seldom values.</p>
-
-<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestStub.png' width='' height='' alt='Test setup that uses a test stub' title='Test setup that uses a test stub'><span class='caption-text'>Test setup that uses a test stub</span></span></p>
-
-<p>Back to the example, the following program illustrates how to use a stub to check specific indirect inputs.
-This stub shows that the CUT relies on the fact that <code>AnotherComponent</code> does not return <code>null</code> as it
-would otherwise raise a <code>NullPointerException</code>.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AnotherComponentStub</span> <span class="kd">implements</span> <span class="n">AnotherComponent</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="n">Integer</span> <span class="nf">inc</span><span class="o">(</span><span class="n">Integer</span> <span class="n">param</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CUTTest</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testIncWhenAnotherComponentReturnsNull</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="c1">//Without any modification of the CUT implement, this would raise an exception</span>
-</span><span class='line'>        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">&quot;inc(3) != 4&quot;</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="k">new</span> <span class="n">CUTImpl</span><span class="o">(</span><span class="k">new</span> <span class="n">AnotherComponentStub</span><span class="o">()).</span><span class="na">inc</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Fake objects</h2>
-
-<p>Fake objects actually have working implementations, but  they may simplify some interactions which makes them not suitable for prime time. The idea is that the object actually displays some real behavior, yet it is not the real thing. While a Fake Object is typically built specifically for testing, it is not used as either a control point or a observation point by the test. The most common reasons for using fake objects is that the real component is not available yet, is too slow or cannot be used during tests because of side effects.</p>
-
-<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestFake.png' width='' height='' alt='Test setup that uses a fake' title='Test setup that uses a fake'><span class='caption-text'>Test setup that uses a fake</span></span></p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">AnotherComponentFake</span> <span class="kd">implements</span> <span class="n">AnotherComponent</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="n">Integer</span> <span class="nf">inc</span><span class="o">(</span><span class="n">Integer</span> <span class="n">param</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">param</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">CUTTest</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testIncWhenAnotherComponentReturnsNull</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">CUT</span> <span class="n">cut</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CUTImpl</span><span class="o">(</span><span class="k">new</span> <span class="n">AnotherComponentFake</span><span class="o">());</span>
-</span><span class='line'>        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">&quot;inc(Integer.MIN_INTEGER) != Integer.MIN_INTEGER + 1&quot;</span><span class="o">,</span>
-</span><span class='line'>                <span class="n">Integer</span><span class="o">.</span><span class="na">MIN_INTEGER</span> <span class="o">+</span> <span class="mi">1</span><span class="o">,</span> <span class="n">cut</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">MIN_INTEGER</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
-</span><span class='line'>        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">&quot;inc(3) != 4&quot;</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="n">cut</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
-</span><span class='line'>        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">&quot;inc(123) != 124&quot;</span><span class="o">,</span> <span class="mi">124</span><span class="o">,</span> <span class="n">cut</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="mi">123</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h1>Mock objects</h1>
-
-<p>Implements the interface and provides a way to verify that the calls to the mock objects where inline with the specification.
-In other words, the developer can set expectations for the mock.
-Mock objects are pre-programmed with expectations which form a specification of the calls they are expected to receive.
-In fact mocks are a certain kind of stub or fake. However, the additional feature mock objects offer on top of acting as simple stubs or fakes is that they provide a flexible way to specify more directly how your function under test should actually operate. In this sense they also act as a kind of recording device: They keep track of which of the mock object&#8217;s methods are called, with what kind of parameters, and how many times.
-A fake object that you assert against (ideally, one per test).
-We can use a Mock Object as an observation point that is used to verify the indirect outputs of the SUT as it is exercised. Typically, the Mock Object also includes the functionality of a Test Stub in that it must return values to the SUT if it hasn&#8217;t already failed the tests but the emphasis(My mother grew up in Hungary and has retained a part of her Hungarian accent &#8211; think Zsa Zsa Gabor &#8211; all her life. She says &#8220;It is important to put the emphasis on the right sylable.&#8221;) is on the verification of the indirect outputs. Therefore, a Mock Object is lot more than just a Test Stub plus assertions; it is used a fundamentally different way.</p>
-
-<p>If the assertion is against the fake object not the SUT, then this fake object is a mock.</p>
-
-<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestMock.png' width='' height='' alt='Test setup that uses a mock' title='Test setup that uses a mock'><span class='caption-text'>Test setup that uses a mock</span></span></p>
-
-<p>The following example uses Mockito to provide easy Mocking.</p>
-
-<p>&#8220;` java
-package ch.demo.business.service;</p>
-
-<p>public class CUTTest {</p>
-
-<pre><code>@Mock
-AnotherComponent ac;
-
-@InjectMocks
-CUT cut = new CUTImpl();
-
-public void testIncWhenAnotherComponentReturnsNull() {
-    Mockito.when(ac.inc(Integer.MIN_INTEGER)).thenReturn(Integer.MIN_INTEGER + 1);
-    Mockito.when(ac.inc(3)).thenReturn(3);
-    Mockito.when(ac.inc(123)).thenReturn(124);
-
-    Assert.assertEquals("inc(Integer.MIN_INTEGER) != Integer.MIN_INTEGER + 1", 
-            Integer.MIN_INTEGER + 1, cut.inc(Integer.MIN_INTEGER, 1));
-    Assert.assertEquals("inc(3) != 4", 4, cut.inc(3, 1));
-    Assert.assertEquals("inc(123) != 124", 124, cut.inc(123, 1));
-}
-</code></pre>
-
-<p>}</p>
-
-<h2>Test Spy</h2>
-
-<p>We can use a more capable version of a Test Stub, the Test Spy (page X), as an observation point for the indirect outputs of the SUT. Like a Test Stub, the Test Spy may need to provide values to the SUT in response to method calls but the Test Spy also captures the indirect outputs of the SUT as it is exercised and saves them for later verification by the test. So in many ways the Test Spy is &#8220;just a&#8221; Test Stub with some recording capability. While it is used for the same fundamental purpose as a Mock Object (page X), the style of test we write using a Test Spy looks much more like a test written with a Test Stub.</p>
-
-<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestSpy.png' width='' height='' alt='Test setup that uses a test spy' title='Test setup that uses a test spy'><span class='caption-text'>Test setup that uses a test spy</span></span></p>
-
-<h2>Bibliography</h2>
-
-<p>Mock aren&#8217;t stubs
-http://martinfowler.com/articles/mocksArentStubs.html</p>
-</div>
-  
-  
-
-
-    </article>
-  
-  
-    <article>
-      
-  <header>
-    
       <h1 class="entry-title"><a href="/blog/2012/06/10/Sessions-GC-Conversations/">About Sessions, Conversations, and the Garbage Collector</a></h1>
     
     
@@ -4347,6 +3961,203 @@ The examples used in this blog are to be found in the <a href="http://code.googl
 
     </article>
   
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">Programmatically Build Web Archives Using ShrinkWrap</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-05T09:09:00+02:00" pubdate data-updated="true">Apr 5<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>While doing integration tests on web applications, it is important to restrict the application to the strict minimum necessary for any given test. It helps to improve the startup time as well as to reduce unexpected interactions.
+To that end, I use <a href="http://www.jboss.org/shrinkwrap">ShrinkWrap</a> from <a href="http://www.jboss.org/">JBoss</a> that is a very nice a simple API to build Java archives (e.g., JAR WAR, EAR). This post describes how to programmatically build a WAR file that can be deployed on an embedded server for integration
+testing. For more details on how to use this web archive in JUnit fixtures please refer to this <a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">article</a>. The following snippet gets the ShrinkWrap package from the JBoss repository. As I only use it for test purposes, I restricted its use to the test scope.</p>
+
+<p><strong>ShrinkWrap</strong> is available as a Maven dependency:</p>
+
+<figure class='code'><figcaption><span>Maven dependencies for the ShrinkWrap project</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;repositories&gt;</span>
+</span><span class='line'>...
+</span><span class='line'>  <span class="nt">&lt;repository&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;id&gt;</span>repository.jboss.org<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;name&gt;</span>JBoss Repository<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;url&gt;</span>http://repository.jboss.org/nexus/content/groups/public-jboss/<span class="nt">&lt;/url&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/repository&gt;</span>
+</span><span class='line'>  ...
+</span><span class='line'><span class="nt">&lt;/repositories&gt;</span>
+</span><span class='line'>...
+</span><span class='line'><span class="nt">&lt;dependencies&gt;</span>
+</span><span class='line'>  ...
+</span><span class='line'>  <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;groupId&gt;</span>org.jboss.shrinkwrap<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;artifactId&gt;</span>shrinkwrap-api<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;version&gt;</span>1.0.0-alpha-12<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;groupId&gt;</span>org.jboss.shrinkwrap<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;artifactId&gt;</span>shrinkwrap-impl<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;version&gt;</span>1.0.0-alpha-12<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'>...
+</span><span class='line'><span class="nt">&lt;dependencies&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Building the archive</h2>
+
+<p>The first step is to crate a web archive a.k.a. a WAR file. As we want to produce a WAR file, we use the <code>WebArchive.class</code> parameter
+to the <code>ShrinkWrap.create</code> method. It is also possible to produce JAR (<code>JavaArchive.class</code>) and EAR (<code>EnterpriseArchive.class</code>).</p>
+
+<figure class='code'><figcaption><span>Creation of a Web Archive</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">WebArchive</span> <span class="n">archive</span> <span class="o">=</span> <span class="n">ShrinkWrap</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">WebArchive</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;test.war&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next step to build a WAR is to provide the <code>web.xml</code> for you project. Again this can a be a simplified version of the web descriptor to improve startup time or limit dependencies. In the following example, the files are taken from a maven directory structure.</p>
+
+<figure class='code'><figcaption><span>Add a web descriptor to the archive</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">WEBAPP_SRC</span> <span class="o">=</span> <span class="s">&quot;src/main/webapp&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">setWebXML</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;WEB-INF/web.xml&quot;</span><span class="o">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that we have a web descriptor, let&#8217;s add some classes that are required to run the application. To not having to add each single class individually, it is possible to a complete package to the archive.</p>
+
+<figure class='code'><figcaption><span>add a package to the runtime classes</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">addPackage</span><span class="o">(</span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Package</span><span class="o">.</span><span class="na">getPackage</span><span class="o">(</span><span class="s">&quot;ch.demo.web&quot;</span><span class="o">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It is also possible to add individual classes:</p>
+
+<figure class='code'><figcaption><span>add a class to the runtime classes</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">addClasses</span><span class="o">(</span><span class="n">Student</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">Address</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>For JSF applications, we add add the <code>faces-config.xml</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;WEB-INF/faces-config.xml&quot;</span><span class="o">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And similarly, let&#8217;s add the CDI descriptor into <code>WEB-INF</code>. As we do not need to create a specific <code>`beans.xml</code>,
+we add an empty descriptor:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="n">EmptyAsset</span><span class="o">.</span><span class="na">INSTANCE</span><span class="o">,</span> <span class="s">&quot;beans.xml&quot;</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&#8217;s finally add standard web resources such as <code>xhtml</code> files or static files:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;login.xhtml&quot;</span><span class="o">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As ShrinkWrap uses <a href="http://en.wikipedia.org/wiki/Method_chaining">Method Chaining</a>, it is possible to chain <code>add</code> class to fill the archive.</p>
+
+<figure class='code'><figcaption><span>Build a simple web application     </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">setWebXML</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;WEB-INF/web.xml&quot;</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="n">EmptyAsset</span><span class="o">.</span><span class="na">INSTANCE</span><span class="o">,</span> <span class="s">&quot;beans.xml&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;WEB-INF/faces-config.xml&quot;</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">addPackage</span><span class="o">(</span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Package</span><span class="o">.</span><span class="na">getPackage</span><span class="o">(</span><span class="s">&quot;ch.demo.web&quot;</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;login.xhtml&quot;</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;index.jsp&quot;</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;xhtml/listStudents.xhtml&quot;</span><span class="o">),</span> <span class="s">&quot;xhtml/listStudents.xhtml&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Please note that when using maven to execute the tests, most of the required libraries are already on the classpath. Therefore, we often do not need to add any library or jars to the web archive.</p>
+
+<h2>Using the archive</h2>
+
+<p>After having built the package, we need to export it either as a war or as an exploded directory.
+The following snippet produces a WAR file named after the archive. The second parameter states whether
+a existing archive can be overwritten.</p>
+
+<figure class='code'><figcaption><span>Produce the actual war </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">new</span> <span class="nf">ZipExporterImpl</span><span class="o">(</span><span class="n">archive</span><span class="o">).</span><span class="na">exportTo</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">archive</span><span class="o">.</span><span class="na">getName</span><span class="o">()),</span> <span class="kc">true</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Alternatively it is possible to produce an exploded archive:</p>
+
+<figure class='code'><figcaption><span>Produce an exploded archive</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">new</span> <span class="nf">ExplodedExporterImpl</span><span class="o">(</span><span class="n">archive</span><span class="o">).</span><span class="na">exportExploded</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">archive</span><span class="o">.</span><span class="na">getName</span><span class="o">()));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>We have seen how to use ShrinkWrap to programmatically build Web archives. This is especially useful to test smaller version of your web application during integration testing. It helps to test webapps with mock services and to improve the startup time. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -4374,10 +4185,6 @@ The examples used in this blog are to be found in the <a href="http://code.googl
       </li>
     
       <li class="post">
-        <a href="/blog/2012/09/18/fakes-stubs-dummy-mocks-doubles-and-all-that/">Fakes, Stubs, Dummy, Mocks, Doubles and all that&#8230;</a>
-      </li>
-    
-      <li class="post">
         <a href="/blog/2012/06/10/Sessions-GC-Conversations/">About Sessions, Conversations, and the Garbage Collector</a>
       </li>
     
@@ -4399,6 +4206,10 @@ The examples used in this blog are to be found in the <a href="http://code.googl
     
       <li class="post">
         <a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">Embedded Web Application integration testing using Tomcat 7 and JUnit</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">Programmatically build web archives using ShrinkWrap</a>
       </li>
     
   </ul>
