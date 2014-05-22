@@ -301,7 +301,7 @@ Some method signatures of the CUT may require objects as parameters. If neither 
 
 <p>The next figure presents a test that relies on a test stub. First, the test case setups a stub object. This object responds to the expected CUT invokation in order to enact a given scenario. This is very useful to check indirect inputs with seldom values.</p>
 
-<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestStub.png' width='' height='' alt='Test setup that uses a test stub' title='Test setup that uses a test stub'><span class='caption-text'>Test setup that uses a test stub</span></span></p>
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestSTUB.png' width='' height='' alt='Test setup that uses a test stub' title='Test setup that uses a test stub'><span class='caption-text'>Test setup that uses a test stub</span></span></p>
 
 <p>Back to the example, the following program illustrates how to use a stub to check specific indirect inputs.
 This stub shows that the CUT relies on the fact that <code>AnotherComponent</code> does not return <code>null</code> as it
@@ -357,7 +357,7 @@ would otherwise raise a <code>NullPointerException</code>.</p>
 
 <p>Fake objects have working implementations, but  they may simplify some behaviors. This makes them not suitable for prime time. The idea is that the object actually displays some real behavior but not everything. While a Fake Object is typically built specifically for testing, it is not used as either a control point or a observation point by the test. The most common reasons for using fake objects is that the real component is not available yet, is too slow or cannot be used during tests because of side effects.</p>
 
-<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestFake.png' width='' height='' alt='Test setup that uses a fake' title='Test setup that uses a fake'><span class='caption-text'>Test setup that uses a fake</span></span></p>
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestFAKE.png' width='' height='' alt='Test setup that uses a fake' title='Test setup that uses a fake'><span class='caption-text'>Test setup that uses a fake</span></span></p>
 
 <p>The following fake simulates most of the behaviors except for the limits (MAX_INTEGER, null, etc&#8230;)</p>
 
@@ -416,7 +416,7 @@ A fake object that you assert against (ideally, one per test).</p>
 
 <p>Whenever the assertions are made on the fake object and not the CUT, then it is a mock.</p>
 
-<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestMock.png' width='' height='' alt='Test setup that uses a mock' title='Test setup that uses a mock'><span class='caption-text'>Test setup that uses a mock</span></span></p>
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestMOCK.png' width='' height='' alt='Test setup that uses a mock' title='Test setup that uses a mock'><span class='caption-text'>Test setup that uses a mock</span></span></p>
 
 <p>The following example uses <a href="https://code.google.com/p/mockito/">Mockito</a> to provide easy Mocking. Note that the last assertion <code>Mockito.verify</code> checks whether the mock was called with a given parameters. In other words, we check that the CUT did not filter the input parameter.</p>
 
@@ -479,7 +479,7 @@ A fake object that you assert against (ideally, one per test).</p>
 
 <p>According to Meszaros [2], a test spy is basically a recorder that is able to save the interactions between the CUT and the spy for later verifications.</p>
 
-<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestSpy.png' width='' height='' alt='Test setup that uses a test spy' title='Test setup that uses a test spy'><span class='caption-text'>Test setup that uses a test spy</span></span></p>
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/TestSPY.png' width='' height='' alt='Test setup that uses a test spy' title='Test setup that uses a test spy'><span class='caption-text'>Test setup that uses a test spy</span></span></p>
 
 <p>On the other hand, <a href="https://code.google.com/p/mockito/">Mockito</a> considers that a spy is an real implementation in which you change only some specific behaviors. Instead of specifying every behavior one by one, you take an existing object that does most of it and you only change very specific behaviors.</p>
 
