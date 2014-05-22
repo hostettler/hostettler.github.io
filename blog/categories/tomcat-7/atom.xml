@@ -1,0 +1,739 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Tomcat 7 | Steve Hostettler]]></title>
+  <link href="http://hostettler.github.io/blog/categories/tomcat-7/atom.xml" rel="self"/>
+  <link href="http://hostettler.github.io/"/>
+  <updated>2014-05-22T21:36:07+02:00</updated>
+  <id>http://hostettler.github.io/</id>
+  <author>
+    <name><![CDATA[Steve Hostettler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[A JEE6 security interceptor for Tomcat 7]]></title>
+    <link href="http://hostettler.github.io/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/"/>
+    <updated>2012-05-02T18:23:00+02:00</updated>
+    <id>http://hostettler.github.io/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7</id>
+    <content type="html"><![CDATA[<p>Security in Java EE is a well-known subject and JAAS, the framework that manages security, is
+stable and reliable. Nevertheless, its API is quite low level and not always very convenient. For
+that reason, there exist a number of frameworks that have been built on top of JAAS that provide
+nice abstractions and convenient tools. This is especially true for the JEE application servers such as <a href="http://glassfish.java.net/">Glassfish</a>, <a href="http://www.jboss.org/">JBoss</a> and the like.</p>
+
+<p>In servlet containers such as <a href="http://tomcat.apache.org/">Tomcat</a> or <a href="http://jetty.codehaus.org/jetty/">Jetty</a> however, only the web components are secured and it is not trivial to secure services and the data access layer. This can be solved by integrating framework such as <a href="http://static.springsource.org/spring-security/site/">Spring Security</a>, <a href="http://shiro.apache.org/">Apache Shiro</a>.</p>
+
+<p>As always it is not always possible to put a new framework or library in place. I will not
+discuss whether it is a good or a bad idea to develop a new security mechanism. Nevertheless, a good
+rule of thumb is to reuse existing components and not reinvent the wheel ... when possible. If for
+let's say licensing reasons, it is not possible: here is a way to provide a simple declarative
+authorisation procedure based on JAAS and the JEE6 interceptors. The objective is to propagate the
+authorisation to non-web layers such as services or data access layer through a thread-local
+variable.</p>
+
+<p>The goal is to be able to write something similar to the following snippet. The idea is to annotate
+a method (or a class) with a list of roles that are authorised. If the method executes in a context
+in which a user has not enough rights, it raises an exception.</p>
+
+<p>```java Example of a service layer protected by JEE6 interceptor
+@Secure(roles = { "user" })
+public List<Student> getAll() {</p>
+
+<pre><code>...
+</code></pre>
+
+<p>}</p>
+
+<p>@Secure(roles = { "admin" })
+public void add(final Student student) {</p>
+
+<pre><code>...
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>Java Authentication and Authorisation System</h3>
+
+<p>Java Authentication and Authorisation System (JAAS) provides a security infrastructure for JAVA.
+Both <strong>authentication</strong> (are you who you pretend to be?) and <strong>authorisation</strong> (are you allowed to do something you would like to do?) are covered. JAAS relies on the concept of principal.
+A principal is a particular identity of a user (e.g. social security id, driver licence id, ...).
+By default, in JAVA SE, there is no easy way to have the list of roles granted to a given user.
+To solve that problem, we need a bean that knows to which role a given Principal is authorised.
+This is the role of <code>MyPrincipal</code>.</p>
+
+<p>```java A custom principal that contains the roles
+public class MyPrincipal implements Principal, Serializable {</p>
+
+<pre><code>public MyPrincipal(final Principal pPrincipal, final List&lt;String&gt; pRoles) {
+    this.principal = pPrincipal;
+    this.roles = pRoles;
+}
+...  
+public boolean isUserInRole(final String pRole) {
+    return roles.contains(pRole);
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>JEE6 Interceptors</h3>
+
+<p>Since JEE6, a feature called interceptors enables simple
+<a href="http://en.wikipedia.org/wiki/Aspect-oriented_programming">Aspect Oriented Programming</a> without
+using any specific framework. It works, of course, only on managed classes. Namely, classes that are instantiated by <a href="http://docs.oracle.com/javaee/6/tutorial/doc/giwhb.html">CDI</a> through dependency injection.</p>
+
+<p>Just to fix the vocabulary, here some definition about Aspect Oriented Programming:</p>
+
+<ul>
+<li>Advice: code at it executed at a certain point in the code. This point is called a join point;</li>
+<li>Join point: place in the code at which a given advice is executed.;</li>
+<li>Pointcut: set of join point, usually described by a meta data that can be internal or external to the program (xml, annotations);</li>
+<li>Aspect: advice + its pointcut;</li>
+</ul>
+
+
+<p>In Java EE6, an interceptor is made of an annotation that characterizes an aspect and an
+implementation for that annotation. The annotation is placed at a join point, that is a place in the code where a specific advice must be executed. Usually around a method call. However, JEE6
+interceptors are not as powerful as advanced AOP frameworks such as AspectJ, it provides enough
+facility to decouple non-functional behaviors from the business code. That is exactly what we want
+to achieve here. Let us now illustrate JEE6 interceptors through the implementation of a declarative security annotation that protects calls to the service layer.</p>
+
+<h4>A meta data that asks for security</h4>
+
+<p>The first thing is to declare an annotation that is parametrized by an array of <code>String</code> that
+represents roles. This is presented in the following snippet. The annotation <code>InterceptorBinding</code>
+is required to mark the annotation as a pointcut. The <code>@Retention(RetentionPolicy.RUNTIME)</code>
+declares that Then <code>@Target({ ElementType.METHOD, ElementType.TYPE })</code> tells that the annotation
+can be applied at both method level and type level. Finally, the member <code>String[] roles();</code>
+declares that the annotation has a parameter called <code>roles</code>.</p>
+
+<p>```java Secure.java
+@InterceptorBinding
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD, ElementType.TYPE })
+public @interface Secure {</p>
+
+<pre><code>@Nonbinding
+String[] roles();
+</code></pre>
+
+<p>}
+```</p>
+
+<h4>The interceptor (advice) that check the authorisation</h4>
+
+<p>The next step is to program an advice. To that end, a
+simple class must be annotated by the annotation <code>@Interceptor</code> and by the annotation that it
+implements <code>@Secure(roles = { })</code> (i.e. the pointcut). The method that is annotated by
+<code>@AroundInvoke</code> is executed by the container when it encounters a method annotated by <code>@Secure</code>
+(i.e. join point). The name of the method (e.g. <code>invoke</code> ) does not matter as long as it returns an
+<code>Object</code> and it accepts an <code>InvocationContext</code> as a parameter. This context contains information
+about the intercepted method.</p>
+
+<p>About the method itself, <code>getRoles</code> is a private method (given hereafter) that extract the list
+of roles that are authorised to this method. The <code>SecurityContext</code> is described below and is
+container for the <code>ThreadLocal</code> variable that contains the principal of the current user. The
+method <code>principal.isUserInRoles(roles)</code> returns true if one the roles matches the expected
+authorisation. If it is not the case an exception is raised and the interceptor stops there without
+having executed the intercepted method. Otherwise, the interceptor goes on and executes the
+intercepted method and finally returns its return value by executing <code>return context.proceed()</code> .</p>
+
+<p>```java SecurityInterceptor.java CDI Interceptor
+@Secure(roles = { })
+@Interceptor
+public class SecurityInterceptor implements Serializable {</p>
+
+<pre><code>@AroundInvoke
+public Object invoke(final InvocationContext context) throws Exception {
+    String[] roles = getRoles(context.getMethod());
+    MyPrincipal principal = SecurityContext.getPrincipal();
+
+    if (!principal.isUserInRoles(roles)) {
+        throw new IllegalAccessException("Current user not autorised!");
+    }
+
+    return context.proceed();
+}
+
+private String[] getRoles(final Method method) {
+    ...
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The private method getRoles scans the class of the method that has been intercepted in order to
+discover the list of roles. First it scans at method level (<code>method.isAnnotationPresent</code> ) to
+find the annotation <code>Secure.class</code> that has been described above. If it does not find the proper
+annotation then it scans at class level (<code>method.getDeclaringClass().isAnnotationPresent</code> ).
+Remember that we allow to put the annotation at the method level AND at the class level.</p>
+
+<p>```java Method that scans the caller for annotation parameters
+private String[] getRoles(final Method method) {</p>
+
+<pre><code>if (method.isAnnotationPresent(Secure.class)) {
+    return method.getAnnotation(Secure.class).roles();
+}
+
+if (method.getDeclaringClass().isAnnotationPresent(Secure.class)) {
+    return method.getDeclaringClass().getAnnotation(Secure.class).roles();
+}
+
+return null;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The last step to activate the interceptor is to declare it in the <code>beans.xml</code> file. Remember that it works
+thanks to CDI and only for the beans managed by CDI. By default, interceptors are disabled.</p>
+
+<p>```xml beans.xml CDI descriptor
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;beans xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"</p>
+
+<pre><code>xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd"&gt;
+&lt;interceptors&gt;
+    &lt;class&gt;ch.demo.business.interceptors.SecurityInterceptor&lt;/class&gt;       
+&lt;/interceptors&gt;
+</code></pre>
+
+<p></beans>
+```</p>
+
+<h4>How to populate the ThreadLocal variable with principal information</h4>
+
+<p>So far, we did intercept the method call and check whether the current principal associated with
+the thread is authorised to access to a the intercepted method. The problem is that in servlet
+containers the security is at web level and we would to propagate this information. To that end, we
+will use the concept of <a href="http://en.wikipedia.org/wiki/Thread-local_storage">thread local</a>
+variables.</p>
+
+<p>The following class contains a thread-local variable <code>principalHolder</code> that holds the current
+(thread-local) principal. This assumes that a thread is processed by one and only one thread from A
+to Z. This is the case for servlet engines but not always for application servers. In the latter
+case, the vendor-specific security mechanism is much better as it takes things such as clustering
+into account. The method <code>setPrincipal</code> is invoked at the beginning of a new request when it is
+authenticated and authorised at the web level. <code>removePrincipal</code> cleans up the Thread-Local value
+at the end of the request processing.</p>
+
+<p>```java SecurityContext.java Thread-local container for the principal
+public final class SecurityContext implements Serializable {</p>
+
+<pre><code>private static InheritableThreadLocal&lt;MyPrincipal&gt; principalHolder = 
+            new InheritableThreadLocal&lt;MyPrincipal&gt;();
+
+private SecurityContext() { }
+
+public static MyPrincipal getPrincipal() {
+    if (principalHolder.get() == null) {
+        principalHolder.set(new MyPrincipal(null, null));
+    }
+    return (MyPrincipal) principalHolder.get();
+}
+
+public static void setPrincipal(final MyPrincipal principal) {
+    principalHolder.set(principal);
+}
+
+public static void removePrincipal() {
+    principalHolder.remove();
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The last step is to populate the principal and its associated roles to the thread-local container
+when the request is initialized. For that purpose, we use a request listener that is invoked when a new
+request has been submit and just before its destruction. On initialization, the method
+<code>getMyPrincipal</code> extracts the principal from the request <code>request.getUserPrincipal()</code>. The
+resulting principal is put in the thread-local by <code>SecurityContext.setPrincipal</code>.</p>
+
+<p><code>getMyPrincipal</code> also goes through the list of roles and adds the authorised roles using <code>request.isUserInRole</code> from <code>HttpServletRequest</code>.</p>
+
+<p>```java SecurityListener.java
+public class SecurityListener implements ServletRequestListener {</p>
+
+<pre><code>private static List&lt;String&gt; roles = null;
+
+@Override
+public void requestInitialized(final ServletRequestEvent sre) {
+    SecurityContext.setPrincipal(getMyPrincipal((HttpServletRequest) sre.getServletRequest()));
+}
+
+@Override
+public void requestDestroyed(final ServletRequestEvent sre) {
+    SecurityContext.removePrincipal();
+}
+
+public static MyPrincipal getMyPrincipal(final HttpServletRequest request) {
+    if (roles == null) {
+        roles = getSecurityRoles(request.getServletContext());
+    }
+
+    Principal principal = (Principal) request.getUserPrincipal();
+    List&lt;String&gt; currentRoles = new ArrayList&lt;String&gt;();
+    for (String role : roles) {
+        if (request.isUserInRole(role)) {
+            currentRoles.add(role);
+        }
+    }
+    return new MyPrincipal(principal, currentRoles);
+}
+
+public static synchronized List&lt;String&gt; getSecurityRoles(final ServletContext ctx) {
+    ...
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The next method is not very elegant but this is the only way that have found to extract the role
+list that is required by the current web application. It parses the <code>web.xml</code>, looking for
+<code>role-name</code> elements that describe a role.</p>
+
+<p>```java Extract the role list from web.xml
+public static synchronized List<String> getSecurityRoles(final ServletContext ctx) {</p>
+
+<pre><code>List&lt;String&gt; r = new ArrayList&lt;String&gt;();
+InputStream is = ctx.getResourceAsStream("/WEB-INF/web.xml");
+
+DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+dbFactory.setNamespaceAware(true);
+try {
+    DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+    Document doc = dBuilder.parse(is);
+    doc.getDocumentElement().normalize();
+
+    NodeList elements = doc.getElementsByTagName("role-name");
+    for (int i = 0; i &lt; elements.getLength(); i++) {
+        r.add(elements.item(i).getTextContent().trim());
+    }
+} catch (Exception e) {
+    new IllegalAccessException(e.getMessage());
+}
+return r;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Finally, the listener is enabled by putting the following lines in <code>web.xml</code>.
+```xml web.xml
+<listener></p>
+
+<pre><code>&lt;listener-class&gt;ch.demo.web.SecurityListener&lt;/listener-class&gt;
+</code></pre>
+
+<p></listener>
+```</p>
+
+<p>Whenever there is not redirect (that triggers a new request) after login or there is a manual call to JAAS, the
+principal must be manually set into thread-local right after the login. This is because if the
+security is checked right after authentication and the listener has already been called (at the beginning of the
+request) it has been set to an invalid principal.</p>
+
+<p><code>java
+request.login(user, password);
+SecurityContext.setPrincipal(SecurityListener.getMyPrincipal(request));
+</code></p>
+
+<h2>Conclusion</h2>
+
+<p>In this post, we have seen how to write a JEE6 interceptor to authorise access to service level methods in servlet containers. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Embedded Web Application integration testing using Tomcat 7 and JUnit]]></title>
+    <link href="http://hostettler.github.io/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/"/>
+    <updated>2012-04-09T14:39:00+02:00</updated>
+    <id>http://hostettler.github.io/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7</id>
+    <content type="html"><![CDATA[<p>To follow up on my previous post about <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">how to programmatically build a web archive</a>, I propose to look at how to deploy this archive in a Tomcat instance that is embedded into a JUnit test.</p>
+
+<p>As usual, the presented snippets are available in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> application. I will first look at the dependencies, then I will show how to configure Tomcat and finally how to start and stop the embedded instance.</p>
+
+<p>The first dependency is the embedded Tomcat core component. JULI which stands for Java Utility Logging Implementation that is the container extension of common logging. The ECJ compiler and JASPER are required to handle JSPs. Of course all these dependencies are scoped to test only.</p>
+
+<h2>The dependencies</h2>
+
+<p>```xml Maven dependencies necessary to start an embedded Tomcat instance into JUnit tests.
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;org.apache.tomcat.embed&lt;/groupId&gt;
+&lt;artifactId&gt;tomcat-embed-core&lt;/artifactId&gt;
+&lt;version&gt;7.0.26&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;org.apache.tomcat.embed&lt;/groupId&gt;
+&lt;artifactId&gt;tomcat-embed-logging-juli&lt;/artifactId&gt;
+&lt;version&gt;7.0.26&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;org.eclipse.jdt.core.compiler&lt;/groupId&gt;
+&lt;artifactId&gt;ecj&lt;/artifactId&gt;
+&lt;version&gt;3.7.1&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;org.apache.tomcat.embed&lt;/groupId&gt;
+&lt;artifactId&gt;tomcat-embed-jasper&lt;/artifactId&gt;
+&lt;version&gt;7.0.26&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;junit&lt;/groupId&gt;
+&lt;artifactId&gt;junit&lt;/artifactId&gt;
+&lt;version&gt;4.10&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+```</p>
+
+<h2>Configuring Tomcat</h2>
+
+<p>The following snippet prepares the embedded instance. The static member <code>mTomcat</code> references a new instance of Tomcat. As Tomcat still requires a file system to work, a temporary directory is used to put all the temporary files. To that end, we use the <code>java.io.tmpdir</code> java property.
+These variables are shared among the test cases.</p>
+
+<p>```java Shared static variables</p>
+
+<p>/<strong> The tomcat instance. */
+private Tomcat mTomcat;
+/</strong> The temporary directory in which Tomcat and the app are deployed. */
+private String mWorkingDir = System.getProperty("java.io.tmpdir");
+```</p>
+
+<p>As we want to use the same Tomcat configuration among all test cases, the initialization is put in a method annotated with <code>@Before</code>. First, the method sets the port to <code>0</code>. This tells the engine to choose the port to run on by itself.  This is especially useful to avoid  starting the embedded Tomcat on a already used port as <code>8080</code> for instance.
+Then the base directory is set <code>mTomcat.setBaseDir()</code> to the temporary directory. Without doing that, Tomcat would start in the current directory. The rest of the method configures the way WAR are managed by the engine.</p>
+
+<p>```java Configuration of the embedded Tomcat instance
+@Before
+public void setup() throws Throwable {</p>
+
+<pre><code>mTomcat = new Tomcat();
+mTomcat.setPort(0);
+mTomcat.setBaseDir(mWorkingDir);
+mTomcat.getHost().setAppBase(mWorkingDir);
+mTomcat.getHost().setAutoDeploy(true);
+mTomcat.getHost().setDeployOnStartup(true);
+...
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The rest of the method builds a reference to a directory (based into the temporary directory) that contains the web application. This directory is deleted if it exists to ensure redeployment of the WAR. Finally, the WAR built as explained <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">there</a> is exported into the temporary directory.</p>
+
+<p>Finally, the web application is added to the Tomcat instance. More specifically, a path
+exploded version <code>webApp.getAbsolutePath()</code> of the WAR is linked to a context <code>contextPath</code>.</p>
+
+<p>```java Cleaning and preparing the web application deployment.
+@Before
+public void setup() throws Throwable {</p>
+
+<pre><code>...
+String contextPath = "/" + getApplicationId();
+File webApp = new File(mWorkingDir, getApplicationId());
+File oldWebApp = new File(webApp.getAbsolutePath());
+FileUtils.deleteDirectory(oldWebApp);
+new ZipExporterImpl(createWebArchive()).exportTo(new File(mWorkingDir + "/" + getApplicationId() + ".war"),
+        true);
+mTomcat.addWebapp(mTomcat.getHost(), contextPath, webApp.getAbsolutePath());    
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>Starting Tomcat</h2>
+
+<p>Now that Tomcat has been configured, the next step is to start it. We want a fresh Tomcat
+for each and every test case. This way, a failed test does not have repercussions on the subsequent tests (e.g. session information, memory leaks);</p>
+
+<p>```java Start the embedded Tomcat instance and add a web application
+@Before
+public void setup() throws Throwable {</p>
+
+<pre><code>...
+mTomcat.start();
+</code></pre>
+
+<p>}
+```</p>
+
+<p>If necessary, the actual port on which Tomcat has been started can be retrieved using the following snippet.
+```java
+protected int getTomcatPort() {</p>
+
+<pre><code>return mTomcat.getConnector().getLocalPort();
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Finally, after the test, the Tomcat instance is stopped and destroyed clearing the way for the next test.</p>
+
+<h2>Stopping Tomcat</h2>
+
+<p>```java
+@After
+public final void teardown() throws Throwable {</p>
+
+<pre><code>if (mTomcat.getServer() != null
+        &amp;&amp; mTomcat.getServer().getState() != LifecycleState.DESTROYED) {
+    if (mTomcat.getServer().getState() != LifecycleState.STOPPED) {
+            mTomcat.stop();
+    }
+    mTomcat.destroy();
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>Conclusion</h2>
+
+<p>In this post, we have seen how to start an embedded version of Tomcat into a JUnit fixture.
+The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Programmatically build web archives using ShrinkWrap]]></title>
+    <link href="http://hostettler.github.io/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/"/>
+    <updated>2012-04-05T09:09:00+02:00</updated>
+    <id>http://hostettler.github.io/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap</id>
+    <content type="html"><![CDATA[<p>While doing integration tests on web applications, it is important to restrict the application to the strict minimum necessary for any given test. It helps to improve the startup time as well as to reduce unexpected interactions.
+To that end, I use <a href="http://www.jboss.org/shrinkwrap">ShrinkWrap</a> from <a href="http://www.jboss.org/">JBoss</a> that is a very nice a simple API to build Java archives (e.g., JAR WAR, EAR). This post describes how to programmatically build a WAR file that can be deployed on an embedded server for integration
+testing. For more details on how to use this web archive in JUnit fixtures please refer to this <a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">article</a>. The following snippet gets the ShrinkWrap package from the JBoss repository. As I only use it for test purposes, I restricted its use to the test scope.</p>
+
+<p><strong>ShrinkWrap</strong> is available as a Maven dependency:
+```xml Maven dependencies for the ShrinkWrap project
+<repositories>
+...</p>
+
+<pre><code>&lt;repository&gt;
+    &lt;id&gt;repository.jboss.org&lt;/id&gt;
+    &lt;name&gt;JBoss Repository&lt;/name&gt;
+    &lt;url&gt;http://repository.jboss.org/nexus/content/groups/public-jboss/&lt;/url&gt;
+&lt;/repository&gt;
+...
+</code></pre>
+
+<p></repositories>
+...
+<dependencies></p>
+
+<pre><code>...
+&lt;dependency&gt;
+    &lt;groupId&gt;org.jboss.shrinkwrap&lt;/groupId&gt;
+    &lt;artifactId&gt;shrinkwrap-api&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-alpha-12&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.jboss.shrinkwrap&lt;/groupId&gt;
+    &lt;artifactId&gt;shrinkwrap-impl&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-alpha-12&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>...
+<dependencies>
+```</p>
+
+<h2>Building the archive</h2>
+
+<p>The first step is to crate a web archive a.k.a. a WAR file. As we want to produce a WAR file, we use the <code>WebArchive.class</code> parameter
+to the <code>ShrinkWrap.create</code> method. It is also possible to produce JAR (<code>JavaArchive.class</code>) and EAR (<code>EnterpriseArchive.class</code>).
+<code>java Creation of a Web Archive
+WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war");
+</code>
+The next step to build a WAR is to provide the <code>web.xml</code> for you project. Again this can a be a simplified version of the web descriptor to improve startup time or limit dependencies. In the following example, the files are taken from a maven directory structure.</p>
+
+<p>```java Add a web descriptor to the archive
+private static final String WEBAPP_SRC = "src/main/webapp";</p>
+
+<p>archive.setWebXML(new File(WEBAPP_SRC, "WEB-INF/web.xml"))
+<code>
+Now that we have a web descriptor, let's add some classes that are required to run the application. To not having to add each single class individually, it is possible to a complete package to the archive.
+</code>java add a package to the runtime classes
+archive.addPackage(java.lang.Package.getPackage("ch.demo.web"))
+```</p>
+
+<p>It is also possible to add individual classes:
+<code>java add a class to the runtime classes
+archive.addClasses(Student.class, Address.class);
+</code></p>
+
+<p>For JSF applications, we add add the <code>faces-config.xml</code>.
+<code>java
+archive.addAsWebInfResource(new File(WEBAPP_SRC, "WEB-INF/faces-config.xml"))
+</code></p>
+
+<p>And similarly, let's add the CDI descriptor into <code>WEB-INF</code>. As we do not need to create a specific <code>`beans.xml</code>,
+we add an empty descriptor:
+<code>java
+archive.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+</code></p>
+
+<p>Let's finally add standard web resources such as <code>xhtml</code> files or static files:
+<code>java
+archive.addAsWebResource(new File(WEBAPP_SRC, "login.xhtml"));
+</code></p>
+
+<p>As ShrinkWrap uses <a href="http://en.wikipedia.org/wiki/Method_chaining">Method Chaining</a>, it is possible to chain <code>add</code> class to fill the archive.
+```java Build a simple web application    <br/>
+archive.setWebXML(new File(WEBAPP_SRC, "WEB-INF/web.xml"))</p>
+
+<pre><code>.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+.addAsWebInfResource(new File(WEBAPP_SRC, "WEB-INF/faces-config.xml"))
+.addPackage(java.lang.Package.getPackage("ch.demo.web"))
+.addAsWebResource(new File(WEBAPP_SRC, "login.xhtml"))
+.addAsWebResource(new File(WEBAPP_SRC, "index.jsp"))
+.addAsWebResource(new File(WEBAPP_SRC, "xhtml/listStudents.xhtml"), "xhtml/listStudents.xhtml");
+</code></pre>
+
+<p>```</p>
+
+<p>Please note that when using maven to execute the tests, most of the required libraries are already on the classpath. Therefore, we often do not need to add any library or jars to the web archive.</p>
+
+<h2>Using the archive</h2>
+
+<p>After having built the package, we need to export it either as a war or as an exploded directory.
+The following snippet produces a WAR file named after the archive. The second parameter states whether
+a existing archive can be overwritten.
+<code>java Produce the actual war
+new ZipExporterImpl(archive).exportTo(new File(archive.getName()), true);
+</code>
+Alternatively it is possible to produce an exploded archive:
+<code>java Produce an exploded archive
+new ExplodedExporterImpl(archive).exportExploded(new File(archive.getName()));
+</code></p>
+
+<h2>Conclusion</h2>
+
+<p>We have seen how to use ShrinkWrap to programmatically build Web archives. This is especially useful to test smaller version of your web application during integration testing. It helps to test webapps with mock services and to improve the startup time. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[On JEE 6 webapps startup time]]></title>
+    <link href="http://hostettler.github.io/blog/2012/03/25/improve-jsf-applications-startup-time/"/>
+    <updated>2012-03-25T23:20:00+02:00</updated>
+    <id>http://hostettler.github.io/blog/2012/03/25/improve-jsf-applications-startup-time</id>
+    <content type="html"><![CDATA[<p>While working on Tomcat 7 embedded to automate my integration tests, I realized that my integration tests wasted much of the time in starting/stopping the server. Even if I do not start the integration tests as often as the unit tests, it becomes rapidly irritating. Furthermore, during development I tend to restart the server a couple of times per hour, especially at the beginning of the project. Sure hot deployment helps, but it is not always enough.</p>
+
+<p>On my Mac Book Pro, a cold start took around 10s. Interestingly enough,  an empty Tomcat startups in less than a second. The problem comes from the fact that Tomcat 7 scans the classpath to find out annotations that declare Servlets using the <code>@WebServlet</code>. This, even if you do not use that feature. Don't get me wrong, not having to configure XML is cool but I am not ready to pay such a high price for it. Especially as the only servlet I use, is the JSF one.</p>
+
+<h2>Where do we start from?</h2>
+
+<p>For these tests, I use a JEE6 application with JSF, Weld and JPA (no EJBs) that runs under Tomcat. <br/>
+This is a demo application called <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> that I use to teach JEE6.
+A mentioned previously, a cold start (without tuning anything) requires around 10s on my Mac Book Pro Intel Core i7 with 8Gb RAM : <code>INFO: Server startup in 9992 ms</code></p>
+
+<h2>Step 1: Avoid looking for <code>@WebSerlet</code> and co.</h2>
+
+<p>By default, Tomcat 7 (along with the Servlet 3.0 specification) scans the classpath to look for classes that are annotated <code>@WebServlet</code>,<code>@WebServletContextListener</code>, <code>@ServletFilter</code>, or <code>@InitParamJSF</code>.  It is a nice feature as you do not have to specify the faces servlet anymore.
+However, it comes at a price: depending of the classpath this can be very long.
+To solve this issues, simple add the <code>metadata-complete="true"</code> to the <code>web-app</code> element of our <code>WEB-INF/web-xml</code> attribute to avoid scanning the classpath.</p>
+
+<p>```xml web.xml's webapp element
+&lt;web-app metadata-complete="true"</p>
+
+<pre><code>xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee"
+xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+id="MyWebApp" version="3.0"&gt;
+</code></pre>
+
+<p>```</p>
+
+<p>Obviously, as it is no more automatically discovered, we have  to manually add the faces servlet to the context:</p>
+
+<p>```xml Add the faces servlet</p>
+
+<pre><code>&lt;servlet&gt;
+    &lt;servlet-name&gt;Faces Servlet&lt;/servlet-name&gt;
+    &lt;servlet-class&gt;javax.faces.webapp.FacesServlet&lt;/servlet-class&gt;
+    &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+&lt;/servlet&gt;
+
+&lt;servlet-mapping&gt;
+    &lt;servlet-name&gt;Faces Servlet&lt;/servlet-name&gt;
+    &lt;url-pattern&gt;/faces/*&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+</code></pre>
+
+<p>```</p>
+
+<p>Using these modifications in <code>web.xml</code>, the startup time came down to around 4.5 seconds:
+<code>INFO: Server startup in 4404 ms</code></p>
+
+<h2>Step 2: Avoid looking for <code>@ManagedBean</code> and co.</h2>
+
+<p>Similarly, the is a similar feature in JSF 2.0. By default, the JSF implementation looks for classes annotated with
+As I use Weld and its <code>@Named</code>, <code>@SessionScoped</code>, and so on, I can disable this feature in JSF.
+<code>xml faces-config.xml annotated with metadata-complete="true"
+&lt;faces-config xmlns="http://java.sun.com/xml/ns/javaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
+   version="2.0"  metadata-complete="true"&gt;
+</code></p>
+
+<p>Using this modification in <code>faces-config.xml</code>, the startup time came down to around 3.7 seconds:
+<code>INFO: Server startup in 3730 ms</code></p>
+
+<h2>Step 3: Limiting Weld's scanning</h2>
+
+<p>Finally, I would like to keep Weld scanning to discover the <code>@Named</code>, <code>@Inject</code>, and other Weld annotations but I would like to limit it to my a subset of the classes of the jar. To that end simply add <code>weld:scan</code> directive and include a pattern with packages to scan.</p>
+
+<p>```
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;beans xmlns="http://java.sun.com/xml/ns/javaee"</p>
+
+<pre><code>    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xmlns:weld="http://jboss.org/schema/weld/beans" 
+    xsi:schemaLocation="
+       http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd
+       http://jboss.org/schema/weld/beans http://jboss.org/schema/weld/beans_1_1.xsd"&gt;
+</code></pre>
+
+<p>&lt;weld:scan></p>
+
+<pre><code>&lt;weld:include pattern="ch.demo.*"/&gt;
+</code></pre>
+
+<p>&lt;/weld:scan>
+```</p>
+
+<p>Using this modification in <code>beans.xml</code>, the startup time came down to around 3.3 seconds:
+<code>INFO: Server startup in 3312 ms</code></p>
+
+<p>To conclude, using these minor modifications I divided the startup time by three. This is very useful during development and integration tests when the server is started and stopped many times.</p>
+]]></content>
+  </entry>
+  
+</feed>

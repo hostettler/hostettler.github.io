@@ -1,0 +1,903 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: JPA 2.0 | Steve Hostettler]]></title>
+  <link href="http://hostettler.github.io/blog/categories/jpa-2-dot-0/atom.xml" rel="self"/>
+  <link href="http://hostettler.github.io/"/>
+  <updated>2014-05-22T21:36:07+02:00</updated>
+  <id>http://hostettler.github.io/</id>
+  <author>
+    <name><![CDATA[Steve Hostettler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Context Dependency Injection and the Rich Object Model]]></title>
+    <link href="http://hostettler.github.io/blog/2012/12/05/servicelocator/"/>
+    <updated>2012-12-05T06:59:00+01:00</updated>
+    <id>http://hostettler.github.io/blog/2012/12/05/servicelocator</id>
+    <content type="html"><![CDATA[<p>[Rich object model] vs [anemic object model] is long running debate. While the latter encourages to use simple and stupid objects with little or no business in them, the rich object model advocates for a clean object design with inheritance, polymorphism and so on.
+The anemic object model is very popular among JEE partitioners because, in the past, the specification did not provide any mean to invoke services in business objects. Therefore, the anemic pattern uses so called "managers" that maintain references to other "managers". A direct benefit is the clear separation of concerns between the different kind of objects. Basically, it splits processing and data. As this is anti-object oriented, the abstract design of such system is often very different from the actual implementation.</p>
+
+<h2>The portfolio example</h2>
+
+<p>As example, let us take a portfolio that contains a set of financial position. A financial position can be either a set of stock, or an amount in a given currency. To evaluate the actual portfolio value, we go through the positions and for each of them we ask the current quote for stock to the service <code>QuoteService</code> or the current value of a given currency to the <code>CurrencyService</code>.
+The next figure presents the "ideal" design.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/portfolio-business.png' width='' height='' alt='An object oriented class diagram of the Portfolio management component.' title='An object oriented class diagram of the Portfolio management component.'><span class='caption-text'>An object oriented class diagram of the Portfolio management component.</span></span></p>
+
+<p>To achieve this, one need to access services from within business objects. Since EJB 3.1,  Context and Dependency Injection (CDI) provides such a mechanism via the <code>@Inject</code> annotation. The only requirement is that the object that requires the service as well as the service to inject are so called "managed beans". The trick is that not all objects are meant to be managed. Furthermore, having managed lists of object is very tricky to say the least. Fortunately, the EJB 3.1 and more specifically the CDI 1.0 specification provide a way to solve this.
+In CDI, the main component is the bean manager. This manager keeps track of the beans to inject via @Inject and other means. Instead of relying on annotations to provide injection, it is possible to use the good old Service Locator pattern. CDI 1.0 exposes the bean manager on JNDI with the name <code>java:comp/BeanManager</code>.</p>
+
+<p>```java
+public class ServiceLocator {</p>
+
+<pre><code>@SuppressWarnings("unchecked")
+public static &lt;T&gt; T getInstance(final Class&lt;T&gt; type) {
+    T result = null;
+    try {
+
+        //Access to the current context.
+        InitialContext ctx = new InitialContext();
+        //Resolve the bean manager
+        BeanManager manager = (BeanManager) ctx.lookup("java:comp/BeanManager");
+        //Retrieve all beans of that type
+        Set&lt;Bean&lt;?&gt;&gt; beans = manager.getBeans(type);
+        Bean&lt;T&gt; bean = (Bean&lt;T&gt;) manager.resolve(beans);
+        if (bean != null) {
+            CreationalContext&lt;T&gt; context = manager
+                    .createCreationalContext(bean);
+            if (context != null) {
+                result = (T) manager.getReference(bean, type, context);
+            }
+        }
+    } catch (NamingException e) {
+        throw new RuntimeException(e);
+    }
+    return result;
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The client code is very simple. It consists in calling the <code>ServiceLocator</code>with the desired interface.
+For the sake of clarity, I did not show the ServiceLocator that takes a qualifier in addition to the interface. To add this feature, look at the <code>getBeans(Type beanType, Annotation... qualifiers)</code> method.</p>
+
+<p>```java</p>
+
+<p>public class StockPos {</p>
+
+<pre><code>private Long qty;
+private String stockId;
+
+Double evaluate() {
+    StockQuoteService sqs = ServiceLocator.getInstance(StockQuoteService.class);
+    return qty * sqs.getQuoteValue(stockId);
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Similarly, here is the code of the <code>CurrencyPos</code> object.</p>
+
+<p>```java</p>
+
+<p>public class CurrencyPos {</p>
+
+<pre><code>private Double amount;
+private String currencyId;
+
+Double evaluate() {
+    CurrencyQuoteService sqs = ServiceLocator.getInstance(CurrencyQuoteService.class);
+    return amount * sqs.getQuoteValue(stockId);
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>Some thoughts on the Demeter law</h2>
+
+<p>Let me be clear, I do <strong>not</strong> recommend this approach everywhere. It is very important to not mix the objects responsabilities. Furthermore,
+in order to respect the Demeter law, a business must <strong>not</strong> directly call something outside of the current component. Calls to other components are always to be done through so-called consumers to have clear components boundaries.
+For instance, putting to much intelligence in JPA entities that can be detached and serialized may cause problems on the client side.</p>
+
+<h2>Conclusion</h2>
+
+<p>In this post, I showed a solution to consume services that are exposed via the CDI BeanManager. These services can be pure POJOs or EJBs.
+Nevertheless, this approach must be used with great care as it can blur the components boundaries and responsabilities.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Multi-Tenancy with EJB 3.1 and JPA 2.0]]></title>
+    <link href="http://hostettler.github.io/blog/2012/11/20/multi-tenancy/"/>
+    <updated>2012-11-20T05:18:00+01:00</updated>
+    <id>http://hostettler.github.io/blog/2012/11/20/multi-tenancy</id>
+    <content type="html"><![CDATA[<p>Multi-tenancy is a recurrent non functional requirement. Indeed, many important IT-systems are meant to be shared among multiple tenants. The data are often distributed over several databases or schemas. This, for different reasons:</p>
+
+<ul>
+<li>Security: The data belong to different customers and some level of isolation is required;</li>
+<li>Performances: Distributing the data over multiple systems may help to master performance issues;</li>
+<li>Legacy: Sometimes, old and new systems must cohabit for a (long) time;</li>
+<li>Maintenability: A database or a schema can be updated without putting the rest of the application at risk.</li>
+</ul>
+
+
+<p>Although data are distributed, the application code should remain tenant agnostic. Furthermore, choosing between the different tenants is often made at runtime based on credentials (e.g. user Joe has access to customer AAAA while user Jane sees data of customer BBB). <a href="/https://blogs.oracle.com/arungupta/entry/java_ee_7_key_features">Java EE 7 will address this problem and much more</a>, but in the mean time here is the way that I use to address this problematic using EJB 3.1 and JPA 2.0</p>
+
+<h2>Overall architecture</h2>
+
+<p>First, let me start with the overall architecture as described below.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/multi-tenancy-architecture.png' width='' height='' alt='Multi-tenancy architecture with serveral datasources' title='Multi-tenancy architecture with serveral datasources'><span class='caption-text'>Multi-tenancy architecture with serveral datasources</span></span></p>
+
+<p>In the above figure, the database is organized in schemas, with one application server datasource (DS) per schema and one persistence unit (PU) per datasource.
+It is also possible to use only one datasoure and to discriminate between schemas by setting the <code>&lt;property name="openjpa.jdbc.Schema" value="TenantX" /&gt;</code> property for each persistence unit (PU). This sets the default schema for the PU.
+Here is a <code>persistence.xml</code> file that provides one persistence unit per tenant.</p>
+
+<p>The following code has been tested for Open-JPA but there is nothing specific to this implementation outside of the <code>&lt;provider&gt;</code>tag in the <code>persistence.xml</code>file.</p>
+
+<p>```xml
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;persistence version="2.0"</p>
+
+<pre><code>xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"&gt;
+
+&lt;persistence-unit name="Tenant1" transaction-type="JTA"&gt;
+    &lt;provider&gt;
+        org.apache.openjpa.persistence.PersistenceProviderImpl
+    &lt;/provider&gt;
+    &lt;jta-data-source&gt;jdbc/Tenant1_DS&lt;/jta-data-source&gt;
+    &lt;exclude-unlisted-classes&gt;false&lt;/exclude-unlisted-classes&gt;
+&lt;/persistence-unit&gt;
+
+
+&lt;persistence-unit name="Tenant2" transaction-type="JTA"&gt;
+    &lt;provider&gt;
+        org.apache.openjpa.persistence.PersistenceProviderImpl
+    &lt;/provider&gt;
+    &lt;jta-data-source&gt;jdbc/Tenant2_DS&lt;/jta-data-source&gt;
+    &lt;exclude-unlisted-classes&gt;false&lt;/exclude-unlisted-classes&gt;
+&lt;/persistence-unit&gt;
+</code></pre>
+
+<p></persistence>
+```</p>
+
+<p>The basic idea is that, instead of using <code>@PersistenceContext</code>, we inject our "own" multi tenant entity manager wraper.
+Then, at runtime, the multi-tenant entity manager loads the persistence context that corresponds to the current user context from JNDI.
+Please note that this only works for JTA-based persistence-units. Otherwise, the persistence context is not container-basd and therefore not exposed to JNDI. Moreover, without JTA, we loose container based transaction demarcation.</p>
+
+<p>Let us first start with the client code. In other words, how to use the Multi-Tenant Entity manager.</p>
+
+<h2>Client Code</h2>
+
+<p>Here is the client code. In order to preserve thread-safety and transactionality, Data access objects are EJBs (<code>@Stateless</code>, <code>@Stateful</code>, <code>@Singleton</code>). The presented solution uses an entity manager that is wrapped and then injected using <code>@Inject</code> or <code>@EJB</code>.  Thread-safety, transactionnality and performances are guaranted by the <code>EJB 3.1</code> and <code>JPA 2.0</code> specification as explained in the section <code>Thread-safety and Transactionality</code>. As shown below, the <code>MultiTenancyWrapper</code> delegates to a real entity manager and implements the <code>EntityManager</code> interface. Therefore, its use is very similar to a normal <code>EntityManager</code> injected via <code>@PersistenceContext</code>.</p>
+
+<p>```java
+@Stateless
+public class MyEJB implements MyEJBLocal {</p>
+
+<pre><code>@Inject
+private MultiTenancyWrapper emWrapper;
+
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public void doSomething() {
+    emWrapper.findAll(...);
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>The Multi-Tenant EntityManager EJB</h2>
+
+<p>The <code>MultiTenanEntityManagertWrapper</code> simply wraps the entity manager that corresponds to the current user context. The trick is to configure it as an EJB in order to get the xml configuration feature via <code>ejb-jar.xml</code>. Another alternative would be to use the <code>@PersistenceContexts</code> and <code>@PersistenceContext</code> annotations. The main drawback being that, for each new tenant, not only the <code>persistence.xml</code> and <code>ejb-jar.xml</code> must be changed but also the <code>Java</code> code.</p>
+
+<p>The JNDI context that is linked to the current request is injected in the <code>MultiTenantEntityManager</code> using the <code>@Resource</code>annotation.
+As there is no creation of a new <code>InitialContext</code> the overhead is not significant. Actually, the <code>@PersistentContext</code> annotation does the exact same thing except that it is not specific to the user context. The <code>MultiTenanEntityManagertWrapper</code> implements the delegate pattern. This allows to use it (almost) transparently in client code.
+The main difference being the use of <code>@Inject</code> or <code>@EJB</code> over <code>@PersistenceContext</code> in the client code.</p>
+
+<p>Using the session context that is specific to the caller bean (and thus the caller request/session) enables transparent support for thread-safety, security and transactionality.</p>
+
+<p>```java
+package ejb;</p>
+
+<p>import javax.persistence.EntityManager;</p>
+
+<p>public interface MultiTenanEntityManagertWrapper extends EntityManager {</p>
+
+<p>}
+```</p>
+
+<p>The method <code>getMultiTenantEntityManager</code> of the <code>MultiTenanEntityManagertWrapperImpl</code> extracts the <code>EntityManager</code> that corresponds to the current request from JNDI (we will see later how it has been put there). To that end, the method <code>getMultiTenantEntityManager</code>first extracts the prinipal from the current EJB context (<code>SessionContext</code>). After what, the tenant that corresponds to the current user is used to obtain the JNDI name of the corresponding entity manager. <code>MultiTenanEntityManagertWrapperImpl</code> simple delegates every call to the this Request specific <code>EntityManager</code>.</p>
+
+<p>```java</p>
+
+<p>@Stateless
+public class MultiTenanEntityManagertWrapperImpl implements MultiTenanEntityManagertWrapper {</p>
+
+<pre><code>private static final String JNDI_ENV = "java:comp/env/persistence/";
+
+@Resource
+SessionContext context;
+
+
+private EntityManager getMultiTenantEntityManager() {
+    //Extract the name of the current user.
+    Principal p = context.getCallerPrincipal();
+
+    //Lookup the tenant name for the current user
+    //This is application specific
+    Users u = Users.getUser(p.getName());
+
+    //Produces either TENANT1 or TENANT2        
+    String tenantName = u.getSite().toString();
+
+    String jndiName = new StringBuffer(JNDI_ENV).append(tenantName).toString();
+    //Lookup the entity manager
+    EntityManager manager = (EntityManager) context.lookup(jndiName);
+
+    if (manager == null) {
+        throw new RuntimeException("Tenant unknown");
+    }
+    return manager;
+}
+
+
+//The delegates
+@Override
+public void persist(Object entity) {
+    getMultiTenantEntityManager().persist(entity);
+}
+
+
+@Override
+public &lt;T&gt; T merge(T entity) {
+    return getMultiTenantEntityManager().merge(entity);
+}
+
+
+@Override
+public void remove(Object entity) {
+    getMultiTenantEntityManager().remove(entity);
+}
+
+    ...
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Now let us see how to put the entity manager references in JNDI.
+In order to avoid a lot of annotations (one per tenant) and therefore to be able to handle a huge number of tenans, I propose to use the <code>ejb-jar.xml</code> file to configure the EJB intead of the <code>PersistenceContext</code> annotation. The <code>MultiTenantEntityWrapper</code>EJB is configured as a stateless EJB. Ther persistence contexts are simply exposed to JNDI with the following pattern: <code>java:comp/env/persistence/TENANTX</code>. For more information please look at the EJB 3.1 specification chapter 16.11.1.</p>
+
+<p><code>&lt;persistence-unit-name&gt;Tenant1&lt;/persistence-unit-name&gt;</code> is the name of the PU as defined in the <code>persistence.xml</code> file. <code>&lt;persistence-context-ref-name&gt;persistence/TENANT1&lt;/persistence-context-ref-name&gt;</code>defines the name of the entity manager that is exposed via JNDI.</p>
+
+<p>```xml
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;ejb-jar xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:ejb="http://java.sun.com/xml/ns/javaee/ejb-jar_3_0.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd" version="3.1"></p>
+
+<pre><code>&lt;enterprise-beans&gt;
+    &lt;session&gt;
+        &lt;ejb-name&gt;MultiTenantEntityWrapper&lt;/ejb-name&gt;   
+        &lt;ejb-class&gt;ejb.MultiTenantWrapperImpl&lt;/ejb-class&gt;
+        &lt;session-type&gt;Stateless&lt;/session-type&gt;
+
+        &lt;!-- Persistece contexts --&gt;
+        &lt;persistence-context-ref&gt;
+            &lt;description&gt;Tenant 1&lt;/description&gt;             
+            &lt;persistence-context-ref-name&gt;persistence/TENANT1&lt;/persistence-context-ref-name&gt;        
+            &lt;persistence-unit-name&gt;Tenant1&lt;/persistence-unit-name&gt;
+            &lt;persistence-context-type&gt;Transaction&lt;/persistence-context-type&gt;
+        &lt;/persistence-context-ref&gt;
+
+        &lt;persistence-context-ref&gt;
+            &lt;description&gt;Tenant 2&lt;/description&gt;             
+            &lt;persistence-context-ref-name&gt;persistence/TENANT2&lt;/persistence-context-ref-name&gt;        
+            &lt;persistence-unit-name&gt;Tenant2&lt;/persistence-unit-name&gt;
+            &lt;persistence-context-type&gt;Transaction&lt;/persistence-context-type&gt;                
+        &lt;/persistence-context-ref&gt;
+
+    &lt;/session&gt;
+&lt;/enterprise-beans&gt;
+</code></pre>
+
+<p>&lt;/ejb-jar>
+```</p>
+
+<h2>Thread-safety and Transactionality</h2>
+
+<p>As this is compliant with both the EJB 3.1 and JPA 2.0 specification, thread-safety and transactionnaly are guaranteed by the container. For more details please look at the EJB 3.1 specification
+at chapters 16.10, 16.11 and the JPA 2.0 specification at chapter 7.6. Of course, the wrapper has to be an EJB in order to have access to the current JNDI context without having to create it.
+Furthermore, because the <code>EntityManager</code>is not <code>per se</code> thread-safe (JPA 2.0, chapter 7.2), the serialization of the invokations that is provided by the container for EJBs is essential the thread-safety aspect (EJB 3.1, chapter 4.10.13).</p>
+
+<h2>Conclusion</h2>
+
+<p>In this post, I showed how to leverage EJB 3.1 and JPA 2.0 standard features to provide multi-tenancy. The presented approach is thead-safe, it preserves transactionaly and does not induce
+a significant overhead.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[One to One relations in JPA 2.0]]></title>
+    <link href="http://hostettler.github.io/blog/2012/03/22/one-to-one-relations-in-jpa-2-dot-0/"/>
+    <updated>2012-03-22T10:41:00+01:00</updated>
+    <id>http://hostettler.github.io/blog/2012/03/22/one-to-one-relations-in-jpa-2-dot-0</id>
+    <content type="html"><![CDATA[<p>Recently I came across the need to map a one 2 one relationship from the object model to the database using JPA 2.0.
+The case was pretty simple as the database was nicely organized but it raised the question: what if? What if I have to deal to a legacy system or a database administrator that has to follow strict company rules. Other reasons such as security or performances may interfere with simple designs. Hence, I had a look to the diverse ways to map a one 2 one relationship. I probably forgot several cases so please do not hesitate to discuss them in the comments.</p>
+
+<p>A one to one relationship consider that the objects involved in the relation are highly dependent. In Object Orientation, this corresponds to the an aggregation or a composition. In a relational model, the data can be either:</p>
+
+<ol>
+<li>in the same table,</li>
+<li>split over two (or more) tables (one per object) and linked by a foreign key, or</li>
+<li>split over two (or more) tables and linked by a join table.</li>
+</ol>
+
+
+<p>The rest of the articles these describes different situations. Please note that for the sake of the explanation, I explicitly map all the fields even if most of the time the default mapping policy would work.</p>
+
+<h2>Data in the same class: Embedded class</h2>
+
+<p>This is especially useful for legacy code where the database design is a bit to flat for your taste.
+The following figure presents the concept of an embedded class. The class <code>Address</code> is embedded in the class <code>Student</code>.
+The idea is that <code>Address</code> is an entity per se, it exists only in the context of the class <code>Student</code>.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/one2oneVariante1.png' width='' height='' alt='One 2 One relations as an embedded class' title='One 2 One relations as an embedded class'><span class='caption-text'>One 2 One relations as an embedded class</span></span></p>
+
+<p>To declare a embedded class, the class itself must be annotated with <code>@Embeddable</code> and its reference must be annotated with
+<code>@Embedded</code>.</p>
+
+<p>```java A embeddable class
+@Embeddable
+public class Address implements Serializable {</p>
+
+<pre><code>...
+@Column(name = "NUMBER")
+private String number;
+
+@Column(name = "STREET")
+private String street;
+...
+</code></pre>
+
+<p>}
+```</p>
+
+<p><code>@Embedded</code> and <code>@Basic</code> cannot be used together. Therefore, if required, lazy fetching must be declared field by field in the embedded class. Remember that outside of a JEE container,  the actual behavior of lazy loading on <code>@Basic</code> and <code>@OneToOne</code> depend on the actual implementation. Eclipse link, for instance, does not perform lazy loading by default on <code>@Basic</code>, <code>@OneToOne</code>, and <code>@ManyToOne</code> mappings. For more detail, please refer to the <a href="http://wiki.eclipse.org/Using_EclipseLink_JPA_Extensions_%28ELUG%29#What_You_May_Need_to_Know_About_EclipseLink_JPA_Lazy_Loading">Eclipse-link specification</a>.</p>
+
+<p>```java The class Address is embedded into a Student
+@Entity
+@Table(name = "STUDENTS")
+public class Student implements Serializable {</p>
+
+<pre><code>...
+
+@Id
+@Column(name = "ID")
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long mId;
+
+...
+
+@Embedded
+private Address mAddress;
+
+...
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The following SQL statement shows the code generated by the previous mapping.</p>
+
+<p>```sql SQL code generated according to the previous mapping
+SELECT  ID, FIRST_NAME, PHONE_NUMBER, BIRTH_DATE, LAST_NAME, NUMBER,</p>
+
+<pre><code>    CITY, STREET, POSTAL_CODE 
+</code></pre>
+
+<p>  FROM  STUDENTS
+```</p>
+
+<h2>Data in different classes: Secondary Tables</h2>
+
+<p>In the second scenario, the OO model is composed on only one class but the relational model is split over several tables.</p>
+
+<h3>The foreign key is in the secondary table</h3>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/one2oneVariante2.png' width='' height='' alt='Data is in different tables with the foreign key in the secondary table' title='Data is in different tables with the foreign key in the secondary table'><span class='caption-text'>Data is in different tables with the foreign key in the secondary table</span></span></p>
+
+<p>In this case, the concepts of secondary tables is very useful. A secondary table is basically a table that hosts
+important data that are one to one related to the data of the primary table.
+Unlike the first case, a join is required and thus a key mapping is required.
+In the following mapping, the secondary table <code>PICTURES</code> is mapped using its <code>STUDENT_ID</code> field to the <code>ID</code> field
+of the main table.</p>
+
+<p>```java Mapping of the Student entity
+@SecondaryTable(name = "PICTURES",</p>
+
+<pre><code>pkJoinColumns = @PrimaryKeyJoinColumn(name = "STUDENT_ID", 
+    referencedColumnName = "ID"))
+</code></pre>
+
+<p>public class Student implements Serializable {</p>
+
+<pre><code>...
+@Id
+@Column(name = "ID")
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long mId;
+
+/** A picture of the student. */
+@Lob
+@Basic(optional = true, fetch = FetchType.EAGER)
+@Column(table = "PICTURES", name = "PICTURE", nullable = true)
+private byte[] mPicture;
+...
+</code></pre>
+
+<p><code>`
+The following SQL statement shows the code generated by the previous mapping.
+It joins the two tables according to the</code>@PrimaryKeyJoinColumn`` annotation.</p>
+
+<p>```sql SQL code generated by the previous mapping
+SELECT  t0.ID, t1.STUDENT_ID, t1.PICTURE, t0.FIRST_NAME, t0.PHONE_NUMBER, t0.BIRTH_DATE,</p>
+
+<pre><code>    t0.LAST_NAME, t0.NUMBER, t0.CITY, t0.STREET, t0.POSTAL_CODE 
+</code></pre>
+
+<p>  FROM  STUDENTS t0, PICTURES t1
+ WHERE  (t1.STUDENT_ID = t0.ID)</p>
+
+<p>```</p>
+
+<h3>The foreign key is in the host table</h3>
+
+<p>Similarly to the previous case, the data is split over several tables. The difference lies in the foreign key position.
+Here the foreign key is hosted in the primary table.
+<span class='caption-wrapper center'><img class='caption' src='/figures/one2oneVariante3.png' width='' height='' alt='Data is in different tables with the foreign key in the primary/host table' title='Data is in different tables with the foreign key in the primary/host table'><span class='caption-text'>Data is in different tables with the foreign key in the primary/host table</span></span></p>
+
+<p>From a mapping point of view, it is very similar to the previous case. Indeed only the key column names have to be changed
+to reflect the organization.</p>
+
+<p>```java Mapping of the Student entity
+@SecondaryTable(name = "PICTURES",</p>
+
+<pre><code>pkJoinColumns = @PrimaryKeyJoinColumn(name = "PICTURE_ID", 
+    referencedColumnName = "PICTURE_ID"))
+</code></pre>
+
+<p>public class Student implements Serializable {
+```</p>
+
+<p>The following SQL statement shows the code generated by the previous mapping.
+Again, the data are joined according to the content of the <code>@PrimaryKeyJoinColumn</code> annotation.</p>
+
+<p>```sql SQL code generated by the previous mapping
+SELECT  t0.ID, t0.PICTURE_ID, t1.PICTURE_ID, t1.PICTURE, t0.FIRST_NAME, t0.PHONE_NUMBER, t0.BIRTH_DATE,</p>
+
+<pre><code>    t0.LAST_NAME,t0.NUMBER, t0.CITY, t0.STREET, t0.POSTAL_CODE 
+</code></pre>
+
+<p>  FROM  STUDENTS t0, PICTURES t1
+ WHERE  (t1.PICTURE_ID = t0.PICTURE_ID)
+```</p>
+
+<h2>First and second class JPA citizens</h2>
+
+<p>In the previous examples, the table <code>PICTURES</code> does not have a business existence in itself. It is a secondary table because its data only have meaning in relation to the data of the primary table. Sometimes, we may want to treat the second objects as first class JPA citizens and thus we must put the <code>@Entity</code> annotation on it. In this case, we have to use the <code>@OneToOne</code> annotation for the mapping. Unlike the previous mappings, <code>@OneToOne</code> enable bidirectional mapping.</p>
+
+<p>In the last example, the tables <code>STUDENTS</code> and  <code>BADGES</code> have a one to one relationship modeled with a foreign in the <code>BADGES</code> table to the <code>STUDENTS</code> table. In this case, the owning side is the <code>Badge</code> entity has it contains the foreign key.</p>
+
+<p>As mentioned before, the class <code>Badge</code> is now an entity has it has a business existence without <code>Student</code>.  The interesting part is the <code>@JoinColumn</code> annotation that specifies the local column that is the foreign key (<code>STUDENT_ID</code>) as well as to which column of the foreign table its corresponds (<code>ID</code>).</p>
+
+<p>```java Mapping of the Badge entity
+@Entity
+@Table(name = "BADGES")
+public class Badge implements Serializable {</p>
+
+<pre><code>...
+
+@Id
+@Column(name = "ID")
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long mId;
+
+@Column(name = "SECURITY_LEVEL")
+private Long mSecurityLevel;
+
+@OneToOne
+@JoinColumn(name = "STUDENT_ID", referencedColumnName = "ID")
+private Student mStudent;
+
+...
+</code></pre>
+
+<p>```</p>
+
+<p>As we want the other side to be aware of the relation (bidirectional), it is required to add the <code>mappedBy</code> attribute to the <code>@OneToOne</code> annotation. This attribute references the (Java) property in the entity that is the owner of the relationship.</p>
+
+<p>```java  Mapping of the Student entity
+@Entity
+...
+public class Student implements Serializable {</p>
+
+<pre><code>...
+@Id
+@Column(name = "ID")
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long mId;
+
+
+/** The Student's badge. */
+@OneToOne(mappedBy = "mStudent")
+private Badge mBadge;
+...
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Using the previous mapping, JPA 2.0 produces the following SQL statements to load the Student object.
+```sql
+SELECT t0.ID, t1.STUDENT_ID, t1.PICTURE, t0.FIRST_NAME, t0.PHONE_NUMBER,</p>
+
+<pre><code>   t0.BIRTH_DATE, t0.LAST_NAME, t0.NUMBER, t0.CITY, t0.STREET, 
+   t0.POSTAL_CODE 
+</code></pre>
+
+<p>  FROM STUDENTS t0, PICTURES t1
+ WHERE (t1.STUDENT_ID = t0.ID)</p>
+
+<p>SELECT ID, SECURITY_LEVEL, STUDENT_ID
+  FROM BADGES
+ WHERE (STUDENT_ID = ?)
+```</p>
+
+<h2>Conclusion</h2>
+
+<p>JPA 2.0 offers many way to represent one to one relationships. This flexibility allows to handle many different scenarios that may happen when integrating legacy databases. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Testing JPA 2.0 entities in Java SE]]></title>
+    <link href="http://hostettler.github.io/blog/2012/03/19/testing-jpa-in-java-se/"/>
+    <updated>2012-03-19T13:40:00+01:00</updated>
+    <id>http://hostettler.github.io/blog/2012/03/19/testing-jpa-in-java-se</id>
+    <content type="html"><![CDATA[<p>Testing JPA components in Java SE has been greatly simplified since JEE6.
+Nevertheless, it is still not as simple as testing other components.
+Although there exist some frameworks such as <a href="http://www.jboss.org/arquillian">Arquillian</a> that solve that problematic,
+it is sometimes to much of hammer to test a couple of entities and simple services.
+Here is a post in which I digest some other posts and my own experience of how to test JPA components. The following example is part
+of a Demo project I use to teach the JEE stack that is located on Google Code Hosting and <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a>
+This project relies on <a href="http://maven.apache.org/">Maven 3</a> for build and dependency management. It does not use EJBs (at least for now) and thus it can be deployed in a Servlet engine.
+Please note, that to me the kind of tests we are doing here are not unit tests (though we use JUnit ). Actually, as a database is required,
+these  are integration tests.</p>
+
+<p>Let us assume that we want to test that the following model has been properly annotated and can be persisted according to a given DB schema:
+``` java An annotated entity that represent a student
+// Get the entity manager for the tests.
+@Entity
+@Table(name = "STUDENTS")
+public class Student implements Serializable {</p>
+
+<pre><code>private static final long serialVersionUID = -6146935825517747043L;
+
+@Id
+@Column(name = "ID")
+@GeneratedValue(strategy = GenerationType.IDENTITY)
+private Long mId;
+
+@Column(name = "LAST_NAME", length = 35)
+private String mLastName;
+
+@Column(name = "FIRST_NAME", nullable = false, length = 35)
+private String mFirstName;
+
+@Column(name = "BIRTH_DATE", nullable = false)
+@Temporal(TemporalType.DATE)
+private Date mBirthDate;
+</code></pre>
+
+<p>}
+<code>
+with the following persistence unit:
+</code>
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;persistence version="1.0"</p>
+
+<pre><code>xmlns="http://java.sun.com/xml/ns/persistence"&gt;
+&lt;persistence-unit name="JEE6Demo-Persistence"
+    transaction-type="RESOURCE_LOCAL"&gt;
+    &lt;provider&gt;org.eclipse.persistence.jpa.PersistenceProvider&lt;/provider&gt;
+    &lt;class&gt;ch.demo.dom.Student&lt;/class&gt;
+    &lt;properties&gt;
+        &lt;property name="eclipselink.target-database" value="MYSQL" /&gt;
+        &lt;property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" /&gt;
+        &lt;property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/Students_DB" /&gt;
+        &lt;property name="javax.persistence.jdbc.user" value="root" /&gt;
+        &lt;property name="javax.persistence.jdbc.password" value="" /&gt;           
+        &lt;property name="eclipselink.ddl-generation" value="none" /&gt;
+        &lt;property name="eclipselink.logging.level" value="INFO" /&gt;
+    &lt;/properties&gt;
+&lt;/persistence-unit&gt;
+</code></pre>
+
+<p></persistence>
+```</p>
+
+<p>We use <a href="http://www.eclipse.org/eclipselink/">Eclipse-link</a> as it is the reference implementation for JPA 2.0
+```xml Eclipse-Link dependencies</p>
+
+<pre><code>&lt;repositories&gt;
+    &lt;repository&gt;
+        &lt;id&gt;EclipseLink Repo&lt;/id&gt;
+        &lt;name&gt;EclipseLink Repository&lt;/name&gt;
+        &lt;url&gt;http://download.eclipse.org/rt/eclipselink/maven.repo&lt;/url&gt;
+    &lt;/repository&gt;
+&lt;/repositories&gt;
+
+&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.eclipse.persistence&lt;/groupId&gt;
+        &lt;artifactId&gt;eclipselink&lt;/artifactId&gt;
+        &lt;version&gt;2.0.0&lt;/version&gt;
+        &lt;scope&gt;compile&lt;/scope&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.eclipse.persistence&lt;/groupId&gt;
+        &lt;artifactId&gt;javax.persistence&lt;/artifactId&gt;
+        &lt;version&gt;2.0.0&lt;/version&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre>
+
+<p>```</p>
+
+<p>Since JEE 6, it is easy to start the JPA manager in a unit test. Let us look at the following listing. The first two lines initialize the persistence manager given a persistence unit. The name of the persistence unit must matched the declared persistence unit in <code>META-INF/persistence</code>. After what, the try block gets a transaction and starts it. The object student is persisted and the transaction is committed. If anything goes wrong, the transaction is roll-backed. Finally, the entity manager and the factory are closed.
+``` java Start the JPA manager manually
+// Get the entity manager for the tests.
+EntityManagerFactory emf = Persistence.createEntityManagerFactory("JEE6Demo-Persistence");
+EntityManager em = emf.createEntityManager();
+try {
+   //Get a new transaction
+   EntityTransaction trx = em.getTransaction();</p>
+
+<p>   //Start the transaction
+   trx.begin();
+   //Persist the object in the DB
+   em.persist(student);
+   //Commit and end the transaction
+   trx.commit();
+} catch (RuntimeException e) {
+   if (trx != null &amp;&amp; trx.isActive()) {</p>
+
+<pre><code>  trx.rollback();
+</code></pre>
+
+<p>   }
+   throw e;
+} finally {
+   //Close the manager
+   em.close();
+   emf.close();
+}
+```</p>
+
+<p>There are several open issues problems with this code:</p>
+
+<ol>
+<li>We do want to use a local in memory database. Indeed, we do not want to mess up with the information stored on the Mysql database. Finally, we need the test to be as autonomous as possible. That is that it does not depend on an external server (e.g. app server, database server).</li>
+<li>JUnit does not guarantee the order in which the tests are ran.
+Therefore, we must initialize the manager before each and every test of the fixture. Furthermore we must close it after the test to
+avoid session leaks.</li>
+<li>During tests, we must make sure that the database is in an acceptable state before running each unit.</li>
+</ol>
+
+
+<p>To limit the dependencies to other components and to keep the setting simple, we will use <a href="http://db.apache.org/derby/">Derby</a> as a pure in
+memory database. That is no file produced during the database execution and thus no cleaning afterwards. Please note that is only used for testing purposes.</p>
+
+<p>```xml Derby in memory database dependencies
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;org.apache.derby&lt;/groupId&gt;
+&lt;artifactId&gt;derby&lt;/artifactId&gt;
+&lt;version&gt;10.8.2.2&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency> <br/>
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;org.apache.derby&lt;/groupId&gt;
+&lt;artifactId&gt;derbyclient&lt;/artifactId&gt;
+&lt;version&gt;10.8.2.2&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+```</p>
+
+<p>The following <code>persistence.xml</code> file sets  <code>DERBY</code> as a target database language. Using Derby, selecting the embedded
+drivers in conjunction <code>org.apache.derby.jdbc.EmbeddedDriver</code> with a <code>jdbc:derby:memory</code> URL runs a database in memory without
+persisting anything to disk. This combination is important as it otherwise will store file on the disk.
+The following will be used by <code>Maven</code> during the test because it overrides the one in `/main/resources/META-INF/``. This is an elegant way to use a different database setting for the unit tests.
+``` xml Persistence descriptor /test/resources/META-INF/persistence.xml
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;persistence version="1.0"</p>
+
+<pre><code>xmlns="http://java.sun.com/xml/ns/persistence"&gt;
+&lt;persistence-unit name="JEE6Demo-Persistence"
+    transaction-type="RESOURCE_LOCAL"&gt;
+    &lt;provider&gt;org.eclipse.persistence.jpa.PersistenceProvider&lt;/provider&gt;
+    &lt;class&gt;ch.demo.dom.Student&lt;/class&gt;
+    &lt;properties&gt;
+        &lt;property name="eclipselink.logging.level" value="FINE" /&gt;
+        &lt;property name="eclipselink.target-database" value="DERBY" /&gt;
+        &lt;property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.EmbeddedDriver" /&gt;
+        &lt;property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:StudentsDB;create=true" /&gt;
+        &lt;property name="javax.persistence.jdbc.user" value="" /&gt;
+        &lt;property name="javax.persistence.jdbc.password" value="" /&gt;
+        &lt;property name="eclipselink.logging.level" value="INFO" /&gt;
+    &lt;/properties&gt;        
+&lt;/persistence-unit&gt;
+</code></pre>
+
+<p></persistence>
+```</p>
+
+<p>To solve the second issue, we must guarantee that each test fixture gets a fresh entity manager. JUnit 4+ executes whatever
+public static method annotated with <code>@BeforeClass</code> before firing up the class constructor. Similarly, methods annotated with <code>@AfterClass</code>
+are executed after all the tests and is therefore a good place for cleanup.
+``` java Start the JPA manager before for each test fixture</p>
+
+<p>/<strong> The factory that produces entity manager. */
+private static EntityManagerFactory mEmf;
+/</strong> The entity manager that persists and queries the DB. */
+private static EntityManager mEntityManager;</p>
+
+<p>@BeforeClass
+public static void initTestFixture() throws Exception {</p>
+
+<pre><code>// Get the entity manager for the tests.
+mEmf = Persistence.createEntityManagerFactory(mPersistenceUnit);
+mEntityManager = mEmf.createEntityManager();
+...
+</code></pre>
+
+<p>}</p>
+
+<p> /<em>*
+ * Cleans up the session.
+ </em>/
+@AfterClass
+public static void closeTestFixture() {</p>
+
+<pre><code>mEntityManager.close();
+mEmf.close();
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The problem with the pure in-memory approach is that schema has to recreated for each run. One solution would be to rely on the <code>Eclipse-link</code> DDL creation. I do not really like this solution as it usually not accepted by the customers that tend to want to have control
+of their schema. Thus, to have a test setting that is as close as possible to the production setting we need something to install the schema
+by running a SQL file. There are many solutions out there:</p>
+
+<ul>
+<li>Manually parsing the SQL file. I do not like this solution as it becomes rapidly intractable when the file contains comments and transactions.</li>
+<li>Using tools such as <a href="http://www.liquibase.org/">Liquibase</a>. Nice solution but to me it was to much of a hammer to that specific case.</li>
+<li>Using an API that does it for me.</li>
+</ul>
+
+
+<p>I propose the last approach by using <code>Derby Tools</code> and in particular the API of <code>ij</code>.
+```xml DBUnit dependency
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;org.apache.derby&lt;/groupId&gt;
+&lt;artifactId&gt;derbytools&lt;/artifactId&gt;
+&lt;version&gt;10.8.2.2&lt;/version&gt;
+</code></pre>
+
+<p></dependency>
+```</p>
+
+<p>This allows to use <code>ij</code> directly in the test to parse the DDL file. This is shown in the following listing.
+First, it gets the underlying JDBC connection and then it run the file located in <code>test/resources/sql/</code>.</p>
+
+<p>```java
+@BeforeClass
+public static void initTestFixture() throws Exception {</p>
+
+<pre><code>// Get the entity manager for the tests.
+mEmf = Persistence.createEntityManagerFactory(mPersistenceUnit);
+mEntityManager = mEmf.createEntityManager();
+
+Connection connection = ((EntityManagerImpl) (mEntityManager
+        .getDelegate())).getServerSession().getAccessor()
+        .getConnection();
+
+ij.runScript(connection,
+        AbstractDBTest.class.getResourceAsStream("sql/studentSchema.ddl"),
+        "UTF-8", System.out, "UTF-8");
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The third item asks for a way to properly initialize the data prior to the test. Remember that your tests should not rely on the success of
+previous ones. To that end, we cleanup the data prior any test execution. A rather easy way to do that is to use
+<a href="http://www.dbunit.org/">DBUnit</a>.</p>
+
+<p>```xml DBUnit dependency</p>
+
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.dbunit&lt;/groupId&gt;
+    &lt;artifactId&gt;dbunit&lt;/artifactId&gt;
+    &lt;version&gt;2.4.8&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p><code>
+It loads a file named `/test/resources/students-datasets.xml`` from the test resources.
+</code>java Initialize the test dataset</p>
+
+<pre><code>@BeforeClass
+public static void initTestFixture() throws Exception {
+// Get the entity manager for the tests.
+mEmf = Persistence.createEntityManagerFactory(mPersistenceUnit);
+mEntityManager = mEmf.createEntityManager();
+
+Connection connection = ((EntityManagerImpl) (mEntityManager
+        .getDelegate())).getServerSession().getAccessor()
+        .getConnection();
+
+ij.runScript(connection,
+        AbstractDBTest.class.getResourceAsStream("sql/studentSchema.ddl"),
+        "UTF-8", System.out, "UTF-8");
+
+    mDBUnitConnection = new DatabaseConnection(connection);
+    //Loads the data set from a file named students-datasets.xml
+    mDataset = new FlatXmlDataSetBuilder().build(Thread.currentThread()
+            .getContextClassLoader()
+            .getResourceAsStream("students-datasets.xml"));
+
+    ...
+}
+</code></pre>
+
+<p>```</p>
+
+<p>After what, clean test data are inserted for each and every test of the fixture:</p>
+
+<p>```java init of the test</p>
+
+<pre><code>@Before
+public void initTest() throws Exception {
+    //Clean the data from previous test and insert new data test.
+    DatabaseOperation.CLEAN_INSERT.execute(mDBUnitConnection, mDataset);
+}
+</code></pre>
+
+<p>```</p>
+
+<p>In this post, I've showed how to test the persistence of an JPA 2.0 entity using JUnit 4. The test setting runs in memory without external server  and enforces a clean database state prior running the tests.</p>
+
+<p>To support my teaching activities on Java EE 6, I've setup a project on Google Code Hosting that contains all the presented sources and much more. Please give me feedbacks on how to improve that demo project and in particular its
+testability.</p>
+]]></content>
+  </entry>
+  
+</feed>
