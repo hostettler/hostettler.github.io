@@ -24,7 +24,7 @@
   <script src="/javascripts/modernizr-2.0.js"></script>
   <script src="/javascripts/ender.js"></script>
   <script src="/javascripts/octopress.js" type="text/javascript"></script>
-  <link href="/github/atom.xml" rel="alternate" title="Steve Hostettler" type="application/atom+xml">
+  <link href="/atom.xml" rel="alternate" title="Steve Hostettler" type="application/atom+xml">
   <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
 <link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
@@ -55,7 +55,7 @@
 
 </header>
   <nav role="navigation"><ul class="subscription" data-subscription="rss">
-  <li><a href="/github/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
   
 </ul>
   
@@ -509,6 +509,124 @@ In fact mocks are a certain kind of stub or fake. However, the additional featur
 <li>[7] <a href="http://en.wikipedia.org/wiki/Test_stubs">Wikipedia Stubs</a></li>
 </ul>
 
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/04/18/black-grey-white-box-and-all-that/">Black, Grey, White Box Testing and All That&#8230;</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-18T10:52:00+02:00" pubdate data-updated="true">Apr 18<span>th</span>, 2014</time>
+        
+         | <a href="/blog/2014/04/18/black-grey-white-box-and-all-that/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h2>Introduction</h2>
+
+<p>In this post, I would like to discuss number of definitions around the testing activity. Having these definitions in mind helps to organize this crucial activity. In a previous post, I discussed the difference between <a href="">verification and validation</a>. If the difference is not clear to you, please have a look at it prior reading this post.</p>
+
+<p>Let me start with the definition of what is testing. Software testing helps to measure the quality of a software in terms of defects. It is crucial to understand that testing does not prove the presence of defects, only their presence [].</p>
+
+<p>This comes from the fact that exhaustive testing is not possible  due to a phenomena called the state space explosion [1]. The idea is that doing exhaustive testing would require a structure in memory that remembers all the tested states of the system. A state of the system being the concatenation of its variables. For instance, let us take a program that has two variables:
+- an integer (4 bytes = 32 bits)
+- an array of ASCII characters of length 10 (10 bytes =  80 bits)
+The number of states to explore is  2<sup>112</sup> ~ 5x10<sup>33</sup> states and the required amount of memory would be 7.2x10<sup>22</sup> Terabytes.
+Although many optimizations can be brought to a brute force approach [1,2], the problem remains huge. Therefore, exhaustive testing is not an option.</p>
+
+<p>A (software) defect originates in a human <strong>mistake</strong> (e.g., a misunderstanding) that produces a <strong>fault</strong> (i.e., a defect, a bug). Under certain circumstances, the faulty code will end up doing something unexpected with respect to the user requirements. This is called a <strong>failure</strong>.</p>
+
+<p>To sum up, there is the following causality chain : Mistake &#8211;> Fault &#8211;> Failure.</p>
+
+<h2>Testing dimensions</h2>
+
+<p>Testing can be characterized in terms of dimensions. These dimensions help to categorized the test types.</p>
+
+<ol>
+<li><p>What : This dimension describes what are the objectives of the tests. Test objectives vary from one approach to another.
+Usually the objectives are the verification or  the validation of functionnal (e.g., portfolio performance) and non-functionnal (e.g., performance, security) requirements.</p></li>
+<li><p>How : This defines how the test objective is achieved. For instance, tests can be either static or dynamic, in isolation or in integration, or knowing the implementation.</p></li>
+<li><p>When : Test can be executed at different moment of the development process. For instance, component testing can be done very early in the development process, while user acceptance test can only be performed when the software is ready for prime time.</p></li>
+<li><p>Who : Different kind of tests are run by different people (e.g., developer, testers , end-users, &#8230;) For instance, component testing can be done by programmers, while user acceptance test can only be performed by end-users.</p></li>
+</ol>
+
+
+<h3>Test Types</h3>
+
+<h4>Functionnal testing</h4>
+
+<h4>Non-Functionnal testing</h4>
+
+<h4>Structural testing</h4>
+
+<h4>Regression Testing</h4>
+
+<h3>The box approach</h3>
+
+<h4>Black box testing</h4>
+
+<p>Equivalence partitioning
+Boundary values
+Decision Table
+Automata
+Use Case/Story</p>
+
+<h4>White box testing</h4>
+
+<p>Statement testing and coverage
+Decision testing and coverage</p>
+
+<h4>Grey box testing</h4>
+
+<h3>Testing level</h3>
+
+<h4>Component testing</h4>
+
+<p>Test objects are isolated components (classes, packages, programs, &#8230;)  To promote isolation, test objects such as stubs, fakes or mocks can be used. for more information see <a href="">Fakes, Stubs, Dummies, Mocks and all that</a>. These tests happen during development and discovered bugs are fixed right away. Therefore, the management overhead is minimal.
+Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h4>Integration testing</h4>
+
+<p>Integration testing (a.k.a. assembly testing) verifies the integration between several components. At this level, some components can still be faked to ease deployment and isolation.
+Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h4>System testing</h4>
+
+<p>This test level aims the system as a whole with every internal and external components.
+Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h4>Acceptance testing</h4>
+
+<p>Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h3>Bibliography</h3>
+
+<p>[1] Antti Valmari. The state explosion problem. In Wolfgang Reisig and Grzegorz Rozenberg, editors, Lectures on Petri Nets I: Basic
+Models, volume 1491 of Lecture Notes in Computer Science, pages 429D528. Springer, 1998.</p>
 </div>
   
   
@@ -4154,250 +4272,6 @@ detect major problems. The examples used in this blog are to be found in the <a 
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">Embedded Web Application Integration Testing Using Tomcat 7 and JUnit</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-04-09T14:39:00+02:00" pubdate data-updated="true">Apr 9<span>th</span>, 2012</time>
-        
-         | <a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/#disqus_thread">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>To follow up on my previous post about <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">how to programmatically build a web archive</a>, I propose to look at how to deploy this archive in a Tomcat instance that is embedded into a JUnit test.</p>
-
-<p>As usual, the presented snippets are available in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> application. I will first look at the dependencies, then I will show how to configure Tomcat and finally how to start and stop the embedded instance.</p>
-
-<p>The first dependency is the embedded Tomcat core component. JULI which stands for Java Utility Logging Implementation that is the container extension of common logging. The ECJ compiler and JASPER are required to handle JSPs. Of course all these dependencies are scoped to test only.</p>
-
-<h2>The dependencies</h2>
-
-<figure class='code'><figcaption><span>Maven dependencies necessary to start an embedded Tomcat instance into JUnit tests.</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-<span class='line-number'>30</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;dependency&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.apache.tomcat.embed<span class="nt">&lt;/groupId&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>tomcat-embed-core<span class="nt">&lt;/artifactId&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;version&gt;</span>7.0.26<span class="nt">&lt;/version&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
-</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
-</span><span class='line'><span class="nt">&lt;dependency&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.apache.tomcat.embed<span class="nt">&lt;/groupId&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>tomcat-embed-logging-juli<span class="nt">&lt;/artifactId&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;version&gt;</span>7.0.26<span class="nt">&lt;/version&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
-</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
-</span><span class='line'><span class="nt">&lt;dependency&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.eclipse.jdt.core.compiler<span class="nt">&lt;/groupId&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>ecj<span class="nt">&lt;/artifactId&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;version&gt;</span>3.7.1<span class="nt">&lt;/version&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
-</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
-</span><span class='line'><span class="nt">&lt;dependency&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.apache.tomcat.embed<span class="nt">&lt;/groupId&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>tomcat-embed-jasper<span class="nt">&lt;/artifactId&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;version&gt;</span>7.0.26<span class="nt">&lt;/version&gt;</span>
-</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
-</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
-</span><span class='line'><span class="nt">&lt;dependency&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;version&gt;</span>4.10<span class="nt">&lt;/version&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
-</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<h2>Configuring Tomcat</h2>
-
-<p>The following snippet prepares the embedded instance. The static member <code>mTomcat</code> references a new instance of Tomcat. As Tomcat still requires a file system to work, a temporary directory is used to put all the temporary files. To that end, we use the <code>java.io.tmpdir</code> java property.
-These variables are shared among the test cases.</p>
-
-<figure class='code'><figcaption><span>Shared static variables</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="cm">/** The tomcat instance. */</span>
-</span><span class='line'><span class="kd">private</span> <span class="n">Tomcat</span> <span class="n">mTomcat</span><span class="o">;</span>
-</span><span class='line'><span class="cm">/** The temporary directory in which Tomcat and the app are deployed. */</span>
-</span><span class='line'><span class="kd">private</span> <span class="n">String</span> <span class="n">mWorkingDir</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>As we want to use the same Tomcat configuration among all test cases, the initialization is put in a method annotated with <code>@Before</code>. First, the method sets the port to <code>0</code>. This tells the engine to choose the port to run on by itself.  This is especially useful to avoid  starting the embedded Tomcat on a already used port as <code>8080</code> for instance.
-Then the base directory is set <code>mTomcat.setBaseDir()</code> to the temporary directory. Without doing that, Tomcat would start in the current directory. The rest of the method configures the way WAR are managed by the engine.</p>
-
-<figure class='code'><figcaption><span>Configuration of the embedded Tomcat instance</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Before</span>
-</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">setup</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
-</span><span class='line'>  <span class="n">mTomcat</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Tomcat</span><span class="o">();</span>
-</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">setPort</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">setBaseDir</span><span class="o">(</span><span class="n">mWorkingDir</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">getHost</span><span class="o">().</span><span class="na">setAppBase</span><span class="o">(</span><span class="n">mWorkingDir</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">getHost</span><span class="o">().</span><span class="na">setAutoDeploy</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">getHost</span><span class="o">().</span><span class="na">setDeployOnStartup</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
-</span><span class='line'>  <span class="o">...</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The rest of the method builds a reference to a directory (based into the temporary directory) that contains the web application. This directory is deleted if it exists to ensure redeployment of the WAR. Finally, the WAR built as explained <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">there</a> is exported into the temporary directory.</p>
-
-<p>Finally, the web application is added to the Tomcat instance. More specifically, a path
-exploded version <code>webApp.getAbsolutePath()</code> of the WAR is linked to a context <code>contextPath</code>.</p>
-
-<figure class='code'><figcaption><span>Cleaning and preparing the web application deployment.</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Before</span>
-</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">setup</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
-</span><span class='line'>  <span class="o">...</span>
-</span><span class='line'>  <span class="n">String</span> <span class="n">contextPath</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">getApplicationId</span><span class="o">();</span>
-</span><span class='line'>  <span class="n">File</span> <span class="n">webApp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">mWorkingDir</span><span class="o">,</span> <span class="n">getApplicationId</span><span class="o">());</span>
-</span><span class='line'>  <span class="n">File</span> <span class="n">oldWebApp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">webApp</span><span class="o">.</span><span class="na">getAbsolutePath</span><span class="o">());</span>
-</span><span class='line'>  <span class="n">FileUtils</span><span class="o">.</span><span class="na">deleteDirectory</span><span class="o">(</span><span class="n">oldWebApp</span><span class="o">);</span>
-</span><span class='line'>  <span class="k">new</span> <span class="nf">ZipExporterImpl</span><span class="o">(</span><span class="n">createWebArchive</span><span class="o">()).</span><span class="na">exportTo</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">mWorkingDir</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">getApplicationId</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;.war&quot;</span><span class="o">),</span>
-</span><span class='line'>          <span class="kc">true</span><span class="o">);</span>
-</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">addWebapp</span><span class="o">(</span><span class="n">mTomcat</span><span class="o">.</span><span class="na">getHost</span><span class="o">(),</span> <span class="n">contextPath</span><span class="o">,</span> <span class="n">webApp</span><span class="o">.</span><span class="na">getAbsolutePath</span><span class="o">());</span>   
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Starting Tomcat</h2>
-
-<p>Now that Tomcat has been configured, the next step is to start it. We want a fresh Tomcat
-for each and every test case. This way, a failed test does not have repercussions on the subsequent tests (e.g. session information, memory leaks);</p>
-
-<figure class='code'><figcaption><span>Start the embedded Tomcat instance and add a web application</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Before</span>
-</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">setup</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>If necessary, the actual port on which Tomcat has been started can be retrieved using the following snippet.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">protected</span> <span class="kt">int</span> <span class="nf">getTomcatPort</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">return</span> <span class="n">mTomcat</span><span class="o">.</span><span class="na">getConnector</span><span class="o">().</span><span class="na">getLocalPort</span><span class="o">();</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Finally, after the test, the Tomcat instance is stopped and destroyed clearing the way for the next test.</p>
-
-<h2>Stopping Tomcat</h2>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@After</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">teardown</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
-</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">mTomcat</span><span class="o">.</span><span class="na">getServer</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span>
-</span><span class='line'>            <span class="o">&amp;&amp;</span> <span class="n">mTomcat</span><span class="o">.</span><span class="na">getServer</span><span class="o">().</span><span class="na">getState</span><span class="o">()</span> <span class="o">!=</span> <span class="n">LifecycleState</span><span class="o">.</span><span class="na">DESTROYED</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">mTomcat</span><span class="o">.</span><span class="na">getServer</span><span class="o">().</span><span class="na">getState</span><span class="o">()</span> <span class="o">!=</span> <span class="n">LifecycleState</span><span class="o">.</span><span class="na">STOPPED</span><span class="o">)</span> <span class="o">{</span>
-</span><span class='line'>              <span class="n">mTomcat</span><span class="o">.</span><span class="na">stop</span><span class="o">();</span>
-</span><span class='line'>        <span class="o">}</span>
-</span><span class='line'>        <span class="n">mTomcat</span><span class="o">.</span><span class="na">destroy</span><span class="o">();</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<h2>Conclusion</h2>
-
-<p>In this post, we have seen how to start an embedded version of Tomcat into a JUnit fixture.
-The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -4414,6 +4288,10 @@ The examples used in this blog are to be found in the <a href="http://code.googl
     
       <li class="post">
         <a href="/blog/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that/">Fakes, Stubs, Dummy, Mocks, Doubles and all that&#8230;</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/18/black-grey-white-box-and-all-that/">Black, Grey, White box testing and all that&#8230;</a>
       </li>
     
       <li class="post">
@@ -4446,10 +4324,6 @@ The examples used in this blog are to be found in the <a href="http://code.googl
     
       <li class="post">
         <a href="/blog/2012/04/16/using-selenium-for-web-integration-testing/">Using Selenium for web integration testing</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">Embedded Web Application integration testing using Tomcat 7 and JUnit</a>
       </li>
     
   </ul>

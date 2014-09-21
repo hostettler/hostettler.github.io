@@ -5,13 +5,12 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>About Sessions, Conversations, and the Garbage Collector - Steve Hostettler</title>
+  <title>Black, Grey, White box testing and all that... - Steve Hostettler</title>
   <meta name="author" content="Steve Hostettler">
 
   
-  <meta name="description" content="A couple of days ago, I had a discussion with a developer about the notion of web conversation.
-More precisely, about its utility. During this &hellip;">
-  <meta name="keywords" content="Java EE 6JEE6JavaSessionConversationGarbage Collector">
+  <meta name="description" content="Introduction In this post, I would like to discuss number of definitions around the testing activity. Having these definitions in mind helps to &hellip;">
+  
 
   <!-- http://t.co/dKP3o1e -->
   <meta name="HandheldFriendly" content="True">
@@ -19,7 +18,7 @@ More precisely, about its utility. During this &hellip;">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://hostettler.github.io/blog/2012/06/10/Sessions-GC-Conversations">
+  <link rel="canonical" href="http://hostettler.github.io/blog/2014/04/18/black-grey-white-box-and-all-that">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -82,7 +81,7 @@ More precisely, about its utility. During this &hellip;">
   
   <header>
     
-      <h1 class="entry-title">About Sessions, Conversations, and the Garbage Collector</h1>
+      <h1 class="entry-title">Black, Grey, White Box Testing and All That...</h1>
     
     
       <p class="meta">
@@ -98,7 +97,7 @@ More precisely, about its utility. During this &hellip;">
   
 
 
-<time datetime="2012-06-10T18:51:00+02:00" pubdate data-updated="true">Jun 10<span>th</span>, 2012</time>
+<time datetime="2014-04-18T10:52:00+02:00" pubdate data-updated="true">Apr 18<span>th</span>, 2014</time>
         
          | <a href="#disqus_thread">Comments</a>
         
@@ -107,60 +106,87 @@ More precisely, about its utility. During this &hellip;">
   </header>
 
 
-<div class="entry-content"><p>A couple of days ago, I had a discussion with a developer about the notion of web conversation.
-More precisely, about its utility. During this discussion, we ran into some basic misconceptions
-that, IMHO, no web developer must do. Conversation (or flows) are good features of the recent
-frameworks (Spring, JSF) because they allow to save information across several user requests without
-putting them into the session. For instance, this can be very useful for wizards. Putting these
-information into the session asks for manual maintenance, and in particular for manual collection.
-This is usual error prone and should be avoided. The problem being that the user rarely logs out
-before closing the browser. Thus, <code>HttpSession.invalidate()</code> does not get a chance to be called
-and the session remains active until the timeout occurs (usually 20 minutes later).</p>
+<div class="entry-content"><h2>Introduction</h2>
 
-<p>The person I was talking with, though that it is not necessary to care about that. In his view,
-the garbage collector will take care of this and that it can be forced. We discuss the matter a bit
-deeper and here are some myths that I think must be rebutted.</p>
+<p>In this post, I would like to discuss number of definitions around the testing activity. Having these definitions in mind helps to organize this crucial activity. In a previous post, I discussed the difference between <a href="">verification and validation</a>. If the difference is not clear to you, please have a look at it prior reading this post.</p>
 
-<h2>First assumption: I can force the garbage collection</h2>
+<p>Let me start with the definition of what is testing. Software testing helps to measure the quality of a software in terms of defects. It is crucial to understand that testing does not prove the presence of defects, only their presence [].</p>
 
-<p>This is not true, actually according to the Java documentation:</p>
+<p>This comes from the fact that exhaustive testing is not possible  due to a phenomena called the state space explosion [1]. The idea is that doing exhaustive testing would require a structure in memory that remembers all the tested states of the system. A state of the system being the concatenation of its variables. For instance, let us take a program that has two variables:
+- an integer (4 bytes = 32 bits)
+- an array of ASCII characters of length 10 (10 bytes =  80 bits)
+The number of states to explore is  2<sup>112</sup> ~ 5x10<sup>33</sup> states and the required amount of memory would be 7.2x10<sup>22</sup> Terabytes.
+Although many optimizations can be brought to a brute force approach [1,2], the problem remains huge. Therefore, exhaustive testing is not an option.</p>
 
-<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class=''><span class='line'>Calling the gc method suggests that the Java Virtual Machine expend effort toward recycling unused objects in order to make the memory they currently occupy available for quick reuse. When control returns from the method call, the Java Virtual Machine has made a best effort to reclaim space from all discarded objects.</span></code></pre></td></tr></table></div></figure>
+<p>A (software) defect originates in a human <strong>mistake</strong> (e.g., a misunderstanding) that produces a <strong>fault</strong> (i.e., a defect, a bug). Under certain circumstances, the faulty code will end up doing something unexpected with respect to the user requirements. This is called a <strong>failure</strong>.</p>
+
+<p>To sum up, there is the following causality chain : Mistake &#8211;> Fault &#8211;> Failure.</p>
+
+<h2>Testing dimensions</h2>
+
+<p>Testing can be characterized in terms of dimensions. These dimensions help to categorized the test types.</p>
+
+<ol>
+<li><p>What : This dimension describes what are the objectives of the tests. Test objectives vary from one approach to another.
+Usually the objectives are the verification or  the validation of functionnal (e.g., portfolio performance) and non-functionnal (e.g., performance, security) requirements.</p></li>
+<li><p>How : This defines how the test objective is achieved. For instance, tests can be either static or dynamic, in isolation or in integration, or knowing the implementation.</p></li>
+<li><p>When : Test can be executed at different moment of the development process. For instance, component testing can be done very early in the development process, while user acceptance test can only be performed when the software is ready for prime time.</p></li>
+<li><p>Who : Different kind of tests are run by different people (e.g., developer, testers , end-users, &#8230;) For instance, component testing can be done by programmers, while user acceptance test can only be performed by end-users.</p></li>
+</ol>
 
 
-<p><code>System.gc()</code> <strong>suggests</strong> the garbage collection, it does not enforce it. This signals that you
-would like the garbage collector to do its job, but there is no guarantee whatsoever. It is only
-possible to enforce garbage collection by writing your own garbage collector, but you cannot expect
-all garbage collectors of all the possible VM to act similarly. Therefore, relying on this
-assumption is not portable.</p>
+<h3>Test Types</h3>
 
-<h2>Second assumption: If I close the browser the session and its objects are collected</h2>
+<h4>Functionnal testing</h4>
 
-<p>Even If it would be possible to enforce the garbage collection, it is of no use as long as there
-remains a single reference to the objects to collect. Again, this is absolutely not the case.
-Remember that closing the browser does not mean anything to the server. It would, in theory possible
-to imagine something with an ajax call that traps the close event of the browser and does a
-<code>HttpSession.invalidate()</code> . This is quite complex to do in a cross-browser manner and gives no
-guarantee. Therefore, the data attached to the session will be kept in memory until the session
-timeout. This is precisely the beauty of conversation scopes, the developer just tells when the
-conversation starts and when it ends. Usually, user do not stop in the middle of a conversation,
-they tend to finish it. At least, more often that they click on logout.</p>
+<h4>Non-Functionnal testing</h4>
 
-<h2>Third assumption: Anyway this does not represent a huge amount of memory.</h2>
+<h4>Structural testing</h4>
 
-<p>Let us take a simple example: a standard business application that, at some point in the business
-process, requires a tree for shop selection. This kind of interactions requires several client-server
-communications and therefore several requests. A temptation would be to put the tree in the session
-scope. Let us say that 10,000 (logical) users log into the application, for instance from 09:00 am to 09:30
-am. If each session requires 100 KB (trees are huge even with lazy loading), we end up with 1G memory(only for the tree).
-As most of the users do not click on logout, you rely on the timeout to free these objects.</p>
+<h4>Regression Testing</h4>
 
-<h2>Conclusion</h2>
+<h3>The box approach</h3>
 
-<p>Using request scope of conversation scope over session scope is a good practice as it frees you
-from managing the garbage collection. The code is therefore cleaner and more efficient.
-This can be done with JSF&#8217;s <code>@ConversationScoped</code> or with Spring Webflow&#8217;s <code>Conversation</code>.</p>
+<h4>Black box testing</h4>
+
+<p>Equivalence partitioning
+Boundary values
+Decision Table
+Automata
+Use Case/Story</p>
+
+<h4>White box testing</h4>
+
+<p>Statement testing and coverage
+Decision testing and coverage</p>
+
+<h4>Grey box testing</h4>
+
+<h3>Testing level</h3>
+
+<h4>Component testing</h4>
+
+<p>Test objects are isolated components (classes, packages, programs, &#8230;)  To promote isolation, test objects such as stubs, fakes or mocks can be used. for more information see <a href="">Fakes, Stubs, Dummies, Mocks and all that</a>. These tests happen during development and discovered bugs are fixed right away. Therefore, the management overhead is minimal.
+Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h4>Integration testing</h4>
+
+<p>Integration testing (a.k.a. assembly testing) verifies the integration between several components. At this level, some components can still be faked to ease deployment and isolation.
+Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h4>System testing</h4>
+
+<p>This test level aims the system as a whole with every internal and external components.
+Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h4>Acceptance testing</h4>
+
+<p>Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h3>Bibliography</h3>
+
+<p>[1] Antti Valmari. The state explosion problem. In Wolfgang Reisig and Grzegorz Rozenberg, editors, Lectures on Petri Nets I: Basic
+Models, volume 1491 of Lecture Notes in Computer Science, pages 429D528. Springer, 1998.</p>
 </div>
 
 
@@ -183,14 +209,8 @@ This can be done with JSF&#8217;s <code>@ConversationScoped</code> or with Sprin
   
 
 
-<time datetime="2012-06-10T18:51:00+02:00" pubdate data-updated="true">Jun 10<span>th</span>, 2012</time>
+<time datetime="2014-04-18T10:52:00+02:00" pubdate data-updated="true">Apr 18<span>th</span>, 2014</time>
       
-
-<span class="categories">
-  
-    <a class='category' href='/blog/categories/conversation/'>Conversation</a>, <a class='category' href='/blog/categories/garbage-collector/'>Garbage Collector</a>, <a class='category' href='/blog/categories/jee6/'>JEE6</a>, <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/java-ee-6/'>Java EE 6</a>, <a class='category' href='/blog/categories/session/'>Session</a>
-  
-</span>
 
 
     </p>
@@ -206,10 +226,10 @@ This can be done with JSF&#8217;s <code>@ConversationScoped</code> or with Sprin
     
     <p class="meta">
       
-        <a class="basic-alignment left" href="/blog/2012/05/24/moxy/" title="Previous Post: Object-XML Mapping with JAXB & MOXy">&laquo; Object-XML Mapping with JAXB & MOXy</a>
+        <a class="basic-alignment left" href="/blog/2012/12/31/jee6-tutorial/" title="Previous Post: JEE6 Tutorial">&laquo; JEE6 Tutorial</a>
       
       
-        <a class="basic-alignment right" href="/blog/2012/11/20/multi-tenancy/" title="Next Post: Multi-Tenancy with EJB 3.1 and JPA 2.0">Multi-Tenancy with EJB 3.1 and JPA 2.0 &raquo;</a>
+        <a class="basic-alignment right" href="/blog/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that/" title="Next Post: Fakes, Stubs, Dummy, Mocks, Doubles and all that...">Fakes, Stubs, Dummy, Mocks, Doubles and all that... &raquo;</a>
       
     </p>
   </footer>
@@ -305,8 +325,8 @@ This can be done with JSF&#8217;s <code>@ConversationScoped</code> or with Sprin
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://hostettler.github.io/blog/2012/06/10/Sessions-GC-Conversations/';
-        var disqus_url = 'http://hostettler.github.io/blog/2012/06/10/Sessions-GC-Conversations/';
+        var disqus_identifier = 'http://hostettler.github.io/blog/2014/04/18/black-grey-white-box-and-all-that/';
+        var disqus_url = 'http://hostettler.github.io/blog/2014/04/18/black-grey-white-box-and-all-that/';
         var disqus_script = 'embed.js';
       
     (function () {
