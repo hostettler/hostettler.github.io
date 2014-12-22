@@ -4,7 +4,7 @@
   <title><![CDATA[Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2014-10-12T17:43:30+02:00</updated>
+  <updated>2014-12-22T23:42:25+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -430,9 +430,10 @@ In fact mocks are a certain kind of stub or fake. However, the additional featur
 
 <p>In this post, I would like to discuss number of definitions around the testing activity. Having these definitions in mind helps to organize this crucial activity. In a previous post, I discussed the difference between <a href="">verification and validation</a>. If the difference is not clear to you, please have a look at it prior reading this post.</p>
 
-<p>Let me start with the definition of what is testing. Software testing helps to measure the quality of a software in terms of defects. It is crucial to understand that testing does not prove the absence of defects, only their presence [].</p>
+<p>Let me start with the definition of what is testing. Software testing helps to measure the quality of a software in terms of defects. It is crucial to understand that
+&#8220;testing shows the presence, not the absence of bugs&#8221; [1].</p>
 
-<p>This comes from the fact that exhaustive testing is not possible  due to a phenomena called the state space explosion [1]. The idea is that doing exhaustive testing would require a structure in memory that remembers all the tested states of the system. A state of the system being the concatenation of its variables. For instance, let us take a program that has two variables:
+<p>This comes from the fact that exhaustive testing is not possible  due to a phenomena called the state space explosion [2]. The idea is that doing exhaustive testing would require a structure in memory that remembers all the tested states of the system. A state of the system being the concatenation of its variables. For instance, let us take a program that has two variables:
 - an integer (4 bytes = 32 bits)
 - an array of ASCII characters of length 10 (10 bytes =  80 bits)
 The number of states to explore is  2<sup>112</sup> ~ 5x10<sup>33</sup> states (remember that the number of atoms in the observable universe is 10<sup>80</sup>) and the required amount of memory would be 7.2x10<sup>22</sup> Terabytes. Although many optimizations can be brought to a brute force approach [1,2], the problem remains huge. Therefore, exhaustive testing is not an option.</p>
@@ -457,24 +458,32 @@ Usually the objectives are the verification or  the validation of functionnal (e
 </ol>
 
 
-<p><span class='caption-wrapper center'><img class='caption' src='http://hostettler.github.io/figures/TESTING_LEVELS.png' width='' height='' alt='Testing Levels' title='Testing Levels'><span class='caption-text'>Testing Levels</span></span></p>
-
 <h3>Testing level</h3>
+
+<p>Testing levels have been addressed in a number of publications, blog posts and talks [3], [4], [5]. Testing levels describe test types by their quantity and when they occur in the software lifecycle. At the base, tests are done early in the development and extensively. The higher the level, the later the test occurs in the lifecycle. Moreover, while lower levels are usually done the the software supplier, higher levels tend to be performed by the customer.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='http://hostettler.github.io/figures/TESTING_LEVELS.png' width='' height='' alt='Testing Levels' title='Testing Levels'><span class='caption-text'>Testing Levels</span></span></p>
 
 <h4>Static testing</h4>
 
-<p>Test objects are isolated components (classes, packages, programs, &#8230;)  To promote isolation, test objects such as stubs, fakes or mocks can be used. for more information see <a href="">Fakes, Stubs, Dummies, Mocks and all that</a>. These tests happen during development and discovered bugs are fixed right away. Therefore, the management overhead is minimal.
-Both verification of functional and non.functional requirements can be addressed.</p>
+<p>This sort of testing do not require to execute the code. Tools crawl the code and look for patterns that can lead to fault. Example of tools are <a href="http://findbugs.sourceforge.net/">Findbugs</a>, <a href="http://sourceforge.net/p/pmd/bugs/">PMD</a>. This kind of testing is especially useful to detect complex mistakes involving thread-safety or typing.</p>
 
 <h4>Unit testing</h4>
 
-<p>Test objects are isolated components (classes, packages, programs, &#8230;)  To promote isolation, test objects such as stubs, fakes or mocks can be used. for more information see <a href="">Fakes, Stubs, Dummies, Mocks and all that</a>. These tests happen during development and discovered bugs are fixed right away. Therefore, the management overhead is minimal.
-Both verification of functional and non.functional requirements can be addressed.</p>
+<p>Test objects are isolated components (classes, packages, programs, &#8230;)  To promote isolation, test objects such as stubs, fakes or mocks can be used. for more information see <a href="">Fakes, Stubs, Dummies, Mocks and all that</a>. These tests happen during development and discovered bugs are fixed right away. Therefore, the management overhead is minimal. Both verification of functional and non.functional requirements can be addressed.</p>
 
 <h4>Integration testing</h4>
 
 <p>Integration testing (a.k.a. assembly testing) verifies the integration between several components. At this level, some components can still be faked to ease deployment and isolation.
 Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h4>API testing</h4>
+
+<p>This is the first test level that addresses validation instead of verification. It tests the software using its contracts (API). This is pure blackbox testing usually by using webservices. Tools such as SoapUI are very good at testing the software API and semantics.</p>
+
+<h4>GUI testing</h4>
+
+<p>This level acts on the graphical user interface. Example of tools are <a href="http://www.seleniumhq.org/">Selenium</a></p>
 
 <h4>System testing</h4>
 
@@ -487,8 +496,15 @@ Both verification of functional and non.functional requirements can be addressed
 
 <h3>Bibliography</h3>
 
-<p>[1] Antti Valmari. The state explosion problem. In Wolfgang Reisig and Grzegorz Rozenberg, editors, Lectures on Petri Nets I: Basic
+<p>[1 ]Dijkstra (1969) J.N. Buxton and B. Randell, eds, Software Engineering Techniques, April 1970, p. 16. Report on a conference sponsored by the NATO Science Committee, Rome, Italy, 27–31 October 1969. Possibly the earliest documented use of the famous quote.</p>
+
+<p>[2] Antti Valmari. The state explosion problem. In Wolfgang Reisig and Grzegorz Rozenberg, editors, Lectures on Petri Nets I: Basic
 Models, volume 1491 of Lecture Notes in Computer Science, pages 429D528. Springer, 1998.</p>
+
+<p>[3] Martin Fowler. TestPyramid. http://martinfowler.com/bliki/TestPyramid.html</p>
+
+<p>[4] Alister Scott. Yet another software testing pyramid. http://watirmelon.com/2011/06/10/yet-another-software-testing-pyramid/
+[5] Alister Scott. Introducing the software testing ice-cream cone (anti-pattern). http://watirmelon.com/2012/01/31/introducing-the-software-testing-ice-cream-cone/</p>
 ]]></content>
   </entry>
   
