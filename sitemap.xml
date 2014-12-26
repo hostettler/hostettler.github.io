@@ -87,16 +87,22 @@
         <lastmod>2014-06-30T23:39:37+02:00</lastmod>
     </url>
     <url>
+        <loc>
+            http://hostettler.github.io/blog/2014/12/26/communication-between-java-enterprise-applications/
+        </loc>
+        <lastmod>2014-12-26T22:52:16+01:00</lastmod>
+    </url>
+    <url>
         <loc>http://hostettler.github.io/about-me/</loc>
         <lastmod>2014-05-13T17:06:28+02:00</lastmod>
     </url>
     <url>
         <loc>http://hostettler.github.io/blog/archives/</loc>
-        <lastmod>2014-12-26T22:33:21+01:00</lastmod>
+        <lastmod>2014-12-26T22:52:16+01:00</lastmod>
     </url>
     <url>
         <loc>http://hostettler.github.io/</loc>
-        <lastmod>2014-12-26T22:33:21+01:00</lastmod>
+        <lastmod>2014-12-26T22:52:16+01:00</lastmod>
     </url>
     <url>
         <loc>http://hostettler.github.io/robots.txt</loc>
