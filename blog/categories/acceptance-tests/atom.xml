@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: Validation | Steve Hostettler]]></title>
-  <link href="http://hostettler.github.io/blog/categories/validation/atom.xml" rel="self"/>
+  <title><![CDATA[Category: Acceptance Tests | Steve Hostettler]]></title>
+  <link href="http://hostettler.github.io/blog/categories/acceptance-tests/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
   <updated>2014-12-26T22:44:20+01:00</updated>
   <id>http://hostettler.github.io/</id>
