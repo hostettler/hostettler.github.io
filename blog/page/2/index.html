@@ -1,0 +1,2146 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Steve Hostettler</title>
+  <meta name="author" content="Steve Hostettler">
+
+  
+  <meta name="description" content="Following up on my previous posts (here
+and here about integration testing
+of JEE web applications, I will present how to write smoke tests using &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://hostettler.github.io/blog/page/2">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Steve Hostettler" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30751319-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Steve Hostettler</a></h1>
+  
+    <h2>JEE and test automation</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:hostettler.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/about-me/">About Me</a></li>
+  <li><a href="http://publicationslist.org/steve.hostettler">Publications</a></li>
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/16/using-selenium-for-web-integration-testing/">Using Selenium for Web Integration Testing</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-16T18:57:00+02:00" pubdate data-updated="true">Apr 16<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/04/16/using-selenium-for-web-integration-testing/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Following up on my previous posts (<a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">here</a>
+and <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">here</a> about integration testing
+of JEE web applications, I will present how to write smoke tests using Selenium. The idea is to
+detect whether important regressions have been introduced. This is especially useful to detect
+configuration and navigation problems. I&#8217;ve split the test in three parts:</p>
+
+<ol>
+<li>starting and stopping the container. Embedded Tomcat 7 in our case. This is described
+<a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7">here</a>;</li>
+<li>building the WAR file to test. To that end, you can look at this
+<a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap">post</a> that describes how to
+build such a test archive using Shrinkwrap;</li>
+<li>finally, we must build the test case. This is the goal of this post.</li>
+</ol>
+
+
+<p>Testing a use case requires to be able to:</p>
+
+<ol>
+<li>get a page at a given URL;</li>
+<li>input test data into the web elements;</li>
+<li>assert whether the server answers as expected.</li>
+</ol>
+
+
+<p>Selenium provides an easy API to fetch URLs
+As these are smoke tests, using the <code>HtmlUnitDriver</code> instead of a specific browser is sufficient.
+We do not want to detect minor display problems but rather important functional problems.</p>
+
+<p>Selenium has many different drivers for many different browser. The problem is that it opens the
+browser in a new window. I prefer to have the continuous integration running headless.</p>
+
+<p>The following dependencies are required to run the tests.</p>
+
+<figure class='code'><figcaption><span>Maven dependencies</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;groupId&gt;</span>org.seleniumhq.selenium<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;artifactId&gt;</span>selenium-java<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;version&gt;</span>2.20.0<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;groupId&gt;</span>net.sourceforge.htmlunit<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;artifactId&gt;</span>htmlunit<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;version&gt;</span>2.9<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>First, let&#8217;s build a new headless driver. This object simulates the browser. It manages the HTTP part as
+well as parsing the HTML and the javascript code that is returned.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">WebDriver</span> <span class="n">driver</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HtmlUnitDriver</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next step is to ask the driver to load the home page that we want to test. For
+convenience, in my previous posts I defined a method that returns the current Tomcat port and the
+application context.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">driver</span><span class="o">.</span><span class="na">get</span><span class="o">(</span><span class="s">&quot;http://localhost:&quot;</span> <span class="o">+</span> <span class="n">getTomcatPort</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">getApplicationId</span><span class="o">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&#8217;s assume that the home page redirects to a login page that has two text boxes (respectively
+called <code>username</code> and password). The following snippet uses XPATH expressions to locate web elements.
+First, it locates a HTML element of type <code>input</code> that has an
+attribute  <code>id</code> set to <code>username</code>. If this web element is not present, the driver will raise an exception.
+This allows to easily detect whether a widget has been accidentally removed.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">WebElement</span> <span class="n">username</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">&quot;//input[contains(@id,&#39;username&#39;)]&quot;</span><span class="o">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Now we can interact with the previous element. For instance, to simulate a user that types in its username (<code>admin</code>).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">username</span><span class="o">.</span><span class="na">sendKeys</span><span class="o">(</span><span class="s">&quot;admin&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>After that, Let&#8217;s do the same for the web element called <code>password</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">WebElement</span> <span class="n">password</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">&quot;//input[contains(@id,&#39;password&#39;)]&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">password</span><span class="o">.</span><span class="na">sendKeys</span><span class="o">(</span><span class="s">&quot;admin&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Finally, we locate a button called <code>login</code>and we simulate a click on it.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">WebElement</span> <span class="n">login</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">&quot;//button[contains(@id,&#39;login&#39;)]&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">login</span><span class="o">.</span><span class="na">click</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>On successful login, our example redirects to a page that contains a list of students.
+The following assertion checks that the string <code>Student list</code> exists somewhere is the returned
+HTML source code.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">&quot;Student list&quot;</span><span class="o">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With this approach, it is also very easy to do trivial security testing. For instance, let&#8217;s check that
+the application redirects (or forwards) the user to the login page upon unsuccessful login.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">WebElement</span> <span class="n">username</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">&quot;//input[contains(@id,&#39;username&#39;)]&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">username</span><span class="o">.</span><span class="na">sendKeys</span><span class="o">(</span><span class="s">&quot;foo&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">WebElement</span> <span class="n">password</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">&quot;//input[contains(@id,&#39;password&#39;)]&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">password</span><span class="o">.</span><span class="na">sendKeys</span><span class="o">(</span><span class="s">&quot;foo&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">WebElement</span> <span class="n">login</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">&quot;//button[contains(@id,&#39;login&#39;)]&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">login</span><span class="o">.</span><span class="na">click</span><span class="o">();</span>
+</span><span class='line'><span class="n">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">&quot;username&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">&quot;password&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="n">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">&quot;login&quot;</span><span class="o">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>In this post, we have seen how to write smoke integration tests with Selenium. This is especially
+useful to detect whether an important functionality has been hindered. For instance, a change in the
+navigation or a unexpected change of the status (availability, visibility) of one the buttons or web elements.
+I recommend implementing the three or four major scenarios with this technique. This is usually enough to
+detect major problems. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">Embedded Web Application Integration Testing Using Tomcat 7 and JUnit</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-09T14:39:00+02:00" pubdate data-updated="true">Apr 9<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>To follow up on my previous post about <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">how to programmatically build a web archive</a>, I propose to look at how to deploy this archive in a Tomcat instance that is embedded into a JUnit test.</p>
+
+<p>As usual, the presented snippets are available in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> application. I will first look at the dependencies, then I will show how to configure Tomcat and finally how to start and stop the embedded instance.</p>
+
+<p>The first dependency is the embedded Tomcat core component. JULI which stands for Java Utility Logging Implementation that is the container extension of common logging. The ECJ compiler and JASPER are required to handle JSPs. Of course all these dependencies are scoped to test only.</p>
+
+<h2>The dependencies</h2>
+
+<figure class='code'><figcaption><span>Maven dependencies necessary to start an embedded Tomcat instance into JUnit tests.</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.apache.tomcat.embed<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>tomcat-embed-core<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;version&gt;</span>7.0.26<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.apache.tomcat.embed<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>tomcat-embed-logging-juli<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;version&gt;</span>7.0.26<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.eclipse.jdt.core.compiler<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>ecj<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;version&gt;</span>3.7.1<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.apache.tomcat.embed<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>tomcat-embed-jasper<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;version&gt;</span>7.0.26<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;groupId&gt;</span>junit<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;artifactId&gt;</span>junit<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;version&gt;</span>4.10<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<h2>Configuring Tomcat</h2>
+
+<p>The following snippet prepares the embedded instance. The static member <code>mTomcat</code> references a new instance of Tomcat. As Tomcat still requires a file system to work, a temporary directory is used to put all the temporary files. To that end, we use the <code>java.io.tmpdir</code> java property.
+These variables are shared among the test cases.</p>
+
+<figure class='code'><figcaption><span>Shared static variables</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="cm">/** The tomcat instance. */</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">Tomcat</span> <span class="n">mTomcat</span><span class="o">;</span>
+</span><span class='line'><span class="cm">/** The temporary directory in which Tomcat and the app are deployed. */</span>
+</span><span class='line'><span class="kd">private</span> <span class="n">String</span> <span class="n">mWorkingDir</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">getProperty</span><span class="o">(</span><span class="s">&quot;java.io.tmpdir&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As we want to use the same Tomcat configuration among all test cases, the initialization is put in a method annotated with <code>@Before</code>. First, the method sets the port to <code>0</code>. This tells the engine to choose the port to run on by itself.  This is especially useful to avoid  starting the embedded Tomcat on a already used port as <code>8080</code> for instance.
+Then the base directory is set <code>mTomcat.setBaseDir()</code> to the temporary directory. Without doing that, Tomcat would start in the current directory. The rest of the method configures the way WAR are managed by the engine.</p>
+
+<figure class='code'><figcaption><span>Configuration of the embedded Tomcat instance</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Before</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">setup</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">mTomcat</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Tomcat</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">setPort</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">setBaseDir</span><span class="o">(</span><span class="n">mWorkingDir</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">getHost</span><span class="o">().</span><span class="na">setAppBase</span><span class="o">(</span><span class="n">mWorkingDir</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">getHost</span><span class="o">().</span><span class="na">setAutoDeploy</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">getHost</span><span class="o">().</span><span class="na">setDeployOnStartup</span><span class="o">(</span><span class="kc">true</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The rest of the method builds a reference to a directory (based into the temporary directory) that contains the web application. This directory is deleted if it exists to ensure redeployment of the WAR. Finally, the WAR built as explained <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">there</a> is exported into the temporary directory.</p>
+
+<p>Finally, the web application is added to the Tomcat instance. More specifically, a path
+exploded version <code>webApp.getAbsolutePath()</code> of the WAR is linked to a context <code>contextPath</code>.</p>
+
+<figure class='code'><figcaption><span>Cleaning and preparing the web application deployment.</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Before</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">setup</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="n">String</span> <span class="n">contextPath</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">getApplicationId</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">File</span> <span class="n">webApp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">mWorkingDir</span><span class="o">,</span> <span class="n">getApplicationId</span><span class="o">());</span>
+</span><span class='line'>  <span class="n">File</span> <span class="n">oldWebApp</span> <span class="o">=</span> <span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">webApp</span><span class="o">.</span><span class="na">getAbsolutePath</span><span class="o">());</span>
+</span><span class='line'>  <span class="n">FileUtils</span><span class="o">.</span><span class="na">deleteDirectory</span><span class="o">(</span><span class="n">oldWebApp</span><span class="o">);</span>
+</span><span class='line'>  <span class="k">new</span> <span class="nf">ZipExporterImpl</span><span class="o">(</span><span class="n">createWebArchive</span><span class="o">()).</span><span class="na">exportTo</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">mWorkingDir</span> <span class="o">+</span> <span class="s">&quot;/&quot;</span> <span class="o">+</span> <span class="n">getApplicationId</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot;.war&quot;</span><span class="o">),</span>
+</span><span class='line'>          <span class="kc">true</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">addWebapp</span><span class="o">(</span><span class="n">mTomcat</span><span class="o">.</span><span class="na">getHost</span><span class="o">(),</span> <span class="n">contextPath</span><span class="o">,</span> <span class="n">webApp</span><span class="o">.</span><span class="na">getAbsolutePath</span><span class="o">());</span>   
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Starting Tomcat</h2>
+
+<p>Now that Tomcat has been configured, the next step is to start it. We want a fresh Tomcat
+for each and every test case. This way, a failed test does not have repercussions on the subsequent tests (e.g. session information, memory leaks);</p>
+
+<figure class='code'><figcaption><span>Start the embedded Tomcat instance and add a web application</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Before</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">setup</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>  <span class="n">mTomcat</span><span class="o">.</span><span class="na">start</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If necessary, the actual port on which Tomcat has been started can be retrieved using the following snippet.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">protected</span> <span class="kt">int</span> <span class="nf">getTomcatPort</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">mTomcat</span><span class="o">.</span><span class="na">getConnector</span><span class="o">().</span><span class="na">getLocalPort</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Finally, after the test, the Tomcat instance is stopped and destroyed clearing the way for the next test.</p>
+
+<h2>Stopping Tomcat</h2>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@After</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">final</span> <span class="kt">void</span> <span class="nf">teardown</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Throwable</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">mTomcat</span><span class="o">.</span><span class="na">getServer</span><span class="o">()</span> <span class="o">!=</span> <span class="kc">null</span>
+</span><span class='line'>            <span class="o">&amp;&amp;</span> <span class="n">mTomcat</span><span class="o">.</span><span class="na">getServer</span><span class="o">().</span><span class="na">getState</span><span class="o">()</span> <span class="o">!=</span> <span class="n">LifecycleState</span><span class="o">.</span><span class="na">DESTROYED</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="k">if</span> <span class="o">(</span><span class="n">mTomcat</span><span class="o">.</span><span class="na">getServer</span><span class="o">().</span><span class="na">getState</span><span class="o">()</span> <span class="o">!=</span> <span class="n">LifecycleState</span><span class="o">.</span><span class="na">STOPPED</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>              <span class="n">mTomcat</span><span class="o">.</span><span class="na">stop</span><span class="o">();</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="n">mTomcat</span><span class="o">.</span><span class="na">destroy</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<h2>Conclusion</h2>
+
+<p>In this post, we have seen how to start an embedded version of Tomcat into a JUnit fixture.
+The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">Programmatically Build Web Archives Using ShrinkWrap</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-05T09:09:00+02:00" pubdate data-updated="true">Apr 5<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>While doing integration tests on web applications, it is important to restrict the application to the strict minimum necessary for any given test. It helps to improve the startup time as well as to reduce unexpected interactions.
+To that end, I use <a href="http://www.jboss.org/shrinkwrap">ShrinkWrap</a> from <a href="http://www.jboss.org/">JBoss</a> that is a very nice a simple API to build Java archives (e.g., JAR WAR, EAR). This post describes how to programmatically build a WAR file that can be deployed on an embedded server for integration
+testing. For more details on how to use this web archive in JUnit fixtures please refer to this <a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">article</a>. The following snippet gets the ShrinkWrap package from the JBoss repository. As I only use it for test purposes, I restricted its use to the test scope.</p>
+
+<p><strong>ShrinkWrap</strong> is available as a Maven dependency:</p>
+
+<figure class='code'><figcaption><span>Maven dependencies for the ShrinkWrap project</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;repositories&gt;</span>
+</span><span class='line'>...
+</span><span class='line'>  <span class="nt">&lt;repository&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;id&gt;</span>repository.jboss.org<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;name&gt;</span>JBoss Repository<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;url&gt;</span>http://repository.jboss.org/nexus/content/groups/public-jboss/<span class="nt">&lt;/url&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/repository&gt;</span>
+</span><span class='line'>  ...
+</span><span class='line'><span class="nt">&lt;/repositories&gt;</span>
+</span><span class='line'>...
+</span><span class='line'><span class="nt">&lt;dependencies&gt;</span>
+</span><span class='line'>  ...
+</span><span class='line'>  <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;groupId&gt;</span>org.jboss.shrinkwrap<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;artifactId&gt;</span>shrinkwrap-api<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;version&gt;</span>1.0.0-alpha-12<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;groupId&gt;</span>org.jboss.shrinkwrap<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;artifactId&gt;</span>shrinkwrap-impl<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;version&gt;</span>1.0.0-alpha-12<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'>...
+</span><span class='line'><span class="nt">&lt;dependencies&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Building the archive</h2>
+
+<p>The first step is to crate a web archive a.k.a. a WAR file. As we want to produce a WAR file, we use the <code>WebArchive.class</code> parameter
+to the <code>ShrinkWrap.create</code> method. It is also possible to produce JAR (<code>JavaArchive.class</code>) and EAR (<code>EnterpriseArchive.class</code>).</p>
+
+<figure class='code'><figcaption><span>Creation of a Web Archive</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">WebArchive</span> <span class="n">archive</span> <span class="o">=</span> <span class="n">ShrinkWrap</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">WebArchive</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;test.war&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next step to build a WAR is to provide the <code>web.xml</code> for you project. Again this can a be a simplified version of the web descriptor to improve startup time or limit dependencies. In the following example, the files are taken from a maven directory structure.</p>
+
+<figure class='code'><figcaption><span>Add a web descriptor to the archive</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">WEBAPP_SRC</span> <span class="o">=</span> <span class="s">&quot;src/main/webapp&quot;</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">setWebXML</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;WEB-INF/web.xml&quot;</span><span class="o">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that we have a web descriptor, let&#8217;s add some classes that are required to run the application. To not having to add each single class individually, it is possible to a complete package to the archive.</p>
+
+<figure class='code'><figcaption><span>add a package to the runtime classes</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">addPackage</span><span class="o">(</span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Package</span><span class="o">.</span><span class="na">getPackage</span><span class="o">(</span><span class="s">&quot;ch.demo.web&quot;</span><span class="o">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>It is also possible to add individual classes:</p>
+
+<figure class='code'><figcaption><span>add a class to the runtime classes</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">addClasses</span><span class="o">(</span><span class="n">Student</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">Address</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>For JSF applications, we add add the <code>faces-config.xml</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;WEB-INF/faces-config.xml&quot;</span><span class="o">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And similarly, let&#8217;s add the CDI descriptor into <code>WEB-INF</code>. As we do not need to create a specific <code>`beans.xml</code>,
+we add an empty descriptor:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="n">EmptyAsset</span><span class="o">.</span><span class="na">INSTANCE</span><span class="o">,</span> <span class="s">&quot;beans.xml&quot;</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&#8217;s finally add standard web resources such as <code>xhtml</code> files or static files:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;login.xhtml&quot;</span><span class="o">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As ShrinkWrap uses <a href="http://en.wikipedia.org/wiki/Method_chaining">Method Chaining</a>, it is possible to chain <code>add</code> class to fill the archive.</p>
+
+<figure class='code'><figcaption><span>Build a simple web application     </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">archive</span><span class="o">.</span><span class="na">setWebXML</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;WEB-INF/web.xml&quot;</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="n">EmptyAsset</span><span class="o">.</span><span class="na">INSTANCE</span><span class="o">,</span> <span class="s">&quot;beans.xml&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;WEB-INF/faces-config.xml&quot;</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">addPackage</span><span class="o">(</span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Package</span><span class="o">.</span><span class="na">getPackage</span><span class="o">(</span><span class="s">&quot;ch.demo.web&quot;</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;login.xhtml&quot;</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;index.jsp&quot;</span><span class="o">))</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">&quot;xhtml/listStudents.xhtml&quot;</span><span class="o">),</span> <span class="s">&quot;xhtml/listStudents.xhtml&quot;</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Please note that when using maven to execute the tests, most of the required libraries are already on the classpath. Therefore, we often do not need to add any library or jars to the web archive.</p>
+
+<h2>Using the archive</h2>
+
+<p>After having built the package, we need to export it either as a war or as an exploded directory.
+The following snippet produces a WAR file named after the archive. The second parameter states whether
+a existing archive can be overwritten.</p>
+
+<figure class='code'><figcaption><span>Produce the actual war </span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">new</span> <span class="nf">ZipExporterImpl</span><span class="o">(</span><span class="n">archive</span><span class="o">).</span><span class="na">exportTo</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">archive</span><span class="o">.</span><span class="na">getName</span><span class="o">()),</span> <span class="kc">true</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Alternatively it is possible to produce an exploded archive:</p>
+
+<figure class='code'><figcaption><span>Produce an exploded archive</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="k">new</span> <span class="nf">ExplodedExporterImpl</span><span class="o">(</span><span class="n">archive</span><span class="o">).</span><span class="na">exportExploded</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">archive</span><span class="o">.</span><span class="na">getName</span><span class="o">()));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>We have seen how to use ShrinkWrap to programmatically build Web archives. This is especially useful to test smaller version of your web application during integration testing. It helps to test webapps with mock services and to improve the startup time. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/02/how-to-test-a-jsf-named-bean/">How to Simulate CDI Scopes and Injection in Java SE.</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-02T21:37:00+02:00" pubdate data-updated="true">Apr 2<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/04/02/how-to-test-a-jsf-named-bean/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Unit testing managed beans is difficult outside of a container. Managed beans heavily rely on the notions of scopes and injection that do not exist outside of a container. In JEE6, both are handled by CDI (Context Dependency Injection).
+<a href="http://www.jboss.org/arquillian.html">Arquillian</a> is a powerful solution to this problem. Nevertheless, sometimes for technical or even for political reasons, it is not possible to add a new component to the existing stack.
+While searching for alternatives, I came across several interesting articles (<a href="http://www.jtips.info/index.php?title=WeldSE/Scopes">here</a>, <a href="http://objectopia.com/2011/05/29/weld-junit-4-runner/">here</a> and <a href="http://danhaywood.com/2010/08/12/simulating-cdis-session-and-request-scope-in-a-j2se-app/">here</a>) that explain how to simulate such features in unit tests.</p>
+
+<p>This post aims at consolidating these articles for Weld 1.1.5 and JUnit 4.5.
+The following example is part of a Demo project that I use to teach the JEE stack that is located on Google Code Hosting and <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a></p>
+
+<p>The following snippet presents a unit test of a managed bean. The bean to test (and all its dependencies) is injected in the test. As you can see the test is simple and straightforward.
+The injected scopes (Conversation in this case) can be used during the test to setup a particular case.</p>
+
+<figure class='code'><figcaption><span>Unit testing of the ManageStudentRegistration managed bean</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@RunWith</span><span class="o">(</span><span class="n">WeldJUnit4Runner</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">ManageStudentRegistrationTest</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** Service injected by the Weld container. */</span>
+</span><span class='line'>  <span class="nd">@Inject</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">ManageStudentRegistration</span> <span class="n">mManageStudentRegistration</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/** A conversation for the test. */</span>
+</span><span class='line'>  <span class="nd">@Inject</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Conversation</span> <span class="n">mConversation</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Test</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testPieChartCreation</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">PieChartModel</span> <span class="n">model</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">mManageStudentRegistration</span><span class="o">.</span><span class="na">getPieModel</span><span class="o">();</span>
+</span><span class='line'>      <span class="n">Assert</span><span class="o">.</span><span class="na">assertNotNull</span><span class="o">(</span><span class="n">model</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="mi">4</span><span class="o">,</span> <span class="n">model</span><span class="o">.</span><span class="na">getData</span><span class="o">().</span><span class="na">size</span><span class="o">());</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Test</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">toRegistrationTest</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">mConversation</span><span class="o">.</span><span class="na">begin</span><span class="o">(</span><span class="s">&quot;ConversationId&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">&quot;register&quot;</span><span class="o">,</span> <span class="n">mManageStudentRegistration</span><span class="o">.</span><span class="na">toRegistration</span><span class="o">());</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The fist step is to enable CDI injection in unit tests. To that end, we extends the <code>BlockJUnit4ClassRunner</code> that is responsible for creating a Test case.
+The constructor simply initializes the Weld container. Finally, we override the
+test creation. Instead of directly invoking the constructor of the test class, we ask Weld to instantiate it (line 25). This will inject all dependencies into the test object. In our case, it will create  the manager bean and its dependencies.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">WeldJUnit4Runner</span> <span class="kd">extends</span> <span class="n">BlockJUnit4ClassRunner</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** The test class to run. */</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Class</span><span class="o">&lt;?&gt;</span> <span class="n">mKlass</span><span class="o">;</span>
+</span><span class='line'>    <span class="cm">/** Weld infrastructure. */</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">Weld</span> <span class="n">weld</span><span class="o">;</span>
+</span><span class='line'>    <span class="cm">/** The container itself. */</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">final</span> <span class="n">WeldContainer</span> <span class="n">container</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * Runs the class passed as a parameter within the container.</span>
+</span><span class='line'><span class="cm">     * @param klass to run</span>
+</span><span class='line'><span class="cm">     * @throws InitializationError if anything goes wrong.</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="nf">WeldJUnit4Runner</span><span class="o">(</span><span class="kd">final</span> <span class="n">Class</span><span class="o">&lt;</span><span class="n">Object</span><span class="o">&gt;</span> <span class="n">klass</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">InitializationError</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">super</span><span class="o">(</span><span class="n">klass</span><span class="o">);</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">mKlass</span> <span class="o">=</span> <span class="n">klass</span><span class="o">;</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">weld</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Weld</span><span class="o">();</span>
+</span><span class='line'>        <span class="k">this</span><span class="o">.</span><span class="na">container</span> <span class="o">=</span> <span class="n">weld</span><span class="o">.</span><span class="na">initialize</span><span class="o">();</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">protected</span> <span class="n">Object</span> <span class="nf">createTest</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>        <span class="kd">final</span> <span class="n">Object</span> <span class="n">test</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="na">instance</span><span class="o">().</span><span class="na">select</span><span class="o">(</span><span class="n">mKlass</span><span class="o">).</span><span class="na">get</span><span class="o">();</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">test</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Remember to declare a <code>META-INF/beans.xml</code> file in the test resources in order to provide
+mock implementations. In this case, we enable the alternative <code>StudentServiceMockImpl</code> that is used by the managed bean that is under test.</p>
+
+<figure class='code'><figcaption><span>META-INF/beans.xml file used for the unit tests.</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee&quot;</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>  <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/beans_1_0.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;alternatives&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;class&gt;</span>ch.demo.business.service.mock.StudentServiceMockImpl<span class="nt">&lt;/class&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/alternatives&gt;</span>
+</span><span class='line'><span class="nt">&lt;/beans&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Until there, the dependency injection does not manage the scopes that may be used in managed bean. To that end, we must add an <a href="http://docs.jboss.org/weld/reference/latest/en-US/html/extend.html">extension</a> to Weld. Extensions are powerful mechanisms to tweak the container behavior. In this case, we want to add the missing scopes. This is done in the following snippet. It listens to the <code>AfterDeploymentValidation</code> event that occurs after the configuration as been validated but before context creation. Methods <code>afterDeployment</code> creates a map for each scope and associates it.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">package</span> <span class="n">org</span><span class="o">.</span><span class="na">jboss</span><span class="o">.</span><span class="na">weld</span><span class="o">.</span><span class="na">manager</span><span class="o">;</span> <span class="c1">// required for visibility to BeanManagerImpl#getContexts()</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Taken from http://www.jtips.info/index.php?title=WeldSE/Scopes,</span>
+</span><span class='line'><span class="cm"> * it simulates request and session scopes outside of an application server.</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">WeldServletScopesSupportForSe</span> <span class="kd">implements</span> <span class="n">Extension</span> <span class="o">{</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="cm">/** {@inheritDoc} */</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">afterDeployment</span><span class="o">(</span><span class="nd">@Observes</span> <span class="kd">final</span> <span class="n">AfterDeploymentValidation</span> <span class="n">event</span><span class="o">,</span>
+</span><span class='line'>                  <span class="kd">final</span> <span class="n">BeanManager</span> <span class="n">beanManager</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>                  
+</span><span class='line'>      <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">sessionMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;();</span>
+</span><span class='line'>      <span class="n">activateContext</span><span class="o">(</span><span class="n">beanManager</span><span class="o">,</span> <span class="n">SessionScoped</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">sessionMap</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;</span> <span class="n">requestMap</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HashMap</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Object</span><span class="o">&gt;();</span>
+</span><span class='line'>      <span class="n">activateContext</span><span class="o">(</span><span class="n">beanManager</span><span class="o">,</span> <span class="n">RequestScoped</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">requestMap</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">activateContext</span><span class="o">(</span><span class="n">beanManager</span><span class="o">,</span> <span class="n">ConversationScoped</span><span class="o">.</span><span class="na">class</span><span class="o">,</span>
+</span><span class='line'>              <span class="k">new</span> <span class="nf">MutableBoundRequest</span><span class="o">(</span><span class="n">requestMap</span><span class="o">,</span> <span class="n">sessionMap</span><span class="o">));</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="cm">/**</span>
+</span><span class='line'><span class="cm">  * Activates a context for a given manager.</span>
+</span><span class='line'><span class="cm">  * @param beanManager in which the context is activated</span>
+</span><span class='line'><span class="cm">  * @param cls the class that represents the scope</span>
+</span><span class='line'><span class="cm">  * @param storage in which to put the scoped values</span>
+</span><span class='line'><span class="cm">  * @param &lt;S&gt; the type of the storage</span>
+</span><span class='line'><span class="cm">  */</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="o">&lt;</span><span class="n">S</span><span class="o">&gt;</span> <span class="kt">void</span> <span class="n">activateContext</span><span class="o">(</span><span class="kd">final</span> <span class="n">BeanManager</span> <span class="n">beanManager</span><span class="o">,</span>
+</span><span class='line'>              <span class="kd">final</span> <span class="n">Class</span><span class="o">&lt;?</span> <span class="kd">extends</span> <span class="n">Annotation</span><span class="o">&gt;</span> <span class="n">cls</span><span class="o">,</span> <span class="kd">final</span> <span class="n">S</span> <span class="n">storage</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">BeanManagerImpl</span> <span class="n">beanManagerImpl</span> <span class="o">=</span> <span class="o">(</span><span class="n">BeanManagerImpl</span><span class="o">)</span> <span class="n">beanManager</span><span class="o">;</span>
+</span><span class='line'>      <span class="nd">@SuppressWarnings</span><span class="o">(</span><span class="s">&quot;unchecked&quot;</span><span class="o">)</span>
+</span><span class='line'>      <span class="n">AbstractBoundContext</span><span class="o">&lt;</span><span class="n">S</span><span class="o">&gt;</span> <span class="n">context</span> <span class="o">=</span>
+</span><span class='line'>          <span class="o">(</span><span class="n">AbstractBoundContext</span><span class="o">&lt;</span><span class="n">S</span><span class="o">&gt;)</span> <span class="n">beanManagerImpl</span><span class="o">.</span><span class="na">getContexts</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="n">cls</span><span class="o">).</span><span class="na">get</span><span class="o">(</span><span class="mi">0</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">context</span><span class="o">.</span><span class="na">associate</span><span class="o">(</span><span class="n">storage</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">context</span><span class="o">.</span><span class="na">activate</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To register and activate a CDI extension, a file that contains the extension class name must be present and named <code>META-INF/services/javax.enterprise.inject.spi.Extension</code>.</p>
+
+<figure class='code'><figcaption><span>META-INF/services/javax.enterprise.inject.spi.Extension</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">org</span><span class="o">.</span><span class="na">jboss</span><span class="o">.</span><span class="na">weld</span><span class="o">.</span><span class="na">manager</span><span class="o">.</span><span class="na">WeldServletScopesSupportForSe</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>Testing the JEE6 outside of the container is easier and easier. Long gone are the days of the EJB 2.1 untestability.
+Nevertheless, not everything is simple and we still have to do some tricks to get it working.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/25/improve-jsf-applications-startup-time/">On JEE 6 Webapps Startup Time</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-25T23:20:00+02:00" pubdate data-updated="true">Mar 25<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/03/25/improve-jsf-applications-startup-time/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>While working on Tomcat 7 embedded to automate my integration tests, I realized that my integration tests wasted much of the time in starting/stopping the server. Even if I do not start the integration tests as often as the unit tests, it becomes rapidly irritating. Furthermore, during development I tend to restart the server a couple of times per hour, especially at the beginning of the project. Sure hot deployment helps, but it is not always enough.</p>
+
+<p>On my Mac Book Pro, a cold start took around 10s. Interestingly enough,  an empty Tomcat startups in less than a second. The problem comes from the fact that Tomcat 7 scans the classpath to find out annotations that declare Servlets using the <code>@WebServlet</code>. This, even if you do not use that feature. Don&#8217;t get me wrong, not having to configure XML is cool but I am not ready to pay such a high price for it. Especially as the only servlet I use, is the JSF one.</p>
+
+<h2>Where do we start from?</h2>
+
+<p>For these tests, I use a JEE6 application with JSF, Weld and JPA (no EJBs) that runs under Tomcat. <br/>
+This is a demo application called <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> that I use to teach JEE6.
+A mentioned previously, a cold start (without tuning anything) requires around 10s on my Mac Book Pro Intel Core i7 with 8Gb RAM : <code>INFO: Server startup in 9992 ms</code></p>
+
+<h2>Step 1: Avoid looking for <code>@WebSerlet</code> and co.</h2>
+
+<p>By default, Tomcat 7 (along with the Servlet 3.0 specification) scans the classpath to look for classes that are annotated <code>@WebServlet</code>,<code>@WebServletContextListener</code>, <code>@ServletFilter</code>, or <code>@InitParamJSF</code>.  It is a nice feature as you do not have to specify the faces servlet anymore.
+However, it comes at a price: depending of the classpath this can be very long.
+To solve this issues, simple add the <code>metadata-complete="true"</code> to the <code>web-app</code> element of our <code>WEB-INF/web-xml</code> attribute to avoid scanning the classpath.</p>
+
+<figure class='code'><figcaption><span>web.xml&#8217;s webapp element</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;web-app</span> <span class="na">metadata-complete=</span><span class="s">&quot;true&quot;</span>
+</span><span class='line'>  <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span> <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee&quot;</span>
+</span><span class='line'>  <span class="na">xmlns:web=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd&quot;</span>
+</span><span class='line'>  <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd&quot;</span>
+</span><span class='line'>  <span class="na">id=</span><span class="s">&quot;MyWebApp&quot;</span> <span class="na">version=</span><span class="s">&quot;3.0&quot;</span><span class="nt">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Obviously, as it is no more automatically discovered, we have  to manually add the faces servlet to the context:</p>
+
+<figure class='code'><figcaption><span>Add the faces servlet</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;servlet&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;servlet-name&gt;</span>Faces Servlet<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;servlet-class&gt;</span>javax.faces.webapp.FacesServlet<span class="nt">&lt;/servlet-class&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;load-on-startup&gt;</span>1<span class="nt">&lt;/load-on-startup&gt;</span>
+</span><span class='line'><span class="nt">&lt;/servlet&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;servlet-mapping&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;servlet-name&gt;</span>Faces Servlet<span class="nt">&lt;/servlet-name&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;url-pattern&gt;</span>/faces/*<span class="nt">&lt;/url-pattern&gt;</span>
+</span><span class='line'><span class="nt">&lt;/servlet-mapping&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Using these modifications in <code>web.xml</code>, the startup time came down to around 4.5 seconds:
+<code>INFO: Server startup in 4404 ms</code></p>
+
+<h2>Step 2: Avoid looking for <code>@ManagedBean</code> and co.</h2>
+
+<p>Similarly, the is a similar feature in JSF 2.0. By default, the JSF implementation looks for classes annotated with
+As I use Weld and its <code>@Named</code>, <code>@SessionScoped</code>, and so on, I can disable this feature in JSF.</p>
+
+<figure class='code'><figcaption><span>faces-config.xml annotated with metadata-complete=&#8221;true&#8221;</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;faces-config</span> <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee&quot;</span>
+</span><span class='line'>   <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>   <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd&quot;</span>
+</span><span class='line'>   <span class="na">version=</span><span class="s">&quot;2.0&quot;</span>  <span class="na">metadata-complete=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>Using this modification in <code>faces-config.xml</code>, the startup time came down to around 3.7 seconds:
+<code>INFO: Server startup in 3730 ms</code></p>
+
+<h2>Step 3: Limiting Weld&#8217;s scanning</h2>
+
+<p>Finally, I would like to keep Weld scanning to discover the <code>@Named</code>, <code>@Inject</code>, and other Weld annotations but I would like to limit it to my a subset of the classes of the jar. To that end simply add <code>weld:scan</code> directive and include a pattern with packages to scan.</p>
+
+<figure class='code'><figcaption><span>faces-config.xml annotated with metadata-complete=&#8221;true&#8221;</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/javaee&quot;</span>
+</span><span class='line'>        <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>        <span class="na">xmlns:weld=</span><span class="s">&quot;http://jboss.org/schema/weld/beans&quot;</span>
+</span><span class='line'>        <span class="na">xsi:schemaLocation=</span><span class="s">&quot;</span>
+</span><span class='line'><span class="s">           http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd</span>
+</span><span class='line'><span class="s">           http://jboss.org/schema/weld/beans http://jboss.org/schema/weld/beans_1_1.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;weld:scan&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;weld:include</span> <span class="na">pattern=</span><span class="s">&quot;ch.demo.*&quot;</span><span class="nt">/&gt;</span>
+</span><span class='line'><span class="nt">&lt;/weld:scan&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Using this modification in <code>beans.xml</code>, the startup time came down to around 3.3 seconds:
+<code>INFO: Server startup in 3312 ms</code></p>
+
+<p>To conclude, using these minor modifications I divided the startup time by three. This is very useful during development and integration tests when the server is started and stopped many times.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/22/one-to-one-relations-in-jpa-2-dot-0/">One to One Relations in JPA 2.0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-22T10:41:00+01:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2012</time>
+        
+         | <a href="/blog/2012/03/22/one-to-one-relations-in-jpa-2-dot-0/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Recently I came across the need to map a one 2 one relationship from the object model to the database using JPA 2.0.
+The case was pretty simple as the database was nicely organized but it raised the question: what if? What if I have to deal to a legacy system or a database administrator that has to follow strict company rules. Other reasons such as security or performances may interfere with simple designs. Hence, I had a look to the diverse ways to map a one 2 one relationship. I probably forgot several cases so please do not hesitate to discuss them in the comments.</p>
+
+<p>A one to one relationship consider that the objects involved in the relation are highly dependent. In Object Orientation, this corresponds to the an aggregation or a composition. In a relational model, the data can be either:</p>
+
+<ol>
+<li>in the same table,</li>
+<li>split over two (or more) tables (one per object) and linked by a foreign key, or</li>
+<li>split over two (or more) tables and linked by a join table.</li>
+</ol>
+
+
+<p>The rest of the articles these describes different situations. Please note that for the sake of the explanation, I explicitly map all the fields even if most of the time the default mapping policy would work.</p>
+
+<h2>Data in the same class: Embedded class</h2>
+
+<p>This is especially useful for legacy code where the database design is a bit to flat for your taste.
+The following figure presents the concept of an embedded class. The class <code>Address</code> is embedded in the class <code>Student</code>.
+The idea is that <code>Address</code> is an entity per se, it exists only in the context of the class <code>Student</code>.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/one2oneVariante1.png' width='' height='' alt='One 2 One relations as an embedded class' title='One 2 One relations as an embedded class'><span class='caption-text'>One 2 One relations as an embedded class</span></span></p>
+
+<p>To declare a embedded class, the class itself must be annotated with <code>@Embeddable</code> and its reference must be annotated with
+<code>@Embedded</code>.</p>
+
+<figure class='code'><figcaption><span>A embeddable class</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Embeddable</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Address</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;NUMBER&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">number</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;STREET&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">street</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>@Embedded</code> and <code>@Basic</code> cannot be used together. Therefore, if required, lazy fetching must be declared field by field in the embedded class. Remember that outside of a JEE container,  the actual behavior of lazy loading on <code>@Basic</code> and <code>@OneToOne</code> depend on the actual implementation. Eclipse link, for instance, does not perform lazy loading by default on <code>@Basic</code>, <code>@OneToOne</code>, and <code>@ManyToOne</code> mappings. For more detail, please refer to the <a href="http://wiki.eclipse.org/Using_EclipseLink_JPA_Extensions_%28ELUG%29#What_You_May_Need_to_Know_About_EclipseLink_JPA_Lazy_Loading">Eclipse-link specification</a>.</p>
+
+<figure class='code'><figcaption><span>The class Address is embedded into a Student</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;STUDENTS&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Id</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">mId</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Embedded</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Address</span> <span class="n">mAddress</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following SQL statement shows the code generated by the previous mapping.</p>
+
+<figure class='code'><figcaption><span>SQL code generated according to the previous mapping</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>  <span class="n">ID</span><span class="p">,</span> <span class="n">FIRST_NAME</span><span class="p">,</span> <span class="n">PHONE_NUMBER</span><span class="p">,</span> <span class="n">BIRTH_DATE</span><span class="p">,</span> <span class="n">LAST_NAME</span><span class="p">,</span> <span class="nb">NUMBER</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">CITY</span><span class="p">,</span> <span class="n">STREET</span><span class="p">,</span> <span class="n">POSTAL_CODE</span>
+</span><span class='line'>  <span class="k">FROM</span>  <span class="n">STUDENTS</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Data in different classes: Secondary Tables</h2>
+
+<p>In the second scenario, the OO model is composed on only one class but the relational model is split over several tables.</p>
+
+<h3>The foreign key is in the secondary table</h3>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/one2oneVariante2.png' width='' height='' alt='Data is in different tables with the foreign key in the secondary table' title='Data is in different tables with the foreign key in the secondary table'><span class='caption-text'>Data is in different tables with the foreign key in the secondary table</span></span></p>
+
+<p>In this case, the concepts of secondary tables is very useful. A secondary table is basically a table that hosts
+important data that are one to one related to the data of the primary table.
+Unlike the first case, a join is required and thus a key mapping is required.
+In the following mapping, the secondary table <code>PICTURES</code> is mapped using its <code>STUDENT_ID</code> field to the <code>ID</code> field
+of the main table.</p>
+
+<figure class='code'><figcaption><span>Mapping of the Student entity</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@SecondaryTable</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;PICTURES&quot;</span><span class="o">,</span>
+</span><span class='line'>    <span class="n">pkJoinColumns</span> <span class="o">=</span> <span class="nd">@PrimaryKeyJoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;STUDENT_ID&quot;</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">referencedColumnName</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">))</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>    <span class="nd">@Id</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">mId</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** A picture of the student. */</span>
+</span><span class='line'>    <span class="nd">@Lob</span>
+</span><span class='line'>    <span class="nd">@Basic</span><span class="o">(</span><span class="n">optional</span> <span class="o">=</span> <span class="kc">true</span><span class="o">,</span> <span class="n">fetch</span> <span class="o">=</span> <span class="n">FetchType</span><span class="o">.</span><span class="na">EAGER</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">table</span> <span class="o">=</span> <span class="s">&quot;PICTURES&quot;</span><span class="o">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s">&quot;PICTURE&quot;</span><span class="o">,</span> <span class="n">nullable</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">mPicture</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following SQL statement shows the code generated by the previous mapping.
+It joins the two tables according to the <code>@PrimaryKeyJoinColumn</code> annotation.</p>
+
+<figure class='code'><figcaption><span>SQL code generated by the previous mapping</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>  <span class="n">t0</span><span class="p">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">t1</span><span class="p">.</span><span class="n">STUDENT_ID</span><span class="p">,</span> <span class="n">t1</span><span class="p">.</span><span class="n">PICTURE</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">FIRST_NAME</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">PHONE_NUMBER</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">BIRTH_DATE</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">t0</span><span class="p">.</span><span class="n">LAST_NAME</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="nb">NUMBER</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">CITY</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">STREET</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">POSTAL_CODE</span>
+</span><span class='line'>  <span class="k">FROM</span>  <span class="n">STUDENTS</span> <span class="n">t0</span><span class="p">,</span> <span class="n">PICTURES</span> <span class="n">t1</span>
+</span><span class='line'> <span class="k">WHERE</span>  <span class="p">(</span><span class="n">t1</span><span class="p">.</span><span class="n">STUDENT_ID</span> <span class="o">=</span> <span class="n">t0</span><span class="p">.</span><span class="n">ID</span><span class="p">)</span>
+</span><span class='line'>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>The foreign key is in the host table</h3>
+
+<p>Similarly to the previous case, the data is split over several tables. The difference lies in the foreign key position.
+Here the foreign key is hosted in the primary table.
+<span class='caption-wrapper center'><img class='caption' src='/figures/one2oneVariante3.png' width='' height='' alt='Data is in different tables with the foreign key in the primary/host table' title='Data is in different tables with the foreign key in the primary/host table'><span class='caption-text'>Data is in different tables with the foreign key in the primary/host table</span></span></p>
+
+<p>From a mapping point of view, it is very similar to the previous case. Indeed only the key column names have to be changed
+to reflect the organization.</p>
+
+<figure class='code'><figcaption><span>Mapping of the Student entity</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@SecondaryTable</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;PICTURES&quot;</span><span class="o">,</span>
+</span><span class='line'>    <span class="n">pkJoinColumns</span> <span class="o">=</span> <span class="nd">@PrimaryKeyJoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;PICTURE_ID&quot;</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">referencedColumnName</span> <span class="o">=</span> <span class="s">&quot;PICTURE_ID&quot;</span><span class="o">))</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following SQL statement shows the code generated by the previous mapping.
+Again, the data are joined according to the content of the <code>@PrimaryKeyJoinColumn</code> annotation.</p>
+
+<figure class='code'><figcaption><span>SQL code generated by the previous mapping</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>  <span class="n">t0</span><span class="p">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">PICTURE_ID</span><span class="p">,</span> <span class="n">t1</span><span class="p">.</span><span class="n">PICTURE_ID</span><span class="p">,</span> <span class="n">t1</span><span class="p">.</span><span class="n">PICTURE</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">FIRST_NAME</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">PHONE_NUMBER</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">BIRTH_DATE</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">t0</span><span class="p">.</span><span class="n">LAST_NAME</span><span class="p">,</span><span class="n">t0</span><span class="p">.</span><span class="nb">NUMBER</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">CITY</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">STREET</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">POSTAL_CODE</span>
+</span><span class='line'>  <span class="k">FROM</span>  <span class="n">STUDENTS</span> <span class="n">t0</span><span class="p">,</span> <span class="n">PICTURES</span> <span class="n">t1</span>
+</span><span class='line'> <span class="k">WHERE</span>  <span class="p">(</span><span class="n">t1</span><span class="p">.</span><span class="n">PICTURE_ID</span> <span class="o">=</span> <span class="n">t0</span><span class="p">.</span><span class="n">PICTURE_ID</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>First and second class JPA citizens</h2>
+
+<p>In the previous examples, the table <code>PICTURES</code> does not have a business existence in itself. It is a secondary table because its data only have meaning in relation to the data of the primary table. Sometimes, we may want to treat the second objects as first class JPA citizens and thus we must put the <code>@Entity</code> annotation on it. In this case, we have to use the <code>@OneToOne</code> annotation for the mapping. Unlike the previous mappings, <code>@OneToOne</code> enable bidirectional mapping.</p>
+
+<p>In the last example, the tables <code>STUDENTS</code> and  <code>BADGES</code> have a one to one relationship modeled with a foreign in the <code>BADGES</code> table to the <code>STUDENTS</code> table. In this case, the owning side is the <code>Badge</code> entity has it contains the foreign key.</p>
+
+<p>As mentioned before, the class <code>Badge</code> is now an entity has it has a business existence without <code>Student</code>.  The interesting part is the <code>@JoinColumn</code> annotation that specifies the local column that is the foreign key (<code>STUDENT_ID</code>) as well as to which column of the foreign table its corresponds (<code>ID</code>).</p>
+
+<figure class='code'><figcaption><span>Mapping of the Badge entity</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;BADGES&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Badge</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  
+</span><span class='line'>    <span class="nd">@Id</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">mId</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;SECURITY_LEVEL&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">mSecurityLevel</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@OneToOne</span>
+</span><span class='line'>    <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;STUDENT_ID&quot;</span><span class="o">,</span> <span class="n">referencedColumnName</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Student</span> <span class="n">mStudent</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As we want the other side to be aware of the relation (bidirectional), it is required to add the <code>mappedBy</code> attribute to the <code>@OneToOne</code> annotation. This attribute references the (Java) property in the entity that is the owner of the relationship.</p>
+
+<figure class='code'><figcaption><span>Mapping of the Student entity</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>    <span class="nd">@Id</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">mId</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** The Student&#39;s badge. */</span>
+</span><span class='line'>    <span class="nd">@OneToOne</span><span class="o">(</span><span class="n">mappedBy</span> <span class="o">=</span> <span class="s">&quot;mStudent&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Badge</span> <span class="n">mBadge</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Using the previous mapping, JPA 2.0 produces the following SQL statements to load the Student object.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">t0</span><span class="p">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">t1</span><span class="p">.</span><span class="n">STUDENT_ID</span><span class="p">,</span> <span class="n">t1</span><span class="p">.</span><span class="n">PICTURE</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">FIRST_NAME</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">PHONE_NUMBER</span><span class="p">,</span>
+</span><span class='line'>       <span class="n">t0</span><span class="p">.</span><span class="n">BIRTH_DATE</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">LAST_NAME</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="nb">NUMBER</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">CITY</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">STREET</span><span class="p">,</span>
+</span><span class='line'>       <span class="n">t0</span><span class="p">.</span><span class="n">POSTAL_CODE</span>
+</span><span class='line'>  <span class="k">FROM</span> <span class="n">STUDENTS</span> <span class="n">t0</span><span class="p">,</span> <span class="n">PICTURES</span> <span class="n">t1</span>
+</span><span class='line'> <span class="k">WHERE</span> <span class="p">(</span><span class="n">t1</span><span class="p">.</span><span class="n">STUDENT_ID</span> <span class="o">=</span> <span class="n">t0</span><span class="p">.</span><span class="n">ID</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">SELECT</span> <span class="n">ID</span><span class="p">,</span> <span class="n">SECURITY_LEVEL</span><span class="p">,</span> <span class="n">STUDENT_ID</span>
+</span><span class='line'>  <span class="k">FROM</span> <span class="n">BADGES</span>
+</span><span class='line'> <span class="k">WHERE</span> <span class="p">(</span><span class="n">STUDENT_ID</span> <span class="o">=</span> <span class="o">?</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>JPA 2.0 offers many way to represent one to one relationships. This flexibility allows to handle many different scenarios that may happen when integrating legacy databases. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/03/19/testing-jpa-in-java-se/">Testing JPA 2.0 Entities in Java SE</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-19T13:40:00+01:00" pubdate data-updated="true">Mar 19<span>th</span>, 2012</time>
+        
+         | <a href="/blog/2012/03/19/testing-jpa-in-java-se/#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Testing JPA components in Java SE has been greatly simplified since JEE6.
+Nevertheless, it is still not as simple as testing other components.
+Although there exist some frameworks such as <a href="http://www.jboss.org/arquillian">Arquillian</a> that solve that problematic,
+it is sometimes to much of hammer to test a couple of entities and simple services.
+Here is a post in which I digest some other posts and my own experience of how to test JPA components. The following example is part
+of a Demo project I use to teach the JEE stack that is located on Google Code Hosting and <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a>
+This project relies on <a href="http://maven.apache.org/">Maven 3</a> for build and dependency management. It does not use EJBs (at least for now) and thus it can be deployed in a Servlet engine.
+Please note, that to me the kind of tests we are doing here are not unit tests (though we use JUnit ). Actually, as a database is required,
+these  are integration tests.</p>
+
+<p>Let us assume that we want to test that the following model has been properly annotated and can be persisted according to a given DB schema:</p>
+
+<figure class='code'><figcaption><span>An annotated entity that represent a student</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// Get the entity manager for the tests.</span>
+</span><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;STUDENTS&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="o">-</span><span class="mi">6146935825517747043L</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Id</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">mId</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;LAST_NAME&quot;</span><span class="o">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">35</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">mLastName</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;FIRST_NAME&quot;</span><span class="o">,</span> <span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">35</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">mFirstName</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;BIRTH_DATE&quot;</span><span class="o">,</span> <span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@Temporal</span><span class="o">(</span><span class="n">TemporalType</span><span class="o">.</span><span class="na">DATE</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Date</span> <span class="n">mBirthDate</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>with the following persistence unit:</p>
+
+<figure class='code'><figcaption><span>An annotated entity that represent a student</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&lt;?</span><span class="n">xml</span> <span class="n">version</span><span class="o">=</span><span class="s">&quot;1.0&quot;</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="o">?&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">persistence</span> <span class="n">version</span><span class="o">=</span><span class="s">&quot;1.0&quot;</span>
+</span><span class='line'>    <span class="n">xmlns</span><span class="o">=</span><span class="s">&quot;http://java.sun.com/xml/ns/persistence&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>    <span class="o">&lt;</span><span class="n">persistence</span><span class="o">-</span><span class="n">unit</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;JEE6Demo-Persistence&quot;</span>
+</span><span class='line'>        <span class="n">transaction</span><span class="o">-</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;RESOURCE_LOCAL&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="n">provider</span><span class="o">&gt;</span><span class="n">org</span><span class="o">.</span><span class="na">eclipse</span><span class="o">.</span><span class="na">persistence</span><span class="o">.</span><span class="na">jpa</span><span class="o">.</span><span class="na">PersistenceProvider</span><span class="o">&lt;/</span><span class="n">provider</span><span class="o">&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="n">class</span><span class="o">&gt;</span><span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">dom</span><span class="o">.</span><span class="na">Student</span><span class="o">&lt;/</span><span class="n">class</span><span class="o">&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="n">properties</span><span class="o">&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;eclipselink.target-database&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;MYSQL&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;javax.persistence.jdbc.driver&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;com.mysql.jdbc.Driver&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;javax.persistence.jdbc.url&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;jdbc:mysql://localhost:3306/Students_DB&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;javax.persistence.jdbc.user&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;root&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;javax.persistence.jdbc.password&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;eclipselink.ddl-generation&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;none&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;eclipselink.logging.level&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;INFO&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>        <span class="o">&lt;/</span><span class="n">properties</span><span class="o">&gt;</span>
+</span><span class='line'>    <span class="o">&lt;/</span><span class="n">persistence</span><span class="o">-</span><span class="n">unit</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">persistence</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We use <a href="http://www.eclipse.org/eclipselink/">Eclipse-link</a> as it is the reference implementation for JPA 2.0</p>
+
+<figure class='code'><figcaption><span>Eclipse-Link dependencies</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;repositories&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;repository&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;id&gt;</span>EclipseLink Repo<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;name&gt;</span>EclipseLink Repository<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;url&gt;</span>http://download.eclipse.org/rt/eclipselink/maven.repo<span class="nt">&lt;/url&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/repository&gt;</span>
+</span><span class='line'><span class="nt">&lt;/repositories&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;dependencies&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;groupId&gt;</span>org.eclipse.persistence<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;artifactId&gt;</span>eclipselink<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;version&gt;</span>2.0.0<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;groupId&gt;</span>org.eclipse.persistence<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;artifactId&gt;</span>javax.persistence<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;version&gt;</span>2.0.0<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependencies&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since JEE 6, it is easy to start the JPA manager in a unit test. Let us look at the following listing. The first two lines initialize the persistence manager given a persistence unit. The name of the persistence unit must matched the declared persistence unit in <code>META-INF/persistence</code>. After what, the try block gets a transaction and starts it. The object student is persisted and the transaction is committed. If anything goes wrong, the transaction is roll-backed. Finally, the entity manager and the factory are closed.</p>
+
+<figure class='code'><figcaption><span>Start the JPA manager manually</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// Get the entity manager for the tests.</span>
+</span><span class='line'><span class="n">EntityManagerFactory</span> <span class="n">emf</span> <span class="o">=</span> <span class="n">Persistence</span><span class="o">.</span><span class="na">createEntityManagerFactory</span><span class="o">(</span><span class="s">&quot;JEE6Demo-Persistence&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">EntityManager</span> <span class="n">em</span> <span class="o">=</span> <span class="n">emf</span><span class="o">.</span><span class="na">createEntityManager</span><span class="o">();</span>
+</span><span class='line'><span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>   <span class="c1">//Get a new transaction</span>
+</span><span class='line'>   <span class="n">EntityTransaction</span> <span class="n">trx</span> <span class="o">=</span> <span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c1">//Start the transaction</span>
+</span><span class='line'>   <span class="n">trx</span><span class="o">.</span><span class="na">begin</span><span class="o">();</span>
+</span><span class='line'>   <span class="c1">//Persist the object in the DB</span>
+</span><span class='line'>   <span class="n">em</span><span class="o">.</span><span class="na">persist</span><span class="o">(</span><span class="n">student</span><span class="o">);</span>
+</span><span class='line'>   <span class="c1">//Commit and end the transaction</span>
+</span><span class='line'>   <span class="n">trx</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">RuntimeException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>   <span class="k">if</span> <span class="o">(</span><span class="n">trx</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">trx</span><span class="o">.</span><span class="na">isActive</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">trx</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>   <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>   <span class="c1">//Close the manager</span>
+</span><span class='line'>   <span class="n">em</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>   <span class="n">emf</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There are several open issues problems with this code:</p>
+
+<ol>
+<li>We do want to use a local in memory database. Indeed, we do not want to mess up with the information stored on the Mysql database. Finally, we need the test to be as autonomous as possible. That is that it does not depend on an external server (e.g. app server, database server).</li>
+<li>JUnit does not guarantee the order in which the tests are ran.
+Therefore, we must initialize the manager before each and every test of the fixture. Furthermore we must close it after the test to
+avoid session leaks.</li>
+<li>During tests, we must make sure that the database is in an acceptable state before running each unit.</li>
+</ol>
+
+
+<p>To limit the dependencies to other components and to keep the setting simple, we will use <a href="http://db.apache.org/derby/">Derby</a> as a pure in
+memory database. That is no file produced during the database execution and thus no cleaning afterwards. Please note that is only used for testing purposes.</p>
+
+<figure class='code'><figcaption><span>Derby in memory database dependencies</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.apache.derby<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>derby<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;version&gt;</span>10.8.2.2<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>   
+</span><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.apache.derby<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>derbyclient<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;version&gt;</span>10.8.2.2<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following <code>persistence.xml</code> file sets  <code>DERBY</code> as a target database language. Using Derby, selecting the embedded
+drivers in conjunction <code>org.apache.derby.jdbc.EmbeddedDriver</code> with a <code>jdbc:derby:memory</code> URL runs a database in memory without
+persisting anything to disk. This combination is important as it otherwise will store file on the disk.
+The following will be used by <code>Maven</code> during the test because it overrides the one in `/main/resources/META-INF/&#8220;. This is an elegant way to use a different database setting for the unit tests.</p>
+
+<figure class='code'><figcaption><span>Persistence descriptor</span><a href='/test/resources/META-INF/persistence.xml'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;persistence</span> <span class="na">version=</span><span class="s">&quot;1.0&quot;</span>
+</span><span class='line'>    <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/persistence&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;persistence-unit</span> <span class="na">name=</span><span class="s">&quot;JEE6Demo-Persistence&quot;</span>
+</span><span class='line'>        <span class="na">transaction-type=</span><span class="s">&quot;RESOURCE_LOCAL&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;provider&gt;</span>org.eclipse.persistence.jpa.PersistenceProvider<span class="nt">&lt;/provider&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;class&gt;</span>ch.demo.dom.Student<span class="nt">&lt;/class&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;properties&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;eclipselink.logging.level&quot;</span> <span class="na">value=</span><span class="s">&quot;FINE&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;eclipselink.target-database&quot;</span> <span class="na">value=</span><span class="s">&quot;DERBY&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;javax.persistence.jdbc.driver&quot;</span> <span class="na">value=</span><span class="s">&quot;org.apache.derby.jdbc.EmbeddedDriver&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;javax.persistence.jdbc.url&quot;</span> <span class="na">value=</span><span class="s">&quot;jdbc:derby:memory:StudentsDB;create=true&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;javax.persistence.jdbc.user&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;javax.persistence.jdbc.password&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;eclipselink.logging.level&quot;</span> <span class="na">value=</span><span class="s">&quot;INFO&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/properties&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/persistence-unit&gt;</span>
+</span><span class='line'><span class="nt">&lt;/persistence&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To solve the second issue, we must guarantee that each test fixture gets a fresh entity manager. JUnit 4+ executes whatever
+public static method annotated with <code>@BeforeClass</code> before firing up the class constructor. Similarly, methods annotated with <code>@AfterClass</code>
+are executed after all the tests and is therefore a good place for cleanup.</p>
+
+<figure class='code'><figcaption><span>Start the JPA manager before for each test fixture</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="cm">/** The factory that produces entity manager. */</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="n">EntityManagerFactory</span> <span class="n">mEmf</span><span class="o">;</span>
+</span><span class='line'><span class="cm">/** The entity manager that persists and queries the DB. */</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="n">EntityManager</span> <span class="n">mEntityManager</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@BeforeClass</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">initTestFixture</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// Get the entity manager for the tests.</span>
+</span><span class='line'>    <span class="n">mEmf</span> <span class="o">=</span> <span class="n">Persistence</span><span class="o">.</span><span class="na">createEntityManagerFactory</span><span class="o">(</span><span class="n">mPersistenceUnit</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">mEntityManager</span> <span class="o">=</span> <span class="n">mEmf</span><span class="o">.</span><span class="na">createEntityManager</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'> <span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Cleans up the session.</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="nd">@AfterClass</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">closeTestFixture</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mEntityManager</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">mEmf</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The problem with the pure in-memory approach is that schema has to recreated for each run. One solution would be to rely on the <code>Eclipse-link</code> DDL creation. I do not really like this solution as it usually not accepted by the customers that tend to want to have control
+of their schema. Thus, to have a test setting that is as close as possible to the production setting we need something to install the schema
+by running a SQL file. There are many solutions out there:</p>
+
+<ul>
+<li>Manually parsing the SQL file. I do not like this solution as it becomes rapidly intractable when the file contains comments and transactions.</li>
+<li>Using tools such as <a href="http://www.liquibase.org/">Liquibase</a>. Nice solution but to me it was to much of a hammer to that specific case.</li>
+<li>Using an API that does it for me.</li>
+</ul>
+
+
+<p>I propose the last approach by using <code>Derby Tools</code> and in particular the API of <code>ij</code>.</p>
+
+<figure class='code'><figcaption><span>DBUnit dependency</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;groupId&gt;</span>org.apache.derby<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;artifactId&gt;</span>derbytools<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;version&gt;</span>10.8.2.2<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>This allows to use <code>ij</code> directly in the test to parse the DDL file. This is shown in the following listing.
+First, it gets the underlying JDBC connection and then it run the file located in <code>test/resources/sql/</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@BeforeClass</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">initTestFixture</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// Get the entity manager for the tests.</span>
+</span><span class='line'>    <span class="n">mEmf</span> <span class="o">=</span> <span class="n">Persistence</span><span class="o">.</span><span class="na">createEntityManagerFactory</span><span class="o">(</span><span class="n">mPersistenceUnit</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">mEntityManager</span> <span class="o">=</span> <span class="n">mEmf</span><span class="o">.</span><span class="na">createEntityManager</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="o">((</span><span class="n">EntityManagerImpl</span><span class="o">)</span> <span class="o">(</span><span class="n">mEntityManager</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">getDelegate</span><span class="o">())).</span><span class="na">getServerSession</span><span class="o">().</span><span class="na">getAccessor</span><span class="o">()</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">getConnection</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ij</span><span class="o">.</span><span class="na">runScript</span><span class="o">(</span><span class="n">connection</span><span class="o">,</span>
+</span><span class='line'>            <span class="n">AbstractDBTest</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="s">&quot;sql/studentSchema.ddl&quot;</span><span class="o">),</span>
+</span><span class='line'>            <span class="s">&quot;UTF-8&quot;</span><span class="o">,</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">,</span> <span class="s">&quot;UTF-8&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The third item asks for a way to properly initialize the data prior to the test. Remember that your tests should not rely on the success of
+previous ones. To that end, we cleanup the data prior any test execution. A rather easy way to do that is to use
+<a href="http://www.dbunit.org/">DBUnit</a>.</p>
+
+<figure class='code'><figcaption><span>DBUnit dependency</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.dbunit<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>dbunit<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;version&gt;</span>2.4.8<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+It loads a file named `/test/resources/students-datasets.xml&#8220; from the test resources.</p>
+
+<figure class='code'><figcaption><span>Initialize the test dataset</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@BeforeClass</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">initTestFixture</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'><span class="c1">// Get the entity manager for the tests.</span>
+</span><span class='line'><span class="n">mEmf</span> <span class="o">=</span> <span class="n">Persistence</span><span class="o">.</span><span class="na">createEntityManagerFactory</span><span class="o">(</span><span class="n">mPersistenceUnit</span><span class="o">);</span>
+</span><span class='line'><span class="n">mEntityManager</span> <span class="o">=</span> <span class="n">mEmf</span><span class="o">.</span><span class="na">createEntityManager</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="o">((</span><span class="n">EntityManagerImpl</span><span class="o">)</span> <span class="o">(</span><span class="n">mEntityManager</span>
+</span><span class='line'>        <span class="o">.</span><span class="na">getDelegate</span><span class="o">())).</span><span class="na">getServerSession</span><span class="o">().</span><span class="na">getAccessor</span><span class="o">()</span>
+</span><span class='line'>        <span class="o">.</span><span class="na">getConnection</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">ij</span><span class="o">.</span><span class="na">runScript</span><span class="o">(</span><span class="n">connection</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">AbstractDBTest</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="s">&quot;sql/studentSchema.ddl&quot;</span><span class="o">),</span>
+</span><span class='line'>        <span class="s">&quot;UTF-8&quot;</span><span class="o">,</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">,</span> <span class="s">&quot;UTF-8&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">mDBUnitConnection</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DatabaseConnection</span><span class="o">(</span><span class="n">connection</span><span class="o">);</span>
+</span><span class='line'>    <span class="c1">//Loads the data set from a file named students-datasets.xml</span>
+</span><span class='line'>    <span class="n">mDataset</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FlatXmlDataSetBuilder</span><span class="o">().</span><span class="na">build</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">()</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">getContextClassLoader</span><span class="o">()</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="s">&quot;students-datasets.xml&quot;</span><span class="o">));</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After what, clean test data are inserted for each and every test of the fixture:</p>
+
+<figure class='code'><figcaption><span>init of the test</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Before</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">initTest</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">//Clean the data from previous test and insert new data test.</span>
+</span><span class='line'>    <span class="n">DatabaseOperation</span><span class="o">.</span><span class="na">CLEAN_INSERT</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">mDBUnitConnection</span><span class="o">,</span> <span class="n">mDataset</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this post, I&#8217;ve showed how to test the persistence of an JPA 2.0 entity using JUnit 4. The test setting runs in memory without external server  and enforces a clean database state prior running the tests.</p>
+
+<p>To support my teaching activities on Java EE 6, I&#8217;ve setup a project on Google Code Hosting that contains all the presented sources and much more. Please give me feedbacks on how to improve that demo project and in particular its
+testability.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+    <a href="/blog/archives">Blog Archives</a>
+    
+    <a class="next" href="/">Newer &rarr;</a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/12/26/communication-between-java-enterprise-applications/">Communication between Java Enterprise Applications</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that/">Fakes, Stubs, Dummy, Mocks, Doubles and all that&#8230;</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/18/testing-levels/">Testing levels</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/31/jee6-tutorial/">JEE6 Tutorial</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/05/servicelocator/">Context Dependency Injection and the Rich Object Model</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/20/multi-tenancy/">Multi-Tenancy with EJB 3.1 and JPA 2.0</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/10/Sessions-GC-Conversations/">About Sessions, Conversations, and the Garbage Collector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/24/moxy/">Object-XML Mapping with JAXB & MOXy</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/18/verification-validation-and-all-that/">Verification & Validation</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/">A JEE6 security interceptor for Tomcat 7</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/116636069211041664299?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Steve Hostettler -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hostettlerblog';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

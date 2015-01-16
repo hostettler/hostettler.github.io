@@ -1,0 +1,751 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Java EE6 | Steve Hostettler]]></title>
+  <link href="http://hostettler.github.io/blog/categories/java-ee6/atom.xml" rel="self"/>
+  <link href="http://hostettler.github.io/"/>
+  <updated>2015-01-16T18:28:04+01:00</updated>
+  <id>http://hostettler.github.io/</id>
+  <author>
+    <name><![CDATA[Steve Hostettler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Context Dependency Injection and the Rich Object Model]]></title>
+    <link href="http://hostettler.github.io/blog/2012/12/05/servicelocator/"/>
+    <updated>2012-12-05T06:59:00+01:00</updated>
+    <id>http://hostettler.github.io/blog/2012/12/05/servicelocator</id>
+    <content type="html"><![CDATA[<p>[Rich object model] vs [anemic object model] is long running debate. While the latter encourages to use simple and stupid objects with little or no business in them, the rich object model advocates for a clean object design with inheritance, polymorphism and so on.
+The anemic object model is very popular among JEE partitioners because, in the past, the specification did not provide any mean to invoke services in business objects. Therefore, the anemic pattern uses so called "managers" that maintain references to other "managers". A direct benefit is the clear separation of concerns between the different kind of objects. Basically, it splits processing and data. As this is anti-object oriented, the abstract design of such system is often very different from the actual implementation.</p>
+
+<h2>The portfolio example</h2>
+
+<p>As example, let us take a portfolio that contains a set of financial position. A financial position can be either a set of stock, or an amount in a given currency. To evaluate the actual portfolio value, we go through the positions and for each of them we ask the current quote for stock to the service <code>QuoteService</code> or the current value of a given currency to the <code>CurrencyService</code>.
+The next figure presents the "ideal" design.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/portfolio-business.png' width='' height='' alt='An object oriented class diagram of the Portfolio management component.' title='An object oriented class diagram of the Portfolio management component.'><span class='caption-text'>An object oriented class diagram of the Portfolio management component.</span></span></p>
+
+<p>To achieve this, one need to access services from within business objects. Since EJB 3.1,  Context and Dependency Injection (CDI) provides such a mechanism via the <code>@Inject</code> annotation. The only requirement is that the object that requires the service as well as the service to inject are so called "managed beans". The trick is that not all objects are meant to be managed. Furthermore, having managed lists of object is very tricky to say the least. Fortunately, the EJB 3.1 and more specifically the CDI 1.0 specification provide a way to solve this.
+In CDI, the main component is the bean manager. This manager keeps track of the beans to inject via @Inject and other means. Instead of relying on annotations to provide injection, it is possible to use the good old Service Locator pattern. CDI 1.0 exposes the bean manager on JNDI with the name <code>java:comp/BeanManager</code>.</p>
+
+<p>```java
+public class ServiceLocator {</p>
+
+<pre><code>@SuppressWarnings("unchecked")
+public static &lt;T&gt; T getInstance(final Class&lt;T&gt; type) {
+    T result = null;
+    try {
+
+        //Access to the current context.
+        InitialContext ctx = new InitialContext();
+        //Resolve the bean manager
+        BeanManager manager = (BeanManager) ctx.lookup("java:comp/BeanManager");
+        //Retrieve all beans of that type
+        Set&lt;Bean&lt;?&gt;&gt; beans = manager.getBeans(type);
+        Bean&lt;T&gt; bean = (Bean&lt;T&gt;) manager.resolve(beans);
+        if (bean != null) {
+            CreationalContext&lt;T&gt; context = manager
+                    .createCreationalContext(bean);
+            if (context != null) {
+                result = (T) manager.getReference(bean, type, context);
+            }
+        }
+    } catch (NamingException e) {
+        throw new RuntimeException(e);
+    }
+    return result;
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The client code is very simple. It consists in calling the <code>ServiceLocator</code>with the desired interface.
+For the sake of clarity, I did not show the ServiceLocator that takes a qualifier in addition to the interface. To add this feature, look at the <code>getBeans(Type beanType, Annotation... qualifiers)</code> method.</p>
+
+<p>```java</p>
+
+<p>public class StockPos {</p>
+
+<pre><code>private Long qty;
+private String stockId;
+
+Double evaluate() {
+    StockQuoteService sqs = ServiceLocator.getInstance(StockQuoteService.class);
+    return qty * sqs.getQuoteValue(stockId);
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Similarly, here is the code of the <code>CurrencyPos</code> object.</p>
+
+<p>```java</p>
+
+<p>public class CurrencyPos {</p>
+
+<pre><code>private Double amount;
+private String currencyId;
+
+Double evaluate() {
+    CurrencyQuoteService sqs = ServiceLocator.getInstance(CurrencyQuoteService.class);
+    return amount * sqs.getQuoteValue(stockId);
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>Some thoughts on the Demeter law</h2>
+
+<p>Let me be clear, I do <strong>not</strong> recommend this approach everywhere. It is very important to not mix the objects responsabilities. Furthermore,
+in order to respect the Demeter law, a business must <strong>not</strong> directly call something outside of the current component. Calls to other components are always to be done through so-called consumers to have clear components boundaries.
+For instance, putting to much intelligence in JPA entities that can be detached and serialized may cause problems on the client side.</p>
+
+<h2>Conclusion</h2>
+
+<p>In this post, I showed a solution to consume services that are exposed via the CDI BeanManager. These services can be pure POJOs or EJBs.
+Nevertheless, this approach must be used with great care as it can blur the components boundaries and responsabilities.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Multi-Tenancy with EJB 3.1 and JPA 2.0]]></title>
+    <link href="http://hostettler.github.io/blog/2012/11/20/multi-tenancy/"/>
+    <updated>2012-11-20T05:18:00+01:00</updated>
+    <id>http://hostettler.github.io/blog/2012/11/20/multi-tenancy</id>
+    <content type="html"><![CDATA[<p>Multi-tenancy is a recurrent non functional requirement. Indeed, many important IT-systems are meant to be shared among multiple tenants. The data are often distributed over several databases or schemas. This, for different reasons:</p>
+
+<ul>
+<li>Security: The data belong to different customers and some level of isolation is required;</li>
+<li>Performances: Distributing the data over multiple systems may help to master performance issues;</li>
+<li>Legacy: Sometimes, old and new systems must cohabit for a (long) time;</li>
+<li>Maintenability: A database or a schema can be updated without putting the rest of the application at risk.</li>
+</ul>
+
+
+<p>Although data are distributed, the application code should remain tenant agnostic. Furthermore, choosing between the different tenants is often made at runtime based on credentials (e.g. user Joe has access to customer AAAA while user Jane sees data of customer BBB). <a href="/https://blogs.oracle.com/arungupta/entry/java_ee_7_key_features">Java EE 7 will address this problem and much more</a>, but in the mean time here is the way that I use to address this problematic using EJB 3.1 and JPA 2.0</p>
+
+<h2>Overall architecture</h2>
+
+<p>First, let me start with the overall architecture as described below.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/multi-tenancy-architecture.png' width='' height='' alt='Multi-tenancy architecture with serveral datasources' title='Multi-tenancy architecture with serveral datasources'><span class='caption-text'>Multi-tenancy architecture with serveral datasources</span></span></p>
+
+<p>In the above figure, the database is organized in schemas, with one application server datasource (DS) per schema and one persistence unit (PU) per datasource.
+It is also possible to use only one datasoure and to discriminate between schemas by setting the <code>&lt;property name="openjpa.jdbc.Schema" value="TenantX" /&gt;</code> property for each persistence unit (PU). This sets the default schema for the PU.
+Here is a <code>persistence.xml</code> file that provides one persistence unit per tenant.</p>
+
+<p>The following code has been tested for Open-JPA but there is nothing specific to this implementation outside of the <code>&lt;provider&gt;</code>tag in the <code>persistence.xml</code>file.</p>
+
+<p>```xml
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;persistence version="2.0"</p>
+
+<pre><code>xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"&gt;
+
+&lt;persistence-unit name="Tenant1" transaction-type="JTA"&gt;
+    &lt;provider&gt;
+        org.apache.openjpa.persistence.PersistenceProviderImpl
+    &lt;/provider&gt;
+    &lt;jta-data-source&gt;jdbc/Tenant1_DS&lt;/jta-data-source&gt;
+    &lt;exclude-unlisted-classes&gt;false&lt;/exclude-unlisted-classes&gt;
+&lt;/persistence-unit&gt;
+
+
+&lt;persistence-unit name="Tenant2" transaction-type="JTA"&gt;
+    &lt;provider&gt;
+        org.apache.openjpa.persistence.PersistenceProviderImpl
+    &lt;/provider&gt;
+    &lt;jta-data-source&gt;jdbc/Tenant2_DS&lt;/jta-data-source&gt;
+    &lt;exclude-unlisted-classes&gt;false&lt;/exclude-unlisted-classes&gt;
+&lt;/persistence-unit&gt;
+</code></pre>
+
+<p></persistence>
+```</p>
+
+<p>The basic idea is that, instead of using <code>@PersistenceContext</code>, we inject our "own" multi tenant entity manager wraper.
+Then, at runtime, the multi-tenant entity manager loads the persistence context that corresponds to the current user context from JNDI.
+Please note that this only works for JTA-based persistence-units. Otherwise, the persistence context is not container-basd and therefore not exposed to JNDI. Moreover, without JTA, we loose container based transaction demarcation.</p>
+
+<p>Let us first start with the client code. In other words, how to use the Multi-Tenant Entity manager.</p>
+
+<h2>Client Code</h2>
+
+<p>Here is the client code. In order to preserve thread-safety and transactionality, Data access objects are EJBs (<code>@Stateless</code>, <code>@Stateful</code>, <code>@Singleton</code>). The presented solution uses an entity manager that is wrapped and then injected using <code>@Inject</code> or <code>@EJB</code>.  Thread-safety, transactionnality and performances are guaranted by the <code>EJB 3.1</code> and <code>JPA 2.0</code> specification as explained in the section <code>Thread-safety and Transactionality</code>. As shown below, the <code>MultiTenancyWrapper</code> delegates to a real entity manager and implements the <code>EntityManager</code> interface. Therefore, its use is very similar to a normal <code>EntityManager</code> injected via <code>@PersistenceContext</code>.</p>
+
+<p>```java
+@Stateless
+public class MyEJB implements MyEJBLocal {</p>
+
+<pre><code>@Inject
+private MultiTenancyWrapper emWrapper;
+
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public void doSomething() {
+    emWrapper.findAll(...);
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>The Multi-Tenant EntityManager EJB</h2>
+
+<p>The <code>MultiTenanEntityManagertWrapper</code> simply wraps the entity manager that corresponds to the current user context. The trick is to configure it as an EJB in order to get the xml configuration feature via <code>ejb-jar.xml</code>. Another alternative would be to use the <code>@PersistenceContexts</code> and <code>@PersistenceContext</code> annotations. The main drawback being that, for each new tenant, not only the <code>persistence.xml</code> and <code>ejb-jar.xml</code> must be changed but also the <code>Java</code> code.</p>
+
+<p>The JNDI context that is linked to the current request is injected in the <code>MultiTenantEntityManager</code> using the <code>@Resource</code>annotation.
+As there is no creation of a new <code>InitialContext</code> the overhead is not significant. Actually, the <code>@PersistentContext</code> annotation does the exact same thing except that it is not specific to the user context. The <code>MultiTenanEntityManagertWrapper</code> implements the delegate pattern. This allows to use it (almost) transparently in client code.
+The main difference being the use of <code>@Inject</code> or <code>@EJB</code> over <code>@PersistenceContext</code> in the client code.</p>
+
+<p>Using the session context that is specific to the caller bean (and thus the caller request/session) enables transparent support for thread-safety, security and transactionality.</p>
+
+<p>```java
+package ejb;</p>
+
+<p>import javax.persistence.EntityManager;</p>
+
+<p>public interface MultiTenanEntityManagertWrapper extends EntityManager {</p>
+
+<p>}
+```</p>
+
+<p>The method <code>getMultiTenantEntityManager</code> of the <code>MultiTenanEntityManagertWrapperImpl</code> extracts the <code>EntityManager</code> that corresponds to the current request from JNDI (we will see later how it has been put there). To that end, the method <code>getMultiTenantEntityManager</code>first extracts the prinipal from the current EJB context (<code>SessionContext</code>). After what, the tenant that corresponds to the current user is used to obtain the JNDI name of the corresponding entity manager. <code>MultiTenanEntityManagertWrapperImpl</code> simple delegates every call to the this Request specific <code>EntityManager</code>.</p>
+
+<p>```java</p>
+
+<p>@Stateless
+public class MultiTenanEntityManagertWrapperImpl implements MultiTenanEntityManagertWrapper {</p>
+
+<pre><code>private static final String JNDI_ENV = "java:comp/env/persistence/";
+
+@Resource
+SessionContext context;
+
+
+private EntityManager getMultiTenantEntityManager() {
+    //Extract the name of the current user.
+    Principal p = context.getCallerPrincipal();
+
+    //Lookup the tenant name for the current user
+    //This is application specific
+    Users u = Users.getUser(p.getName());
+
+    //Produces either TENANT1 or TENANT2        
+    String tenantName = u.getSite().toString();
+
+    String jndiName = new StringBuffer(JNDI_ENV).append(tenantName).toString();
+    //Lookup the entity manager
+    EntityManager manager = (EntityManager) context.lookup(jndiName);
+
+    if (manager == null) {
+        throw new RuntimeException("Tenant unknown");
+    }
+    return manager;
+}
+
+
+//The delegates
+@Override
+public void persist(Object entity) {
+    getMultiTenantEntityManager().persist(entity);
+}
+
+
+@Override
+public &lt;T&gt; T merge(T entity) {
+    return getMultiTenantEntityManager().merge(entity);
+}
+
+
+@Override
+public void remove(Object entity) {
+    getMultiTenantEntityManager().remove(entity);
+}
+
+    ...
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Now let us see how to put the entity manager references in JNDI.
+In order to avoid a lot of annotations (one per tenant) and therefore to be able to handle a huge number of tenans, I propose to use the <code>ejb-jar.xml</code> file to configure the EJB intead of the <code>PersistenceContext</code> annotation. The <code>MultiTenantEntityWrapper</code>EJB is configured as a stateless EJB. Ther persistence contexts are simply exposed to JNDI with the following pattern: <code>java:comp/env/persistence/TENANTX</code>. For more information please look at the EJB 3.1 specification chapter 16.11.1.</p>
+
+<p><code>&lt;persistence-unit-name&gt;Tenant1&lt;/persistence-unit-name&gt;</code> is the name of the PU as defined in the <code>persistence.xml</code> file. <code>&lt;persistence-context-ref-name&gt;persistence/TENANT1&lt;/persistence-context-ref-name&gt;</code>defines the name of the entity manager that is exposed via JNDI.</p>
+
+<p>```xml
+&lt;?xml version="1.0" encoding="UTF-8"?>
+&lt;ejb-jar xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:ejb="http://java.sun.com/xml/ns/javaee/ejb-jar_3_0.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd" version="3.1"></p>
+
+<pre><code>&lt;enterprise-beans&gt;
+    &lt;session&gt;
+        &lt;ejb-name&gt;MultiTenantEntityWrapper&lt;/ejb-name&gt;   
+        &lt;ejb-class&gt;ejb.MultiTenantWrapperImpl&lt;/ejb-class&gt;
+        &lt;session-type&gt;Stateless&lt;/session-type&gt;
+
+        &lt;!-- Persistece contexts --&gt;
+        &lt;persistence-context-ref&gt;
+            &lt;description&gt;Tenant 1&lt;/description&gt;             
+            &lt;persistence-context-ref-name&gt;persistence/TENANT1&lt;/persistence-context-ref-name&gt;        
+            &lt;persistence-unit-name&gt;Tenant1&lt;/persistence-unit-name&gt;
+            &lt;persistence-context-type&gt;Transaction&lt;/persistence-context-type&gt;
+        &lt;/persistence-context-ref&gt;
+
+        &lt;persistence-context-ref&gt;
+            &lt;description&gt;Tenant 2&lt;/description&gt;             
+            &lt;persistence-context-ref-name&gt;persistence/TENANT2&lt;/persistence-context-ref-name&gt;        
+            &lt;persistence-unit-name&gt;Tenant2&lt;/persistence-unit-name&gt;
+            &lt;persistence-context-type&gt;Transaction&lt;/persistence-context-type&gt;                
+        &lt;/persistence-context-ref&gt;
+
+    &lt;/session&gt;
+&lt;/enterprise-beans&gt;
+</code></pre>
+
+<p>&lt;/ejb-jar>
+```</p>
+
+<h2>Thread-safety and Transactionality</h2>
+
+<p>As this is compliant with both the EJB 3.1 and JPA 2.0 specification, thread-safety and transactionnaly are guaranteed by the container. For more details please look at the EJB 3.1 specification
+at chapters 16.10, 16.11 and the JPA 2.0 specification at chapter 7.6. Of course, the wrapper has to be an EJB in order to have access to the current JNDI context without having to create it.
+Furthermore, because the <code>EntityManager</code>is not <code>per se</code> thread-safe (JPA 2.0, chapter 7.2), the serialization of the invokations that is provided by the container for EJBs is essential the thread-safety aspect (EJB 3.1, chapter 4.10.13).</p>
+
+<h2>Conclusion</h2>
+
+<p>In this post, I showed how to leverage EJB 3.1 and JPA 2.0 standard features to provide multi-tenancy. The presented approach is thead-safe, it preserves transactionaly and does not induce
+a significant overhead.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Using Selenium for web integration testing]]></title>
+    <link href="http://hostettler.github.io/blog/2012/04/16/using-selenium-for-web-integration-testing/"/>
+    <updated>2012-04-16T18:57:00+02:00</updated>
+    <id>http://hostettler.github.io/blog/2012/04/16/using-selenium-for-web-integration-testing</id>
+    <content type="html"><![CDATA[<p>Following up on my previous posts (<a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">here</a>
+and <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">here</a> about integration testing
+of JEE web applications, I will present how to write smoke tests using Selenium. The idea is to
+detect whether important regressions have been introduced. This is especially useful to detect
+configuration and navigation problems. I've split the test in three parts:</p>
+
+<ol>
+<li>starting and stopping the container. Embedded Tomcat 7 in our case. This is described
+<a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7">here</a>;</li>
+<li>building the WAR file to test. To that end, you can look at this
+<a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap">post</a> that describes how to
+build such a test archive using Shrinkwrap;</li>
+<li>finally, we must build the test case. This is the goal of this post.</li>
+</ol>
+
+
+<p>Testing a use case requires to be able to:</p>
+
+<ol>
+<li>get a page at a given URL;</li>
+<li>input test data into the web elements;</li>
+<li>assert whether the server answers as expected.</li>
+</ol>
+
+
+<p>Selenium provides an easy API to fetch URLs
+As these are smoke tests, using the <code>HtmlUnitDriver</code> instead of a specific browser is sufficient.
+We do not want to detect minor display problems but rather important functional problems.</p>
+
+<p>Selenium has many different drivers for many different browser. The problem is that it opens the
+browser in a new window. I prefer to have the continuous integration running headless.</p>
+
+<p>The following dependencies are required to run the tests.</p>
+
+<p>```xml Maven dependencies
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;org.seleniumhq.selenium&lt;/groupId&gt;
+&lt;artifactId&gt;selenium-java&lt;/artifactId&gt;
+&lt;version&gt;2.20.0&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;net.sourceforge.htmlunit&lt;/groupId&gt;
+&lt;artifactId&gt;htmlunit&lt;/artifactId&gt;
+&lt;version&gt;2.9&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+```</p>
+
+<p>First, let's build a new headless driver. This object simulates the browser. It manages the HTTP part as
+well as parsing the HTML and the javascript code that is returned.</p>
+
+<p><code>java
+WebDriver driver = new HtmlUnitDriver();
+</code></p>
+
+<p>The next step is to ask the driver to load the home page that we want to test. For
+convenience, in my previous posts I defined a method that returns the current Tomcat port and the
+application context.</p>
+
+<p><code>java
+driver.get("http://localhost:" + getTomcatPort() + "/" + getApplicationId());
+</code></p>
+
+<p>Let's assume that the home page redirects to a login page that has two text boxes (respectively
+called <code>username</code> and password). The following snippet uses XPATH expressions to locate web elements.
+First, it locates a HTML element of type <code>input</code> that has an
+attribute  <code>id</code> set to <code>username</code>. If this web element is not present, the driver will raise an exception.
+This allows to easily detect whether a widget has been accidentally removed.</p>
+
+<p><code>java
+WebElement username = driver.findElement(By.xpath("//input[contains(@id,'username')]"));
+</code></p>
+
+<p>Now we can interact with the previous element. For instance, to simulate a user that types in its username (<code>admin</code>).
+<code>java
+username.sendKeys("admin");
+</code></p>
+
+<p>After that, Let's do the same for the web element called <code>password</code>.
+<code>java
+WebElement password = driver.findElement(By.xpath("//input[contains(@id,'password')]"));
+password.sendKeys("admin");
+</code></p>
+
+<p>Finally, we locate a button called <code>login</code>and we simulate a click on it.</p>
+
+<p><code>java
+WebElement login = driver.findElement(By.xpath("//button[contains(@id,'login')]"));
+login.click();
+</code></p>
+
+<p>On successful login, our example redirects to a page that contains a list of students.
+The following assertion checks that the string <code>Student list</code> exists somewhere is the returned
+HTML source code.</p>
+
+<p><code>java
+Assert.assertTrue(driver.getPageSource().contains("Student list"));
+</code></p>
+
+<p>With this approach, it is also very easy to do trivial security testing. For instance, let's check that
+the application redirects (or forwards) the user to the login page upon unsuccessful login.
+<code>java
+WebElement username = driver.findElement(By.xpath("//input[contains(@id,'username')]"));
+username.sendKeys("foo");
+WebElement password = driver.findElement(By.xpath("//input[contains(@id,'password')]"));
+password.sendKeys("foo");
+WebElement login = driver.findElement(By.xpath("//button[contains(@id,'login')]"));
+login.click();
+Assert.assertTrue(driver.getPageSource().contains("username"));
+Assert.assertTrue(driver.getPageSource().contains("password"));
+Assert.assertTrue(driver.getPageSource().contains("login"));
+</code></p>
+
+<h2>Conclusion</h2>
+
+<p>In this post, we have seen how to write smoke integration tests with Selenium. This is especially
+useful to detect whether an important functionality has been hindered. For instance, a change in the
+navigation or a unexpected change of the status (availability, visibility) of one the buttons or web elements.
+I recommend implementing the three or four major scenarios with this technique. This is usually enough to
+detect major problems. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Embedded Web Application integration testing using Tomcat 7 and JUnit]]></title>
+    <link href="http://hostettler.github.io/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/"/>
+    <updated>2012-04-09T14:39:00+02:00</updated>
+    <id>http://hostettler.github.io/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7</id>
+    <content type="html"><![CDATA[<p>To follow up on my previous post about <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">how to programmatically build a web archive</a>, I propose to look at how to deploy this archive in a Tomcat instance that is embedded into a JUnit test.</p>
+
+<p>As usual, the presented snippets are available in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> application. I will first look at the dependencies, then I will show how to configure Tomcat and finally how to start and stop the embedded instance.</p>
+
+<p>The first dependency is the embedded Tomcat core component. JULI which stands for Java Utility Logging Implementation that is the container extension of common logging. The ECJ compiler and JASPER are required to handle JSPs. Of course all these dependencies are scoped to test only.</p>
+
+<h2>The dependencies</h2>
+
+<p>```xml Maven dependencies necessary to start an embedded Tomcat instance into JUnit tests.
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;org.apache.tomcat.embed&lt;/groupId&gt;
+&lt;artifactId&gt;tomcat-embed-core&lt;/artifactId&gt;
+&lt;version&gt;7.0.26&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;org.apache.tomcat.embed&lt;/groupId&gt;
+&lt;artifactId&gt;tomcat-embed-logging-juli&lt;/artifactId&gt;
+&lt;version&gt;7.0.26&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;org.eclipse.jdt.core.compiler&lt;/groupId&gt;
+&lt;artifactId&gt;ecj&lt;/artifactId&gt;
+&lt;version&gt;3.7.1&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;org.apache.tomcat.embed&lt;/groupId&gt;
+&lt;artifactId&gt;tomcat-embed-jasper&lt;/artifactId&gt;
+&lt;version&gt;7.0.26&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+<dependency></p>
+
+<pre><code>&lt;groupId&gt;junit&lt;/groupId&gt;
+&lt;artifactId&gt;junit&lt;/artifactId&gt;
+&lt;version&gt;4.10&lt;/version&gt;
+&lt;scope&gt;test&lt;/scope&gt;
+</code></pre>
+
+<p></dependency>
+```</p>
+
+<h2>Configuring Tomcat</h2>
+
+<p>The following snippet prepares the embedded instance. The static member <code>mTomcat</code> references a new instance of Tomcat. As Tomcat still requires a file system to work, a temporary directory is used to put all the temporary files. To that end, we use the <code>java.io.tmpdir</code> java property.
+These variables are shared among the test cases.</p>
+
+<p>```java Shared static variables</p>
+
+<p>/<strong> The tomcat instance. */
+private Tomcat mTomcat;
+/</strong> The temporary directory in which Tomcat and the app are deployed. */
+private String mWorkingDir = System.getProperty("java.io.tmpdir");
+```</p>
+
+<p>As we want to use the same Tomcat configuration among all test cases, the initialization is put in a method annotated with <code>@Before</code>. First, the method sets the port to <code>0</code>. This tells the engine to choose the port to run on by itself.  This is especially useful to avoid  starting the embedded Tomcat on a already used port as <code>8080</code> for instance.
+Then the base directory is set <code>mTomcat.setBaseDir()</code> to the temporary directory. Without doing that, Tomcat would start in the current directory. The rest of the method configures the way WAR are managed by the engine.</p>
+
+<p>```java Configuration of the embedded Tomcat instance
+@Before
+public void setup() throws Throwable {</p>
+
+<pre><code>mTomcat = new Tomcat();
+mTomcat.setPort(0);
+mTomcat.setBaseDir(mWorkingDir);
+mTomcat.getHost().setAppBase(mWorkingDir);
+mTomcat.getHost().setAutoDeploy(true);
+mTomcat.getHost().setDeployOnStartup(true);
+...
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The rest of the method builds a reference to a directory (based into the temporary directory) that contains the web application. This directory is deleted if it exists to ensure redeployment of the WAR. Finally, the WAR built as explained <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">there</a> is exported into the temporary directory.</p>
+
+<p>Finally, the web application is added to the Tomcat instance. More specifically, a path
+exploded version <code>webApp.getAbsolutePath()</code> of the WAR is linked to a context <code>contextPath</code>.</p>
+
+<p>```java Cleaning and preparing the web application deployment.
+@Before
+public void setup() throws Throwable {</p>
+
+<pre><code>...
+String contextPath = "/" + getApplicationId();
+File webApp = new File(mWorkingDir, getApplicationId());
+File oldWebApp = new File(webApp.getAbsolutePath());
+FileUtils.deleteDirectory(oldWebApp);
+new ZipExporterImpl(createWebArchive()).exportTo(new File(mWorkingDir + "/" + getApplicationId() + ".war"),
+        true);
+mTomcat.addWebapp(mTomcat.getHost(), contextPath, webApp.getAbsolutePath());    
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>Starting Tomcat</h2>
+
+<p>Now that Tomcat has been configured, the next step is to start it. We want a fresh Tomcat
+for each and every test case. This way, a failed test does not have repercussions on the subsequent tests (e.g. session information, memory leaks);</p>
+
+<p>```java Start the embedded Tomcat instance and add a web application
+@Before
+public void setup() throws Throwable {</p>
+
+<pre><code>...
+mTomcat.start();
+</code></pre>
+
+<p>}
+```</p>
+
+<p>If necessary, the actual port on which Tomcat has been started can be retrieved using the following snippet.
+```java
+protected int getTomcatPort() {</p>
+
+<pre><code>return mTomcat.getConnector().getLocalPort();
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Finally, after the test, the Tomcat instance is stopped and destroyed clearing the way for the next test.</p>
+
+<h2>Stopping Tomcat</h2>
+
+<p>```java
+@After
+public final void teardown() throws Throwable {</p>
+
+<pre><code>if (mTomcat.getServer() != null
+        &amp;&amp; mTomcat.getServer().getState() != LifecycleState.DESTROYED) {
+    if (mTomcat.getServer().getState() != LifecycleState.STOPPED) {
+            mTomcat.stop();
+    }
+    mTomcat.destroy();
+}
+</code></pre>
+
+<p>}
+```</p>
+
+<h2>Conclusion</h2>
+
+<p>In this post, we have seen how to start an embedded version of Tomcat into a JUnit fixture.
+The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Programmatically build web archives using ShrinkWrap]]></title>
+    <link href="http://hostettler.github.io/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/"/>
+    <updated>2012-04-05T09:09:00+02:00</updated>
+    <id>http://hostettler.github.io/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap</id>
+    <content type="html"><![CDATA[<p>While doing integration tests on web applications, it is important to restrict the application to the strict minimum necessary for any given test. It helps to improve the startup time as well as to reduce unexpected interactions.
+To that end, I use <a href="http://www.jboss.org/shrinkwrap">ShrinkWrap</a> from <a href="http://www.jboss.org/">JBoss</a> that is a very nice a simple API to build Java archives (e.g., JAR WAR, EAR). This post describes how to programmatically build a WAR file that can be deployed on an embedded server for integration
+testing. For more details on how to use this web archive in JUnit fixtures please refer to this <a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">article</a>. The following snippet gets the ShrinkWrap package from the JBoss repository. As I only use it for test purposes, I restricted its use to the test scope.</p>
+
+<p><strong>ShrinkWrap</strong> is available as a Maven dependency:
+```xml Maven dependencies for the ShrinkWrap project
+<repositories>
+...</p>
+
+<pre><code>&lt;repository&gt;
+    &lt;id&gt;repository.jboss.org&lt;/id&gt;
+    &lt;name&gt;JBoss Repository&lt;/name&gt;
+    &lt;url&gt;http://repository.jboss.org/nexus/content/groups/public-jboss/&lt;/url&gt;
+&lt;/repository&gt;
+...
+</code></pre>
+
+<p></repositories>
+...
+<dependencies></p>
+
+<pre><code>...
+&lt;dependency&gt;
+    &lt;groupId&gt;org.jboss.shrinkwrap&lt;/groupId&gt;
+    &lt;artifactId&gt;shrinkwrap-api&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-alpha-12&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.jboss.shrinkwrap&lt;/groupId&gt;
+    &lt;artifactId&gt;shrinkwrap-impl&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0-alpha-12&lt;/version&gt;
+    &lt;scope&gt;test&lt;/scope&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<p>...
+<dependencies>
+```</p>
+
+<h2>Building the archive</h2>
+
+<p>The first step is to crate a web archive a.k.a. a WAR file. As we want to produce a WAR file, we use the <code>WebArchive.class</code> parameter
+to the <code>ShrinkWrap.create</code> method. It is also possible to produce JAR (<code>JavaArchive.class</code>) and EAR (<code>EnterpriseArchive.class</code>).
+<code>java Creation of a Web Archive
+WebArchive archive = ShrinkWrap.create(WebArchive.class, "test.war");
+</code>
+The next step to build a WAR is to provide the <code>web.xml</code> for you project. Again this can a be a simplified version of the web descriptor to improve startup time or limit dependencies. In the following example, the files are taken from a maven directory structure.</p>
+
+<p>```java Add a web descriptor to the archive
+private static final String WEBAPP_SRC = "src/main/webapp";</p>
+
+<p>archive.setWebXML(new File(WEBAPP_SRC, "WEB-INF/web.xml"))
+<code>
+Now that we have a web descriptor, let's add some classes that are required to run the application. To not having to add each single class individually, it is possible to a complete package to the archive.
+</code>java add a package to the runtime classes
+archive.addPackage(java.lang.Package.getPackage("ch.demo.web"))
+```</p>
+
+<p>It is also possible to add individual classes:
+<code>java add a class to the runtime classes
+archive.addClasses(Student.class, Address.class);
+</code></p>
+
+<p>For JSF applications, we add add the <code>faces-config.xml</code>.
+<code>java
+archive.addAsWebInfResource(new File(WEBAPP_SRC, "WEB-INF/faces-config.xml"))
+</code></p>
+
+<p>And similarly, let's add the CDI descriptor into <code>WEB-INF</code>. As we do not need to create a specific <code>`beans.xml</code>,
+we add an empty descriptor:
+<code>java
+archive.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+</code></p>
+
+<p>Let's finally add standard web resources such as <code>xhtml</code> files or static files:
+<code>java
+archive.addAsWebResource(new File(WEBAPP_SRC, "login.xhtml"));
+</code></p>
+
+<p>As ShrinkWrap uses <a href="http://en.wikipedia.org/wiki/Method_chaining">Method Chaining</a>, it is possible to chain <code>add</code> class to fill the archive.
+```java Build a simple web application    <br/>
+archive.setWebXML(new File(WEBAPP_SRC, "WEB-INF/web.xml"))</p>
+
+<pre><code>.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+.addAsWebInfResource(new File(WEBAPP_SRC, "WEB-INF/faces-config.xml"))
+.addPackage(java.lang.Package.getPackage("ch.demo.web"))
+.addAsWebResource(new File(WEBAPP_SRC, "login.xhtml"))
+.addAsWebResource(new File(WEBAPP_SRC, "index.jsp"))
+.addAsWebResource(new File(WEBAPP_SRC, "xhtml/listStudents.xhtml"), "xhtml/listStudents.xhtml");
+</code></pre>
+
+<p>```</p>
+
+<p>Please note that when using maven to execute the tests, most of the required libraries are already on the classpath. Therefore, we often do not need to add any library or jars to the web archive.</p>
+
+<h2>Using the archive</h2>
+
+<p>After having built the package, we need to export it either as a war or as an exploded directory.
+The following snippet produces a WAR file named after the archive. The second parameter states whether
+a existing archive can be overwritten.
+<code>java Produce the actual war
+new ZipExporterImpl(archive).exportTo(new File(archive.getName()), true);
+</code>
+Alternatively it is possible to produce an exploded archive:
+<code>java Produce an exploded archive
+new ExplodedExporterImpl(archive).exportExploded(new File(archive.getName()));
+</code></p>
+
+<h2>Conclusion</h2>
+
+<p>We have seen how to use ShrinkWrap to programmatically build Web archives. This is especially useful to test smaller version of your web application during integration testing. It helps to test webapps with mock services and to improve the startup time. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

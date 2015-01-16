@@ -1,0 +1,1686 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>JEE6 Tutorial - Steve Hostettler</title>
+  <meta name="author" content="Steve Hostettler">
+
+  
+  <meta name="description" content="I hereby start a series of tutorial on the major (IMHO) JEE 6 features. As a lecturer, I teach the JEE stack at the University of Geneva. This &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://hostettler.github.io/blog/2012/12/31/jee6-tutorial">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Steve Hostettler" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30751319-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Steve Hostettler</a></h1>
+  
+    <h2>JEE and test automation</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:hostettler.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/about-me/">About Me</a></li>
+  <li><a href="http://publicationslist.org/steve.hostettler">Publications</a></li>
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">JEE6 Tutorial</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-31T09:43:00+01:00" pubdate data-updated="true">Dec 31<span>st</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I hereby start a series of tutorial on the major (IMHO) JEE 6 features. As a lecturer, I teach the JEE stack at the University of Geneva. This tutorial represents most of the topics that I cover during the EJB, CDI, and JPA lessons.</p>
+
+<p>There already exists a bunch of very complete tutorials and books on the subject. Let me cite the excellent <a href="http://docs.oracle.com/javaee/6/tutorial/doc/" title="Oracle's official JEE6 tutorial">Oracle JEE tutorial</a> and
+Antonio Goncalvez&#8217;s books that are available both in <a href="http://www.amazon.com/Beginning-GlassFish-Experts-Voice-Technology/dp/143022889X/ref=sr_1_1?ie=UTF8&amp;qid=1356945347&amp;sr=8-1&amp;keywords=JEE6+antonio+goncalves" title="Antonio's Book in English">English</a> and in <a href="http://www.amazon.com/Java-EE6-GlassFish-Antonio-Goncalves/dp/2744024236/ref=sr_1_fkmr2_1?s=books&amp;ie=UTF8&amp;qid=1356945440&amp;sr=1-1-fkmr2&amp;keywords=JEE6+et+glassfish" title="Antonio's Book in French">French</a>. For advanced JEE developers, Adam Bien&#8217;s <a href="http://press.adam-bien.com/real-world-java-ee-night-hacks-dissecting-the-business-tier.htm" title="Real World Java EE Night Hacks--Dissecting the Business Tier">Real World Java EE Night Hacks</a> is a must read.</p>
+
+<p>As the <a href="http://jcp.org/aboutJava/communityprocess/final/jsr318/index.html" title="EJB 3.1 specification">EJB 3.1 specification</a> is rather well written, I encourage people to read it or at least to look at specifics when needed.</p>
+
+<p>To support this tutorial you can find a JEE6-Demo on GitHub. It contains a simple enterprise application that demonstrates many of the
+aspects I discuss hereafter. The first step of this tutorial is to prepare the environment:</p>
+
+<p>1) Install GlassFish and integrate it to your favorite development environment (eclipse in my case). You can get GlassFish from <a href="http://glassfish.java.net/downloads/3.1.2.2-final.html" title="Glassfish Download Page">here</a>. Grab the zip version and install it by unzipping the archive.</p>
+
+<p>2) Run GlassFish and check that it works. Locate the script named <code>asadmin</code> in the <code>bin</code> directory, start it and at the prompt, execute the command <code>start-domain</code>. This starts the GlassFish instance.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>localhost:bin ~$ ./asadmin
+</span><span class='line'>Use "exit" to exit and "help" for online help.
+</span><span class='line'>asadmin&gt; start-domain
+</span><span class='line'>Waiting for domain1 to start ...
+</span><span class='line'>Successfully started the domain : domain1
+</span><span class='line'>domain  Location: ~/Applications/glassfish3/glassfish/domains/domain1
+</span><span class='line'>Log File: ~/Applications/glassfish3/glassfish/domains/domain1/logs/server.log
+</span><span class='line'>Admin Port: 4848
+</span><span class='line'>Command start-domain executed successfully.
+</span><span class='line'>asadmin&gt; </span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now the server is started and it listens to the ports 8080 and 4848. The first being the application port while the second is the administrative console.</p>
+
+<p>Start a browser and navigate to <a href="http://localhost:4848/common/index.jsf"><code>http://localhost:4848/common/index.jsf</code></a>. Depending of the server configuration, you may have to log in.</p>
+
+<p>3) Do a Git checkout of the jee6-demo project that is available <a href="https://github.com/hostettler/JEE6-Demo">here</a>.</p>
+
+<p>4) Perform a <code>mvn clean install</code> at the project root</p>
+
+<p>This compiles the project and builds the artifacts. It should end up in something like:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>[INFO] ------------------------------------------------------------------------
+</span><span class='line'>[INFO] Reactor Summary:
+</span><span class='line'>[INFO] 
+</span><span class='line'>[INFO] jee6-demo ......................................... SUCCESS [0.480s]
+</span><span class='line'>[INFO] Service Layer ..................................... SUCCESS [3.650s]
+</span><span class='line'>[INFO] Presentation Layer ................................ SUCCESS [1.725s]
+</span><span class='line'>[INFO] Application ....................................... SUCCESS [0.663s]
+</span><span class='line'>[INFO] ------------------------------------------------------------------------
+</span><span class='line'>[INFO] BUILD SUCCESS
+</span><span class='line'>[INFO] ------------------------------------------------------------------------
+</span><span class='line'>[INFO] Total time: 6.923s
+</span><span class='line'>[INFO] Finished at: Sun Jan 06 16:41:29 CET 2013
+</span><span class='line'>[INFO] Final Memory: 19M/81M
+</span><span class='line'>[INFO] --------------------------------------------------------------------</span></code></pre></td></tr></table></div></figure>
+
+
+<p>5) In the GlassFish installation directory, there is a <code>javadb</code> directory that contains, Derby, a Java-based database. Starts the network server:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>&gt;$ pwd
+</span><span class='line'>/~/Applications/glassfish3/javadb/bin
+</span><span class='line'>localhost:bin ~$ ./startNetworkServer
+</span><span class='line'>Mon Jan 07 06:02:54 CET 2013 : Security manager installed using the Basic server security policy.
+</span><span class='line'>Mon Jan 07 06:02:54 CET 2013 : Apache Derby Network Server - 10.8.1.2 - (1095077) started and ready to accept connections on port 1527</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The database server listens to the port <code>1527</code>.</p>
+
+<p>Now that the database is started. It is time to populate the database with the database creation scripts as well as some data.
+In the project, under the ejb components, there is a sql file that initializes the database structure as well as some data.</p>
+
+<p>Derby provides a command line tool called <code>ij</code> to connect to the database and to execute sql scripts:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>localhost:bin ~$ pwd
+</span><span class='line'>~/Applications/glassfish3/javadb/bin
+</span><span class='line'>localhost:bin ~$./ij ~/git/jee6demo/jee6-ejb/src/main/resources/sql/createStudentsDB_DERBY.sql
+</span><span class='line'>...
+</span><span class='line'>ij&gt; QUIT;</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now the database is ready to use.</p>
+
+<p>6) Create a datasource in GlassFish that points to the  database server that has been started previously:</p>
+
+<p>First, let us create a connection pool:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>asadmin&gt; create-jdbc-connection-pool  --datasourceclassname=org.apache.derby.jdbc.ClientDataSource40 --restype=javax.sql.DataSource --property user=DEV:DatabaseName=StudentsDB:Password=DEV:ServerName=localhost:PortNumber=1527:create=true StudentsDB
+</span><span class='line'>Authentication failed with password from login store: ~/.asadminpass
+</span><span class='line'>Enter admin password for user "admin"&gt; 
+</span><span class='line'>222JDBC connection pool StudentsDB created successfully.
+</span><span class='line'>Command create-jdbc-connection-pool executed successfully.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The connection pool provides a &#8230; pool of connection that is managed by the application server. A major benefit being that the developer does not have to open and close connections.
+The server opens n connections and allocate them on demand. It ensures that there will not be 1000 open connections to the database thus improving the performances.
+Then, we create a datasource that uses the previous connection pool:</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>asadmin&gt; create-jdbc-resource --connectionpoolid StudentsDB --enabled jdbc/StudentsDS
+</span><span class='line'>Authentication failed with password from login store: ~/.asadminpass
+</span><span class='line'>Enter admin password for user "admin"&gt; 
+</span><span class='line'>JDBC resource jdbc/StudentsDS created successfully.
+</span><span class='line'>Command create-jdbc-resource executed successfully.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>7) Configure the messaging resources.</p>
+
+<p>The tutorial uses JMS (Java Messaging Service) to implement the publish/subscribe pattern. The following script builds a connection factory for JMS queues.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>asadmin&gt; create-jms-resource --restype javax.jms.QueueConnectionFactory --enabled  MyConnectionFactory
+</span><span class='line'>Authentication failed with password from login store: ~/.asadminpass
+</span><span class='line'>Enter admin password for user "admin"&gt; 
+</span><span class='line'>Connector resource MyConnectionFactory created.
+</span><span class='line'>Command create-jms-resource executed successfully.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following snippet declares the JMS queue. That is the message endpoint.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>asadmin&gt; create-jms-resource --restype javax.jms.Queue MyQueue
+</span><span class='line'>Authentication failed with password from login store: ~/.asadminpass
+</span><span class='line'>Enter admin password for user "admin"&gt; 
+</span><span class='line'>Administered object MyQueue created.
+</span><span class='line'>Command create-jms-resource executed successfully.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>8) Configure the security</p>
+
+<p>Authentication and authorization is another major feature that is provided by the application server.
+First let us create the realm with two groups user and manager.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>asadmin&gt; create-auth-realm --classname com.sun.enterprise.security.auth.realm.file.FileRealm  --property assign-groups=manager,user:file=jee6-tutorial-file-realm:jaas-context=fileRealm jee6-tutorial-file-realm
+</span><span class='line'>Authentication failed with password from login store: ~/.asadminpass
+</span><span class='line'>Enter admin password for user "admin"&gt; 
+</span><span class='line'>Command create-auth-realm executed successfully.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then, we add a user that belongs two groups: user and manager.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>asadmin&gt; create-file-user --authrealmname jee6-tutorial-file-realm --groups user:manager user1
+</span><span class='line'>Authentication failed with password from login store: ~/.asadminpass
+</span><span class='line'>Enter admin password for user "admin"&gt; 
+</span><span class='line'>Enter the user password&gt; 
+</span><span class='line'>Enter the user password again&gt; 
+</span><span class='line'>Command create-file-user executed successfully.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The second user only belongs to the group user.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>asadmin&gt; create-file-user --authrealmname jee6-tutorial-file-realm --groups user user2
+</span><span class='line'>Authentication failed with password from login store: ~/.asadminpass
+</span><span class='line'>Enter admin password for user "admin"&gt; 
+</span><span class='line'>Enter the user password&gt; 
+</span><span class='line'>Enter the user password again&gt; 
+</span><span class='line'>Command create-file-user executed successfully.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>9) Deploy the application</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>asadmin&gt; deploy ~/git/jee6demo/jee6-ear/target/jee6-demo-ear-1.0.0-SNAPSHOT.ear
+</span><span class='line'>Authentication failed with password from login store: ~/.asadminpass
+</span><span class='line'>Enter admin password for user "admin"&gt; 
+</span><span class='line'>Application deployed with name jee6-demo-ear-1.0.0-SNAPSHOT.
+</span><span class='line'>Command deploy executed successfully.</span></code></pre></td></tr></table></div></figure>
+
+
+<p>10) Test the application</p>
+
+<p>Once deployed, serve to <a href="http://localhost:8080/jee6-demo-web/facade/studentService/all"><code>http://localhost:8080/jee6-demo-web/facade/studentService/all</code></a> and you should get:
+You must log yourself with one of the use that you created at step 8).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;studentsDto</span> <span class="na">xmlns:ns2=</span><span class="s">&quot;http://ch.demo.app&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;students&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;id&gt;</span>0<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;last_name&gt;</span>Doe<span class="nt">&lt;/last_name&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;firstName&gt;</span>John<span class="nt">&lt;/firstName&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;birthDate&gt;</span>1965-12-10T00:00:00+01:00<span class="nt">&lt;/birthDate&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;phoneNumber&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;areaCode&gt;</span>0<span class="nt">&lt;/areaCode&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;countryCode&gt;</span>0<span class="nt">&lt;/countryCode&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;number&gt;</span>0<span class="nt">&lt;/number&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/phoneNumber&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;address&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;number&gt;</span>22<span class="nt">&lt;/number&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;street&gt;</span>wisteria street<span class="nt">&lt;/street&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;city&gt;</span>Downtown<span class="nt">&lt;/city&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;postalCode&gt;</span>34343<span class="nt">&lt;/postalCode&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/address&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/students&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;students&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;id&gt;</span>1<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;last_name&gt;</span>Doe<span class="nt">&lt;/last_name&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;firstName&gt;</span>Jane<span class="nt">&lt;/firstName&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;birthDate&gt;</span>1985-12-10T00:00:00+01:00<span class="nt">&lt;/birthDate&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;phoneNumber&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;areaCode&gt;</span>0<span class="nt">&lt;/areaCode&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;countryCode&gt;</span>0<span class="nt">&lt;/countryCode&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;number&gt;</span>0<span class="nt">&lt;/number&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/phoneNumber&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;address&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;number&gt;</span>22<span class="nt">&lt;/number&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;street&gt;</span>wisteria street<span class="nt">&lt;/street&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;city&gt;</span>Downtown<span class="nt">&lt;/city&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;postalCode&gt;</span>34343<span class="nt">&lt;/postalCode&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/address&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/students&gt;</span>
+</span><span class='line'><span class="nt">&lt;/studentsDto&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now you are ready to follow me in the EJB world.</p>
+
+<p>The tutorial is organized in three parts. First, in this post, we will look at the EJB stack. In following posts, we will cover both the Context and Dependency Injection and the Java Persistence API.</p>
+
+<h1><a id="ejbs"></a>EJBs</h1>
+
+<p>The EJB API provides useful non-functional services to Java Enterprise Applications such as transactionality, security, pooling, and thread-safety.
+Server side components that implement this API and wrap up business logic are called Enterprise Java Beans (EJBs). While the first versions were infamously known for the boilerplate code as well as their low testability,
+EJB 3.x are rather easy to use thanks to a new design paradigms called <a href="http://en.wikipedia.org/wiki/Convention_over_configuration" title="Convention over Configuration on Wikipedia">Convention over Configuration</a>. The idea is to specify unconventional aspects rather than everything. This dramatically reduces the boilerplate code and improves readability.</p>
+
+<p>Furthermore, the massive usage of annotations instead of XML descriptor greatly improves the productivity. In the sequel, I mostly rely on annotations. Nevertheless, every annotation has its counterpart in a configuration descriptor that is called <code>ejb-jar.xml</code>.</p>
+
+<blockquote><p>In case there is two different value for the same property, remember that one from the <code>ejb-jar.xml</code> always overrides the annotation.</p></blockquote>
+
+<p>Enterprise Java Beans are of three kinds:</p>
+
+<ul>
+<li><strong>Session Beans</strong>: components whose execution is triggered by a client call. The call can be local (within the JVM) or remote (by another JVM).</li>
+<li><strong>Message Beans</strong>: execution is triggered by a message and the business logic is processed asynchronously. Please note that, since JEE6 there are other (simpler) ways to process logic asynchronously. Nevertheless, Message Beans
+remain very useful to implement bus and/or publish-subscribe patterns and to enforce loose coupling between the client and the server component.</li>
+<li><strong>Entity Beans</strong>: I will not discuss entity beans as they have been replaced by the <a href="http://jcp.org/aboutJava/communityprocess/final/jsr317/index.html" title="JPA 2.0 specification">JPA 2.0 specification</a>.</li>
+</ul>
+
+
+<h2><a id="sb"></a>Session Beans</h2>
+
+<p>As mentioned previously, session beans (merely) react on client invocation. Henceforth, the bean can either take the client session into account (thus it shares a state between multiple client invocations) or it can treat each call as unrelated.
+In the first case, the EJB is called <strong>Stateful</strong> while in the latter it is called <strong>Stateless</strong>.</p>
+
+<h3><a id="slsb"></a>Stateless Session Beans</h3>
+
+<p>Let us start with a <strong>Stateless</strong> bean. The following Java class describes a Stateless EJB.
+The most important part is the annotation <code>@Stateless</code> at the top of the class.
+This marks the class as an EJB. When the container instantiates this class, it knows that
+it is a so-called <strong>Managed Bean</strong>. By this, it means that the container manages the bean&#8217;s lifecycle (e.g., instantiation, passivation). Furthermore, as an EJB, it has access to the container services such as security and transactionality.</p>
+
+<p>The following snippet describes a Stateless Session bean that computes a grade distribution. The method is secured and only authorized to client that have the role <code>user</code> through the <code>@RolesAllowed({ "user" })</code> annotation.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Stateless</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceJPAImpl</span> <span class="kd">implements</span> <span class="n">StudentService</span> <span class="o">{</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="nd">@RolesAllowed</span><span class="o">({</span> <span class="s">&quot;user&quot;</span> <span class="o">})</span> <span class="c1">// This a role-based security.</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kd">final</span> <span class="n">Integer</span><span class="o">[]</span> <span class="nf">getDistribution</span><span class="o">(</span><span class="kd">final</span> <span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">numberOfAccess</span><span class="o">++;</span>
+</span><span class='line'>        <span class="n">Integer</span><span class="o">[]</span> <span class="n">grades</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">[</span><span class="n">n</span><span class="o">];</span>
+</span><span class='line'>
+</span><span class='line'>        <span class="k">for</span> <span class="o">(</span><span class="n">Student</span> <span class="n">s</span> <span class="o">:</span> <span class="k">this</span><span class="o">.</span><span class="na">getAll</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>            <span class="n">grades</span><span class="o">[(</span><span class="n">s</span><span class="o">.</span><span class="na">getAvgGrade</span><span class="o">().</span><span class="na">intValue</span><span class="o">()</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span> <span class="o">/</span> <span class="o">(</span><span class="n">TOTAL</span> <span class="o">/</span> <span class="n">n</span><span class="o">)]++;</span>
+</span><span class='line'>        <span class="o">}</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">grades</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'> <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Please note that the previous EJB implements an interface. An EJB can be local (invokable from within the container),
+remote (invokable from another JVM) or both. In the previous case, it is a local interface and therefore the bean is only
+invokable locally.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Local</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StudentService</span> <span class="kd">extends</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>  <span class="cm">/**</span>
+</span><span class='line'><span class="cm">  * @return an array that contains the distribution of the grades. It</span>
+</span><span class='line'><span class="cm">  *         partitions the grades in &quot;n&quot; parts.</span>
+</span><span class='line'><span class="cm">  * @param n : number of parts</span>
+</span><span class='line'><span class="cm">  */</span>
+</span><span class='line'>  <span class="kt">int</span><span class="o">[]</span> <span class="nf">getDistribution</span><span class="o">(</span><span class="kd">final</span> <span class="kt">int</span> <span class="n">n</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Adding a remote invocation to the implementation amounts to add an interface that is annotated <code>@Remote</code>.
+Of course, the interface may be different and may exposes different services locally and remotely.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Remote</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StudentServiceRemote</span> <span class="kd">extends</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/**</span>
+</span><span class='line'><span class="cm">     * @param lastname</span>
+</span><span class='line'><span class="cm">     *            of the student</span>
+</span><span class='line'><span class="cm">     * @return the student with the given lastname.</span>
+</span><span class='line'><span class="cm">     */</span>
+</span><span class='line'>    <span class="n">Student</span> <span class="nf">getStudentByLastName</span><span class="o">(</span><span class="n">String</span> <span class="n">lastname</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The implementation must be changed as follow to be remotely invokable:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Stateless</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceJPAImpl</span> <span class="kd">implements</span> <span class="n">StudentService</span><span class="o">,</span> <span class="n">StudentServiceRemote</span> <span class="o">{</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To use this EJB, we need a client code. The easiest possible interaction is either via a JAX-RS service or via a servlet.
+In the JEE6-Demo, under the JEE6-WEB project the JAX-RS facade is called <code>StudentFacade.java</code>. It implements a JAX-RS facade over the <code>StudentService</code>.</p>
+
+<p>The method <code>getDistribution()</code> uses the student service that is injected via <code>@EJB</code> in the
+facade. <a href="http://en.wikipedia.org/wiki/Dependency_injection" title="Dependency Injection on Wikipedia">Dependency injection</a>  is now a first class citizen in the JEE6 stack.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@ApplicationScoped</span> <span class="c1">// This sets the scope to application level</span>
+</span><span class='line'><span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;/studentService&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceFacade</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'>  <span class="nd">@EJB</span>
+</span><span class='line'>  <span class="n">StudentService</span> <span class="n">studentService</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@GET</span>
+</span><span class='line'>  <span class="nd">@Produces</span><span class="o">({</span> <span class="s">&quot;application/xml&quot;</span><span class="o">,</span> <span class="s">&quot;application/json&quot;</span> <span class="o">})</span>
+</span><span class='line'>  <span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;distribution&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">Response</span> <span class="nf">getDistribution</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Integer</span><span class="o">[]</span> <span class="n">distrib</span> <span class="o">=</span> <span class="n">studentService</span><span class="o">.</span><span class="na">getDistribution</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span><span class="k">new</span> <span class="n">DistributionDto</span><span class="o">(</span><span class="n">distrib</span><span class="o">)).</span><span class="na">build</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following snippet illustrates the injection of a Stateless EJB into a Servlet.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@WebServlet</span><span class="o">(</span><span class="s">&quot;/student&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServlet</span> <span class="kd">extends</span> <span class="n">HttpServlet</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="mi">1L</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@EJB</span>
+</span><span class='line'>  <span class="n">StudentService</span> <span class="n">studentService</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Override</span>
+</span><span class='line'>  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">response</span><span class="o">.</span><span class="na">getOutputStream</span><span class="o">()</span>
+</span><span class='line'>              <span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;There are #&quot;</span> <span class="o">+</span> <span class="n">studentService</span><span class="o">.</span><span class="na">getAll</span><span class="o">().</span><span class="na">size</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot; students in the database&quot;</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Override</span>
+</span><span class='line'>  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doPost</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">arg0</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">arg1</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">this</span><span class="o">.</span><span class="na">doGet</span><span class="o">(</span><span class="n">arg0</span><span class="o">,</span> <span class="n">arg1</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As you can see, implementing EJBs (and invoking them) is rather easy. So far, we did not talk much about transactionality and security so you might wonder why using EJBs for such simple business services. The answer is pooling and thread-safety. As the container manages a pool of EJBs, it handles the invocation queue and you do not have to manager re-entrance and thread-safety.</p>
+
+<blockquote><p>Remember that there is a <strong>one to many relationship</strong> between a stateless session bean and the clients. In other words, one instance may manage different clients. Hence, there must be not field that represent a client state in a <strong>Stateless</strong> EJB because there is no guarantee that a given client will get the same SLSB accross two invokations. Nevertheless, within a given invokation the client is guaranteed to be the only user.</p></blockquote>
+
+<p>Consider the following exercises.</p>
+
+<blockquote><p><em>Exercise 1:</em> Add a new method to the StudentService service that computes the standard deviation and use this method in the JAX-RS facade.</p>
+
+<p><em>Exercise 2:</em> Add a counter that is incremented each and every time a method is invoked. Print out the thread-id (and if possible the session-id) and explain why the so-called stateless beans must be without state. Add a rest service to interface this method.</p></blockquote>
+
+<h4><a id="trx"></a>Transactionality</h4>
+
+<p><a href="http://en.wikipedia.org/wiki/Database_transaction" title="Transactions on wikipedia">Transactions</a> are important concepts when dealing with enterprise applications. It is of vital importance that whenever something goes wrong, the transaction is roll-backed. This preserves the <a href="http://en.wikipedia.org/wiki/ACID" title="ACID in wikipedia">ACID</a> properties. Managing database transactions with JDBC is complex to say the least. Remember that we often have to manage transactions over several databases and even between databases and messaging queues. If the processing of a message leads to a database exception, we might want to put the message back in the queue.</p>
+
+<p>Lucky for us, JEE 6 manages (almost) everything by itself. By default a bean is transactional and each method either reuse a running transaction or creates a new one if necessary.</p>
+
+<blockquote><p>By default the transaction (or transaction context) is propagated to other business methods that are called from within a transactional method.</p></blockquote>
+
+<p>In JEE, there is two types of transaction management:</p>
+
+<ul>
+<li><p><strong>Bean Managed</strong> : In this case the bean is annotated with <code>@TransactionManagement(TransactionManagementType.BEAN)</code>. In this mode, the developer must manage the transaction himself.</p></li>
+<li><p><strong>Container Managed</strong>: this is the default behavior and it corresponds to marking the bean <code>@TransactionManagement(TransactionManagementType.CONTAINER)</code>. This mode is called <strong>Container Managed Transaction Demarcation</strong>. This idea is that every public method is transactional and is marked as <code>@Required</code>.</p></li>
+</ul>
+
+
+<p>The following snippet shows how to use bean demarcation:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@MessageDriven</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">&quot;MyQueue&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@TransactionManagement</span><span class="o">(</span><span class="n">TransactionManagementType</span><span class="o">.</span><span class="na">BEAN</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@PersistenceContext</span>
+</span><span class='line'>  <span class="n">EntityManager</span> <span class="n">em</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">begin</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>          <span class="o">...</span>
+</span><span class='line'>          <span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
+</span><span class='line'>          <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;MESSAGE BEAN: Message received: &quot;</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+</span><span class='line'>          <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+</span><span class='line'>          <span class="o">...</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">rollback</span><span class="o">();</span>
+</span><span class='line'>          <span class="o">...</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>      <span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">commit</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>and now the exact same class using container demarcation:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@MessageDriven</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">&quot;MyQueue&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@PersistenceContext</span>
+</span><span class='line'>  <span class="n">EntityManager</span> <span class="n">em</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>          <span class="o">...</span>
+</span><span class='line'>          <span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
+</span><span class='line'>          <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;MESSAGE BEAN: Message received: &quot;</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+</span><span class='line'>          <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+</span><span class='line'>          <span class="o">...</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">rollback</span><span class="o">();</span>
+</span><span class='line'>          <span class="o">...</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Because the previous snippet relies on the default convention, it is equivalent to:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@MessageDriven</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">&quot;MyQueue&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@TransactionManagement</span><span class="o">(</span><span class="n">TransactionManagementType</span><span class="o">.</span><span class="na">CONTAINER</span><span class="o">)</span>
+</span><span class='line'><span class="nd">@TransactionAttribute</span><span class="o">(</span><span class="n">TransactionAttributeType</span><span class="o">.</span><span class="na">REQUIRED</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Inject</span> <span class="c1">// Let&#39;s ignore this for the moment</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">transient</span> <span class="n">Logger</span> <span class="n">logger</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@PersistenceContext</span>
+</span><span class='line'>  <span class="n">EntityManager</span> <span class="n">em</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Resource</span> <span class="c1">// Let&#39;s ignore this for the moment</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">MessageDrivenContext</span> <span class="n">mdbContext</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>          <span class="o">...</span>
+</span><span class='line'>          <span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
+</span><span class='line'>          <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;MESSAGE BEAN: Message received: &quot;</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+</span><span class='line'>          <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+</span><span class='line'>          <span class="o">...</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">rollback</span><span class="o">();</span>
+</span><span class='line'>          <span class="o">...</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In other terms, it uses container managed transaction demarcation <code>@TransactionManagement(TransactionManagementType.CONTAINER)</code>.
+Moreover, each and every public method either reuses an existing transaction or creates a new one if none has been started <code>@TransactionAttribute(TransactionAttributeType.REQUIRED)</code></p>
+
+<p>The <code>@TransactionAttribute</code> annotation can also be put directly on the method. Valid options are:</p>
+
+<ul>
+<li><code>REQUIRED</code>: if there is an existing transaction then it reuses it, otherwise it creates a new one.</li>
+<li><code>REQUIRES_NEW</code>: it always creates a new transaction</li>
+<li><code>NEVER</code>: if there is an existing transaction then it fails</li>
+<li><code>MANDATORY</code>: if there is an existing transaction then it reuses it, otherwise it fails</li>
+<li><code>NOT_SUPPORTED</code>: If there is a transaction then it suspends it and it does not propagate the transaction to other business methods, otherwise it does nothing.</li>
+<li><code>SUPPORTS</code>: If a transaction exists then it works as for <code>REQUIRED</code>, otherwise it works as for <code>NOT_SUPPORTED</code>.</li>
+</ul>
+
+
+<p>Consider the following exercises.</p>
+
+<blockquote><p><em>Exercise 3:</em> Test the different types of transaction attribute and observe their respective behavior.</p>
+
+<p><em>Exercise 4:</em> Are the snippets 1 and 2 semantically equivalent?</p>
+
+<p><em>Exercise 5:</em> Mix the two types of transaction management.</p></blockquote>
+
+<h4><a id="secu"></a>Security</h4>
+
+<p>Another great feature of EJBs is their ability for declarative authorization and the integration in the JAAS framework. JAAS is the Java Authentication and Authorization Service
+It provides unified services to access user directories for user authentication and their authorization. As the client is already authenticated, at the EJB level, only authorization matters.</p>
+
+<p>After authentication, a principal (e.g., user name, role) is set in the context. This principal is used for authorization.</p>
+
+<p>The main annotation is <code>@RolesAllowed</code> followed by a list of authorized roles. As an example, look at the method <code>getDistribution</code> of <code>StudentServiceJPAImpl.java</code>. The method is only allowed for client that belongs to the group/role <code>user</code>.</p>
+
+<p>Sometimes, a method of an EJB is not executed in the context of an authenticated user or the authenticated user has not enough credentials. If it is still important to run the method, you can use the <code>@RunAs</code> annotation. This basically overrides the current security context (and the associated principal) similarly to <code>sudo</code> for UNIX.</p>
+
+<p>In any EJB, it is possible to get the current client session and therefore the principal:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Resource</span>
+</span><span class='line'><span class="n">SessionContext</span> <span class="n">ctx</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSomething</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="c1">// obtain the principal. </span>
+</span><span class='line'>  <span class="n">Principal</span> <span class="n">principal</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getCallerPrincipal</span><span class="o">();</span>
+</span><span class='line'>  <span class="c1">// obtain the name. </span>
+</span><span class='line'>  <span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">callerPrincipal</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span>
+</span><span class='line'>  <span class="c1">// Is the caller an admin?</span>
+</span><span class='line'>  <span class="n">ctx</span><span class="o">.</span><span class="na">isCallerInRole</span><span class="o">(</span><span class="s">&quot;admin&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<blockquote><p><em>Exercise 6:</em> Change the method getDistribution to only allow client that belong to the <code>admin</code> group. Log as a user and as an admin, check the servlet as well as the JAX-RS service. What do you observe?</p>
+
+<p><em>Exercise 7:</em> Add a new Role to the application, and use it. Warning, some configurations are vendor specific.</p>
+
+<p><em>Exercise 8:</em> Create a service that uses <code>@RunAs</code> to upgrade the credentials of a standard user in order to call another service that requires the admin level.</p></blockquote>
+
+<h4><a id="callbacks"></a> Callbacks and Interceptors</h4>
+
+<p>Interceptors are used to enhance the business method invocations and the beans&#8217; lifecycle events. Interceptors implements the AOP paradigm.</p>
+
+<p>Interceptors are of two kinds:
+- Lifecycle event interceptors such as <code>@PostConstruct</code>, <code>@PostActivate</code>, and <code>@PrePassivate</code>, and <code>@PreDestroy</code> enable to add logic when the bean is created or destroyed.
+- Call-based interceptors that relies on the <code>@AroundInvoke</code> annotation.</p>
+
+<p>In the first case, adding the annotation before the method declaration is enough. It will then be called when the lifecycle event occurs.
+In the latter case, in addition to the annotation the developer must configure the <code>ejb-jar.xml</code> file.</p>
+
+<p>Here is a simple interceptor that prints out the time consumed by a method call:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@AroundInvoke</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">Object</span> <span class="nf">intercept</span><span class="o">(</span><span class="n">InvocationContext</span> <span class="n">ctx</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span>
+</span><span class='line'><span class="o">{</span>
+</span><span class='line'>   <span class="kt">long</span> <span class="n">start</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Object</span> <span class="n">value</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">proceed</span><span class="o">();</span>
+</span><span class='line'>   <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">StringBuilder</span> <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuilder</span><span class="o">(</span><span class="s">&quot;******  &quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="na">getMethod</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+</span><span class='line'>      <span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot; took :&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()</span> <span class="o">-</span> <span class="n">start</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">&quot; ms  ******&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">mLogger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">str</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In addition to the interceptor declaration, it must be activated by mean of either an annotation on the target EJB or via the <code>ejb-jar.xml</code> file. If several interceptors are declared, then the order of declaration is the order of execution: the last is the most nested interceptor.</p>
+
+<p>The following example presents the annotation based declaration.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Stateless</span>
+</span><span class='line'><span class="nd">@Interceptor</span><span class="o">({</span><span class="n">PerformanceEJBInterceptor</span><span class="o">.</span><span class="na">class</span><span class="o">})</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">StudentServiceJPAImpl</span> <span class="kd">implements</span> <span class="n">StudentService</span><span class="o">,</span> <span class="n">StudentServiceRemote</span> <span class="o">{</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>In the following snippet, the interceptor is applied to all methods whose name is like <code>get*</code> and EJB&#8217;s name is like <code>Student*</code>. It is also possible to specify the parameters&#8217; type in case of overloading.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;assembly-descriptor&gt;</span>
+</span><span class='line'> <span class="c">&lt;!-- Default interceptor that will apply to all methods for all beans in deployment --&gt;</span>
+</span><span class='line'> <span class="nt">&lt;interceptor-binding&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;ejb-name&gt;</span>Student*<span class="nt">&lt;/ejb-name&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;method&gt;</span>
+</span><span class='line'>           <span class="nt">&lt;method-name&gt;</span>get*<span class="nt">&lt;/method-name&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/method&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;interceptor-class&gt;</span>ch.demo.business.interceptors.PerformanceEJBInterceptor<span class="nt">&lt;/interceptor-class&gt;</span>
+</span><span class='line'>   <span class="nt">&lt;/interceptor-binding&gt;</span>
+</span><span class='line'>   ...
+</span><span class='line'><span class="nt">&lt;/assembly-descriptor&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<blockquote><p><em>Exercise 9:</em> Add an interceptor that for all public methods of <code>StudentServiceJPAImpl.java</code> to increments an overall (common to all clients) usage counter using the annotation based approach.</p>
+
+<p><em>Exercise 10:</em> Do the same, but using the <code>`ejb-jar.xml</code>.</p></blockquote>
+
+<h4><a id="timers"></a> Timers</h4>
+
+<p>Some services are not directly linked to a client session. This is the case for batch processes that must run every x hours. To that end, EJB 3.1 provides the annotation <code>@Schedule</code> to specify how often a service method must be called. This is similar to the CRON  feature on UNIX systems.</p>
+
+<p>The following example runs the method <code>doSomethingUseful</code> every 30 minutes.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Schedule</span><span class="o">(</span><span class="n">minute</span><span class="o">=</span><span class="s">&quot;*/30&quot;</span><span class="o">,</span> <span class="n">hour</span><span class="o">=</span><span class="s">&quot;*&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSomethingUseful</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<blockquote><p><em>Exercise 11:</em>  Add a scheduler that runs a method every minutes to print out the number of students in the database.</p>
+
+<p><em>Exercise 12:</em>  <code>@Schedule</code> is often used in conjunction with <code>@RunAs</code>. Why?</p></blockquote>
+
+<h4><a id="async"></a> Asynchronous calls</h4>
+
+<p>Asynchronous calling means that the control is returned to the caller before the process has been completed. For instance, a batch job that loads 1000 customers description from one database, processes them and finally save them in another database. From a performances point of view, it is better to split the process in x batches and then to wait until every thing is finished. Firstly, if the asynchronous call is made to another EJB, it is possible to leverage the pool to have parallel treatments without managing multi-threading and race conditions. Secondly, as the different call may use different database connections, it will limit the database bottleneck.</p>
+
+<p>To do this, JEE provides the <code>@Asynchronous</code> annotation. Any method that returns either nothing (<code>void</code>) or an instance of type <code>Future&lt;T&gt;</code> can be run asynchronously.</p>
+
+<p>The <code>Future</code> interface exposes the method <code>get</code> that blocks until the job is over.
+The following class, exposes the method <code>processJob</code> that runs asynchronously.</p>
+
+<p>The methods <code>processJobs</code> starts 10 times the method processJob and put the resulting <code>Future&lt;String&gt;</code> in an array. Then it iterates of the pool and wait until all calls have returned.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Stateless</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">BatchProcessor</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">processJobs</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">Future</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;[]</span> <span class="n">pool</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Future</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;[</span><span class="mi">10</span><span class="o">];</span>
+</span><span class='line'>  <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">pool</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">processJob</span><span class="o">(</span><span class="s">&quot;Job #&quot;</span> <span class="o">+</span> <span class="n">i</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">pool</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">get</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>    
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Asynchronous</span>
+</span><span class='line'><span class="kd">public</span> <span class="n">Future</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="nf">processJob</span><span class="o">(</span><span class="n">String</span> <span class="n">jobName</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">10000</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">Thread</span><span class="o">.</span><span class="na">interrupted</span><span class="o">();</span>
+</span><span class='line'>        <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">return</span> <span class="k">new</span> <span class="n">AsyncResult</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;(</span><span class="n">jobName</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<blockquote><p><em>Exercise 13:</em> Create an EJB that invoke an asynchronous method that runs 100 times. The asynchronous method should wait a random time between 5 and 10 seconds  before returning a the actual waiting time. Collect all the waiting times and compute the average.</p></blockquote>
+
+<h3>Singleton Beans</h3>
+
+<p>Singleton beans (<code>@Singleton</code>) are special kind of EJBS that exist only in one instance in the container. This is for instance useful to initialize the application. Thus, <code>@Singleton</code> can be associated with <code>@Startup</code> to start the EJB during container&#8217;s startup.</p>
+
+<p>As there is only one instance, it means the bean is meant to be shared. Therefore, it is important to specify the locking policy. There are two types of locking:
+- Container managed concurrency management <code>@ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)</code>. This is the default behavior and it is highly recommended to stick to it. Annotating a method (or the class) with <code>@Lock(LockType.READ)</code> means that the method can be safely access concurrently. <code>@Lock(LockType.WRITE)</code> requires the calls to the method to be serialized. The methods are <code>@Lock(LockType.WRITE)</code> by default.
+- Bean managed concurrency management <code>@ConcurrencyManagement(ConcurrencyManagementType.BEAN)</code>. This requires the developer to use synchronized and volatile to achieve good concurrency.</p>
+
+<blockquote><p>By default the class is marked as <code>@Lock(LockType.WRITE)</code>, thus EVERY CALL is synchronized. This is probably not the expected behavior (at least most of the time) and produces a huge bottleneck. Make sure to set the proper lock policy on the class and to only put <code>@Lock(LockType.WRITE)</code> where needed.</p></blockquote>
+
+<p>The following bean initialize a shared variable during container startup and lock the access to the modification to only one thread (client) at a time.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Singleton</span>
+</span><span class='line'><span class="nd">@Startup</span>
+</span><span class='line'><span class="nd">@Lock</span><span class="o">(</span><span class="n">LockType</span><span class="o">.</span><span class="na">READ</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StatusBean</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">String</span> <span class="n">status</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@PostConstruct</span>
+</span><span class='line'>  <span class="kt">void</span> <span class="n">init</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="o">.</span><span class="na">status</span> <span class="o">=</span> <span class="s">&quot;Ready&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getStatus</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">status</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Lock</span><span class="o">(</span><span class="n">LockType</span><span class="o">.</span><span class="na">WRITE</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setStatus</span><span class="o">(</span><span class="n">String</span> <span class="k">new</span> <span class="n">Status</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="o">.</span><span class="na">status</span> <span class="o">=</span> <span class="n">newStatus</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Lock</span><span class="o">(</span><span class="n">LockType</span><span class="o">.</span><span class="na">WRITE</span><span class="o">)</span>
+</span><span class='line'>  <span class="nd">@AccessTimeout</span><span class="o">(</span><span class="n">value</span><span class="o">=</span><span class="mi">360000</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="n">doTediousOperation</span> <span class="o">{</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<blockquote><p><em>Exercise 14:</em> Write a singleton that reads the postal code from the database during startup, update them every 30 minutes. Take care of the concurrency aspects.</p></blockquote>
+
+<h3><a id="sfsb"></a>Stateful Session Beans</h3>
+
+<p>Unlike stateless session beans, stateful session beans maintain a state across several client invocation. This is because there is a one to one relationship between a client and a stateful session bean.</p>
+
+<p>The following code snippet describes a stateful session bean that maintains a counter across several invocations.
+A stateful session bean is annotated with <code>@Stateful</code>. As it is stateful, it maintains a session state and it is therefore important to set a timeout. Otherwise, the number of open session will raise and it will consume the server memory.
+The timeout is defined using the <code>@StatefulTimeout</code> annotation.</p>
+
+<blockquote><p>Because there is no instance sharing among several client, Stateful session beans are more resource-demanding than stateless session beans. Therefore, they should be used with great care.</p></blockquote>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Stateful</span>
+</span><span class='line'><span class="nd">@StatefulTimeout</span><span class="o">(</span><span class="n">unit</span> <span class="o">=</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">MINUTES</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">30</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentStatisticsServiceImpl</span> <span class="kd">implements</span> <span class="n">StudentStatisticsService</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Long</span> <span class="n">numberOfAccess</span> <span class="o">=</span> <span class="mi">0</span><span class="n">l</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Override</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getStatistics</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="s">&quot;The student service has been invoked #&quot;</span> <span class="o">+</span> <span class="n">numberOfAccess</span>
+</span><span class='line'>              <span class="o">+</span> <span class="s">&quot; in this session&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">count</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">numberOfAccess</span><span class="o">++;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As a stateful session bean is not per se linked to an HTTP session, the application client code must ensure to remember which instance of the EJB is dedicated to which client.
+When used in conjunction with a Servlet, Stateful beans are often put in the HTTP session for further reuse.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Override</span>
+</span><span class='line'><span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">StudentStatisticsService</span> <span class="n">statistics</span> <span class="o">=</span> <span class="o">(</span><span class="n">StudentStatisticsService</span><span class="o">)</span> <span class="n">request</span><span class="o">.</span><span class="na">getSession</span><span class="o">().</span><span class="na">getAttribute</span><span class="o">(</span>
+</span><span class='line'>              <span class="n">StudentStatisticsService</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">if</span> <span class="o">(</span><span class="n">statistics</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>              <span class="n">InitialContext</span> <span class="n">ctx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">InitialContext</span><span class="o">();</span>
+</span><span class='line'>              <span class="n">statistics</span> <span class="o">=</span> <span class="o">(</span><span class="n">StudentStatisticsService</span><span class="o">)</span> <span class="n">ctx</span>
+</span><span class='line'>                      <span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="s">&quot;java:global/JEE6-EAR/JEE6-EJB-0.0.1-SNAPSHOT/StudentStatisticsServiceImpl&quot;</span><span class="o">);</span>
+</span><span class='line'>              <span class="n">request</span><span class="o">.</span><span class="na">getSession</span><span class="o">().</span><span class="na">setAttribute</span><span class="o">(</span><span class="n">StudentStatisticsService</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">toString</span><span class="o">(),</span> <span class="n">statistics</span><span class="o">);</span>
+</span><span class='line'>          <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">NamingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>              <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+</span><span class='line'>          <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">statistics</span><span class="o">.</span><span class="na">count</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="n">response</span><span class="o">.</span><span class="na">getOutputStream</span><span class="o">().</span><span class="na">println</span><span class="o">(</span><span class="s">&quot;There are #&quot;</span> <span class="o">+</span> <span class="n">studentService</span><span class="o">.</span><span class="na">getAll</span><span class="o">().</span><span class="na">size</span><span class="o">()</span> <span class="o">+</span> <span class="s">&quot; students in the database&quot;</span><span class="o">);</span>
+</span><span class='line'>      <span class="n">response</span><span class="o">.</span><span class="na">getOutputStream</span><span class="o">().</span><span class="na">println</span><span class="o">(</span><span class="n">statistics</span><span class="o">.</span><span class="na">getStatistics</span><span class="o">());</span>
+</span><span class='line'>      <span class="n">response</span><span class="o">.</span><span class="na">getOutputStream</span><span class="o">().</span><span class="na">println</span><span class="o">(</span><span class="n">studentService</span><span class="o">.</span><span class="na">getStatistics</span><span class="o">());</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Either the EJB is looked-up with JNDI and then put into the HTTP session or, when using CDI, the link is made based on the caller scope.
+The class <code>StudentServiceFacade.java</code> describes how the injection automatically links the correct instance of a stateful session bean to a given based on the <code>@SessionScoped</code> annotation.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@SessionScoped</span>
+</span><span class='line'><span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;/studentService&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceFacade</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="mi">1318211294294344900L</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@EJB</span>
+</span><span class='line'>  <span class="n">StudentService</span> <span class="n">studentService</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@EJB</span>
+</span><span class='line'>  <span class="n">StudentStatisticsService</span> <span class="n">studentServiceStatistics</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@GET</span>
+</span><span class='line'>  <span class="nd">@Produces</span><span class="o">({</span> <span class="s">&quot;application/xml&quot;</span><span class="o">,</span> <span class="s">&quot;application/json&quot;</span> <span class="o">})</span>
+</span><span class='line'>  <span class="nd">@Path</span><span class="o">(</span><span class="s">&quot;session&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="n">Response</span> <span class="nf">getSessionStatistics</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span><span class="n">studentServiceStatistics</span><span class="o">.</span><span class="na">getStatistics</span><span class="o">()).</span><span class="na">build</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Consider the following exercise.</p>
+
+<blockquote><p><em>Exercise 15:</em> Show that two sessions share the same overall count but not the same per session count.</p></blockquote>
+
+<p>As the container does not share the stateful instances, it might run out of memory and therefore it will try to save the state of the bean on disk (or database). This operation is called <strong>Passivation</strong>. Afterwards, when the client comes back and requires its stateful instance, the container loads it from the disk. This operation is called <strong>Activation</strong>.</p>
+
+<p>Some operations such as initializing/cleaning File, a socket connection, or a database connection can be made before activation and/or after activation using the following
+<code>@PrePassivate</code> and the <code>@PostActivate</code> annotations.</p>
+
+<p>Consider the following exercises:</p>
+
+<blockquote><p><em>Exercise 16:</em> Stop the server and observe that the bean has been passivated.</p>
+
+<p><em>Exercise 17:</em> Start the server and observe that the bean has been activated.</p></blockquote>
+
+<p>Whenever the user logs out and thus invalidate the HTTP Session, you might want to clean up the EJB state and release the resources. To achieve this, the client must call a method annotated with <code>@Remove</code>. As soon as the client call is over the container can garbage the bean. The idea is simply to get ahead of the timeout.</p>
+
+<blockquote><p><em>Exercise 18:</em> Implements two methods with <code>@Remove</code> with two different behaviors. Check that both will discard the current instance. Hint: you can use <code>@PreDestroy</code> to check the bean&#8217;s destruction.</p></blockquote>
+
+<h2>Message Driven Beans</h2>
+
+<p>Message driven beans (MDB) are very useful for asynchronous process and for decoupling the client from the processor. MDB implement a typical publish/subscribe architecture.</p>
+
+<p>There are two kinds of objects, a MDB can listen to:</p>
+
+<ul>
+<li><strong>Topics</strong>: pure publish/subscribe semantics. A new message will be processed by every listeners.</li>
+<li><strong>Queue</strong>: more of a load balancer, once the message is consumed by one of the listeners, it
+is removed from the queue.</li>
+</ul>
+
+
+<p>Although, there is, in JEE6, another mechanism for asynchronous processing, MDBs remain the best alternative if you do not want the client to be aware of the asynchronous logic and processor.</p>
+
+<p>The idea is that there is a queue (or a topic) in between. Therefore, the client as no knowledge whatsoever of the message processor contract or semantics.</p>
+
+<p>The first step is to configure a Queue Connection Factory as well as a Queue in the application server.</p>
+
+<p>The following servlet gets  the connection factory as well as the queue injected. As always with dependency injection, the same result can be achieved using JNDI lookups.
+For each request to the servlet 100 messages are generated and put in the Queue called <code>MyQueue</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@WebServlet</span><span class="o">(</span><span class="s">&quot;/registration&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">RegistrationServlet</span> <span class="kd">extends</span> <span class="n">HttpServlet</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>      
+</span><span class='line'>  <span class="nd">@Resource</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">&quot;MyConnectionFactory&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">ConnectionFactory</span> <span class="n">connectionFactory</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Resource</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">&quot;MyQueue&quot;</span><span class="o">)</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">Queue</span> <span class="n">queue</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Override</span>
+</span><span class='line'>  <span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">)</span> <span class="kd">throws</span>  <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">Connection</span> <span class="n">connection</span><span class="o">;</span>
+</span><span class='line'>          <span class="n">connection</span> <span class="o">=</span> <span class="n">connectionFactory</span><span class="o">.</span><span class="na">createConnection</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>          <span class="n">Session</span> <span class="n">session</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createSession</span><span class="o">(</span><span class="kc">false</span><span class="o">,</span> <span class="n">Session</span><span class="o">.</span><span class="na">AUTO_ACKNOWLEDGE</span><span class="o">);</span>
+</span><span class='line'>          <span class="n">MessageProducer</span> <span class="n">messageProducer</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createProducer</span><span class="o">(</span><span class="n">queue</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>          <span class="n">TextMessage</span> <span class="n">message</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createTextMessage</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>          <span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+</span><span class='line'>              <span class="n">message</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="s">&quot;This is message &quot;</span> <span class="o">+</span> <span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">));</span>
+</span><span class='line'>              <span class="n">messageProducer</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">message</span><span class="o">);</span>
+</span><span class='line'>          <span class="o">}</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following MDB listens to <code>MyQueue</code> (thanks to the annotation <code>@MessageDriven(mappedName = "MyQueue")</code> and because it implements the <code>MessageListener</code> interface it takes a message when available.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@MessageDriven</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">&quot;MyQueue&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nd">@Resource</span>
+</span><span class='line'>  <span class="kd">private</span> <span class="n">MessageDrivenContext</span> <span class="n">mdbContext</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>      <span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>          <span class="k">if</span> <span class="o">(</span><span class="n">inMessage</span> <span class="k">instanceof</span> <span class="n">TextMessage</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>              <span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
+</span><span class='line'>              <span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">&quot;MESSAGE BEAN: Message received: &quot;</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+</span><span class='line'>          <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+</span><span class='line'>              <span class="n">logger</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">&quot;Message of wrong type: &quot;</span>
+</span><span class='line'>                      <span class="o">+</span> <span class="n">inMessage</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+</span><span class='line'>          <span class="o">}</span>
+</span><span class='line'>      <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>          <span class="n">mdbContext</span><span class="o">.</span><span class="na">setRollbackOnly</span><span class="o">();</span>
+</span><span class='line'>          <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Here is a sample output. As you can see, the messages are processed according to their input order but not necessarily by the same EJB (worker).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nl">INFO:</span> <span class="n">Sending</span> <span class="nl">message:</span> <span class="n">This</span> <span class="n">is</span> <span class="n">message</span> <span class="mi">1</span>
+</span><span class='line'><span class="nl">INFO:</span> <span class="n">Sending</span> <span class="nl">message:</span> <span class="n">This</span> <span class="n">is</span> <span class="n">message</span> <span class="mi">2</span>
+</span><span class='line'><span class="nl">INFO:</span> <span class="n">Sending</span> <span class="nl">message:</span> <span class="n">This</span> <span class="n">is</span> <span class="n">message</span> <span class="mi">3</span>
+</span><span class='line'><span class="nl">INFO:</span> <span class="n">MESSAGE</span> <span class="nl">BEAN:</span> <span class="n">Message</span> <span class="nl">received:</span> <span class="n">This</span> <span class="n">is</span> <span class="n">message</span> <span class="mi">1</span>
+</span><span class='line'><span class="nl">INFO:</span> <span class="n">MESSAGE</span> <span class="nl">BEAN:</span> <span class="n">Message</span> <span class="nl">received:</span> <span class="n">This</span> <span class="n">is</span> <span class="n">message</span> <span class="mi">2</span>
+</span><span class='line'><span class="nl">INFO:</span> <span class="n">Sending</span> <span class="nl">message:</span> <span class="n">This</span> <span class="n">is</span> <span class="n">message</span> <span class="mi">5</span>
+</span><span class='line'><span class="nl">INFO:</span> <span class="n">Sending</span> <span class="nl">message:</span> <span class="n">This</span> <span class="n">is</span> <span class="n">message</span> <span class="mi">6</span>
+</span><span class='line'><span class="nl">INFO:</span> <span class="n">MESSAGE</span> <span class="nl">BEAN:</span> <span class="n">Message</span> <span class="nl">received:</span> <span class="n">This</span> <span class="n">is</span> <span class="n">message</span> <span class="mi">4</span>
+</span><span class='line'><span class="nl">INFO:</span> <span class="n">MESSAGE</span> <span class="nl">BEAN:</span> <span class="n">Message</span> <span class="nl">received:</span> <span class="n">This</span> <span class="n">is</span> <span class="n">message</span> <span class="mi">5</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="nl">INFO:</span> <span class="n">MESSAGE</span> <span class="nl">BEAN:</span> <span class="n">Message</span> <span class="nl">received:</span> <span class="n">This</span> <span class="n">is</span> <span class="n">message</span> <span class="mi">100</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Consider the following exercises:</p>
+
+<blockquote><p><em>Exercise 19:</em> Compare Message Driven Beans and Session Beans with asynchronous calls.</p>
+
+<p><em>Exercise 20:</em> Print out the thread-id. What do you observe?</p>
+
+<p><em>Exercise 21:</em> Create another MDB that consumes the same queue. What do you observe?</p>
+
+<p><em>Exercise 22:</em> Do the same (2 consumers) but using a <code>Topic</code> instead of a <code>Queue</code>.</p></blockquote>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Steve Hostettler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-12-31T09:43:00+01:00" pubdate data-updated="true">Dec 31<span>st</span>, 2012</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/12/05/servicelocator/" title="Previous Post: Context Dependency Injection and the Rich Object Model">&laquo; Context Dependency Injection and the Rich Object Model</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/04/18/testing-levels/" title="Next Post: Testing levels">Testing levels &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/12/26/communication-between-java-enterprise-applications/">Communication between Java Enterprise Applications</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that/">Fakes, Stubs, Dummy, Mocks, Doubles and all that...</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/18/testing-levels/">Testing levels</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/31/jee6-tutorial/">JEE6 Tutorial</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/05/servicelocator/">Context Dependency Injection and the Rich Object Model</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/20/multi-tenancy/">Multi-Tenancy with EJB 3.1 and JPA 2.0</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/10/Sessions-GC-Conversations/">About Sessions, Conversations, and the Garbage Collector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/24/moxy/">Object-XML Mapping with JAXB & MOXy</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/18/verification-validation-and-all-that/">Verification & Validation</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/">A JEE6 security interceptor for Tomcat 7</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/116636069211041664299?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Steve Hostettler -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hostettlerblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://hostettler.github.io/blog/2012/12/31/jee6-tutorial/';
+        var disqus_url = 'http://hostettler.github.io/blog/2012/12/31/jee6-tutorial/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

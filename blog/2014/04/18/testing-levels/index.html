@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Testing levels - Steve Hostettler</title>
+  <meta name="author" content="Steve Hostettler">
+
+  
+  <meta name="description" content="Introduction In this post, I would like to discuss number of definitions around the testing activity. Having these definitions in mind helps to &hellip;">
+  <meta name="keywords" content="Unit testsAcceptance TestsTests LevelsIntegration TestsVerificationValidation">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://hostettler.github.io/blog/2014/04/18/testing-levels">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Steve Hostettler" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30751319-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Steve Hostettler</a></h1>
+  
+    <h2>JEE and test automation</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:hostettler.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/about-me/">About Me</a></li>
+  <li><a href="http://publicationslist.org/steve.hostettler">Publications</a></li>
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Testing Levels</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-18T10:52:00+02:00" pubdate data-updated="true">Apr 18<span>th</span>, 2014</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>Introduction</h2>
+
+<p>In this post, I would like to discuss number of definitions around the testing activity. Having these definitions in mind helps to organize this crucial activity. In a previous post, I discussed the difference between <a href="">verification and validation</a>. If the difference is not clear to you, please have a look at it prior reading this post.</p>
+
+<p>Let me start with the definition of what is testing. Software testing helps to measure the quality of a software in terms of defects. It is crucial to understand that
+&#8220;testing shows the presence, not the absence of bugs&#8221; [1].</p>
+
+<p>This comes from the fact that exhaustive testing is not possible  due to a phenomena called the state space explosion [2]. The idea is that doing exhaustive testing would require a structure in memory that remembers all the tested states of the system. A state of the system being the concatenation of its variables. For instance, let us take a program that has two variables:
+- an integer (4 bytes = 32 bits)
+- an array of ASCII characters of length 10 (10 bytes =  80 bits)
+The number of states to explore is  2<sup>112</sup> ~ 5x10<sup>33</sup> states (remember that the number of atoms in the observable universe is 10<sup>80</sup>) and the required amount of memory would be 7.2x10<sup>22</sup> Terabytes. Although many optimizations can be brought to a brute force approach [1,2], the problem remains huge. Therefore, exhaustive testing is not an option.</p>
+
+<p>Another important point about defects is to understand from where they originate.
+A (software) defect originates in a human <strong>mistake</strong> (e.g., a misunderstanding) that produces a <strong>fault</strong> (i.e., a defect, a bug). Under certain circumstances, the faulty code will end up doing something unexpected with respect to the user requirements. This is called a <strong>failure</strong>.</p>
+
+<p>To sum up, there is the following causality chain : Mistake &#8211;> Fault &#8211;> Failure.</p>
+
+<p>This demonstrates that testing is not only a matter of detecting the failure but that it can be done earlier. Of course the earlier the defect is detected the cheaper is it to address it. For instance, informing the developer about the business may avoid a mistake. Using automated code checker may detect some faults.</p>
+
+<h2>Testing dimensions</h2>
+
+<p>Testing can be characterized in terms of dimensions. These dimensions help to categorized the test types.</p>
+
+<ol>
+<li><p>What : This dimension describes what are the objectives of the tests. Test objectives vary from one approach to another.
+Usually the objectives are the verification or  the validation of functionnal (e.g., portfolio performance) and non-functionnal (e.g., performance, security) requirements.</p></li>
+<li><p>How : This defines how the test objective is achieved. For instance, tests can be either static or dynamic, in isolation or in integration, or knowing the implementation.</p></li>
+<li><p>When : Test can be executed at different moment of the development process. For instance, component testing can be done very early in the development process, while user acceptance test can only be performed when the software is ready for prime time.</p></li>
+<li><p>Who : Different kind of tests are run by different people (e.g., developer, testers , end-users, &#8230;) For instance, component testing can be done by programmers, while user acceptance test are performed by end-users.</p></li>
+</ol>
+
+
+<h3>Testing level</h3>
+
+<p>Testing levels have been addressed in a number of publications, blog posts and talks [3], [4], [5]. Testing levels describe test types by their quantity and when they occur in the software lifecycle. At the base, tests are done early in the development and extensively. The higher the level, the later the test occurs in the lifecycle. Moreover, while lower levels are usually done the the software supplier, higher levels tend to be performed by the customer.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/TESTING_LEVELS.png' width='' height='' alt='Testing Levels' title='Testing Levels'><span class='caption-text'>Testing Levels</span></span></p>
+
+<h4>Static testing</h4>
+
+<p>This sort of testing do not require to execute the code. Tools crawl the code and look for patterns that can lead to fault. Example of tools are <a href="http://findbugs.sourceforge.net/">Findbugs</a>, <a href="http://sourceforge.net/p/pmd/bugs/">PMD</a>. This kind of testing is especially useful to detect complex mistakes involving thread-safety or typing.</p>
+
+<h4>Unit testing</h4>
+
+<p>Test objects are isolated components (classes, packages, programs, &#8230;)  To promote isolation, test objects such as stubs, fakes or mocks can be used. for more information see <a href="">Fakes, Stubs, Dummies, Mocks and all that</a>. These tests happen during development and discovered bugs are fixed right away. Therefore, the management overhead is minimal. Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h4>Integration testing</h4>
+
+<p>Integration testing (a.k.a. assembly testing) verifies the integration between several components. At this level, some components can still be faked to ease deployment and isolation.
+Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h4>API testing</h4>
+
+<p>This is the first test level that addresses validation instead of verification. It tests the software using its contracts (API). This is pure blackbox testing usually by using webservices. Tools such as SoapUI are very good at testing the software API and semantics.</p>
+
+<h4>GUI testing</h4>
+
+<p>This level acts on the graphical user interface. Example of tools are <a href="http://www.seleniumhq.org/">Selenium</a></p>
+
+<h4>System testing</h4>
+
+<p>This test level aims the system as a whole with every internal and external components.
+Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h4>Acceptance testing</h4>
+
+<p>Both verification of functional and non.functional requirements can be addressed.</p>
+
+<h3>Bibliography</h3>
+
+<p>[1 ]Dijkstra (1969) J.N. Buxton and B. Randell, eds, Software Engineering Techniques, April 1970, p. 16. Report on a conference sponsored by the NATO Science Committee, Rome, Italy, 27–31 October 1969. Possibly the earliest documented use of the famous quote.</p>
+
+<p>[2] Antti Valmari. The state explosion problem. In Wolfgang Reisig and Grzegorz Rozenberg, editors, Lectures on Petri Nets I: Basic
+Models, volume 1491 of Lecture Notes in Computer Science, pages 429D528. Springer, 1998.</p>
+
+<p>[3] Martin Fowler. TestPyramid. http://martinfowler.com/bliki/TestPyramid.html</p>
+
+<p>[4] Alister Scott. Yet another software testing pyramid. http://watirmelon.com/2011/06/10/yet-another-software-testing-pyramid/
+[5] Alister Scott. Introducing the software testing ice-cream cone (anti-pattern). http://watirmelon.com/2012/01/31/introducing-the-software-testing-ice-cream-cone/</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Steve Hostettler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-04-18T10:52:00+02:00" pubdate data-updated="true">Apr 18<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/acceptance-tests/'>Acceptance Tests</a>, <a class='category' href='/blog/categories/integration-tests/'>Integration Tests</a>, <a class='category' href='/blog/categories/tests-levels/'>Tests Levels</a>, <a class='category' href='/blog/categories/unit-tests/'>Unit tests</a>, <a class='category' href='/blog/categories/validation/'>Validation</a>, <a class='category' href='/blog/categories/verification/'>Verification</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/12/31/jee6-tutorial/" title="Previous Post: JEE6 Tutorial">&laquo; JEE6 Tutorial</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that/" title="Next Post: Fakes, Stubs, Dummy, Mocks, Doubles and all that...">Fakes, Stubs, Dummy, Mocks, Doubles and all that... &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/12/26/communication-between-java-enterprise-applications/">Communication between Java Enterprise Applications</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that/">Fakes, Stubs, Dummy, Mocks, Doubles and all that...</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/18/testing-levels/">Testing levels</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/31/jee6-tutorial/">JEE6 Tutorial</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/05/servicelocator/">Context Dependency Injection and the Rich Object Model</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/20/multi-tenancy/">Multi-Tenancy with EJB 3.1 and JPA 2.0</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/10/Sessions-GC-Conversations/">About Sessions, Conversations, and the Garbage Collector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/24/moxy/">Object-XML Mapping with JAXB & MOXy</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/18/verification-validation-and-all-that/">Verification & Validation</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/">A JEE6 security interceptor for Tomcat 7</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/116636069211041664299?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Steve Hostettler -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hostettlerblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://hostettler.github.io/blog/2014/04/18/testing-levels/';
+        var disqus_url = 'http://hostettler.github.io/blog/2014/04/18/testing-levels/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

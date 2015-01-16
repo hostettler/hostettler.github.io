@@ -1,0 +1,604 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>One to One relations in JPA 2.0 - Steve Hostettler</title>
+  <meta name="author" content="Steve Hostettler">
+
+  
+  <meta name="description" content="In this article, we look at the different ways to map one to one relations in JPA 2.0.">
+  <meta name="keywords" content="JPA 2.0Java EE 6JEE6JavaOR MappingJava SE">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://hostettler.github.io/blog/2012/03/22/one-to-one-relations-in-jpa-2-dot-0">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Steve Hostettler" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30751319-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Steve Hostettler</a></h1>
+  
+    <h2>JEE and test automation</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:hostettler.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/about-me/">About Me</a></li>
+  <li><a href="http://publicationslist.org/steve.hostettler">Publications</a></li>
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">One to One Relations in JPA 2.0</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-22T10:41:00+01:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Recently I came across the need to map a one 2 one relationship from the object model to the database using JPA 2.0.
+The case was pretty simple as the database was nicely organized but it raised the question: what if? What if I have to deal to a legacy system or a database administrator that has to follow strict company rules. Other reasons such as security or performances may interfere with simple designs. Hence, I had a look to the diverse ways to map a one 2 one relationship. I probably forgot several cases so please do not hesitate to discuss them in the comments.</p>
+
+<p>A one to one relationship consider that the objects involved in the relation are highly dependent. In Object Orientation, this corresponds to the an aggregation or a composition. In a relational model, the data can be either:</p>
+
+<ol>
+<li>in the same table,</li>
+<li>split over two (or more) tables (one per object) and linked by a foreign key, or</li>
+<li>split over two (or more) tables and linked by a join table.</li>
+</ol>
+
+
+<p>The rest of the articles these describes different situations. Please note that for the sake of the explanation, I explicitly map all the fields even if most of the time the default mapping policy would work.</p>
+
+<h2>Data in the same class: Embedded class</h2>
+
+<p>This is especially useful for legacy code where the database design is a bit to flat for your taste.
+The following figure presents the concept of an embedded class. The class <code>Address</code> is embedded in the class <code>Student</code>.
+The idea is that <code>Address</code> is an entity per se, it exists only in the context of the class <code>Student</code>.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/one2oneVariante1.png' width='' height='' alt='One 2 One relations as an embedded class' title='One 2 One relations as an embedded class'><span class='caption-text'>One 2 One relations as an embedded class</span></span></p>
+
+<p>To declare a embedded class, the class itself must be annotated with <code>@Embeddable</code> and its reference must be annotated with
+<code>@Embedded</code>.</p>
+
+<figure class='code'><figcaption><span>A embeddable class</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Embeddable</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Address</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;NUMBER&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">number</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;STREET&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">street</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>@Embedded</code> and <code>@Basic</code> cannot be used together. Therefore, if required, lazy fetching must be declared field by field in the embedded class. Remember that outside of a JEE container,  the actual behavior of lazy loading on <code>@Basic</code> and <code>@OneToOne</code> depend on the actual implementation. Eclipse link, for instance, does not perform lazy loading by default on <code>@Basic</code>, <code>@OneToOne</code>, and <code>@ManyToOne</code> mappings. For more detail, please refer to the <a href="http://wiki.eclipse.org/Using_EclipseLink_JPA_Extensions_%28ELUG%29#What_You_May_Need_to_Know_About_EclipseLink_JPA_Lazy_Loading">Eclipse-link specification</a>.</p>
+
+<figure class='code'><figcaption><span>The class Address is embedded into a Student</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;STUDENTS&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Id</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">mId</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Embedded</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Address</span> <span class="n">mAddress</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following SQL statement shows the code generated by the previous mapping.</p>
+
+<figure class='code'><figcaption><span>SQL code generated according to the previous mapping</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>  <span class="n">ID</span><span class="p">,</span> <span class="n">FIRST_NAME</span><span class="p">,</span> <span class="n">PHONE_NUMBER</span><span class="p">,</span> <span class="n">BIRTH_DATE</span><span class="p">,</span> <span class="n">LAST_NAME</span><span class="p">,</span> <span class="nb">NUMBER</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">CITY</span><span class="p">,</span> <span class="n">STREET</span><span class="p">,</span> <span class="n">POSTAL_CODE</span>
+</span><span class='line'>  <span class="k">FROM</span>  <span class="n">STUDENTS</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Data in different classes: Secondary Tables</h2>
+
+<p>In the second scenario, the OO model is composed on only one class but the relational model is split over several tables.</p>
+
+<h3>The foreign key is in the secondary table</h3>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/one2oneVariante2.png' width='' height='' alt='Data is in different tables with the foreign key in the secondary table' title='Data is in different tables with the foreign key in the secondary table'><span class='caption-text'>Data is in different tables with the foreign key in the secondary table</span></span></p>
+
+<p>In this case, the concepts of secondary tables is very useful. A secondary table is basically a table that hosts
+important data that are one to one related to the data of the primary table.
+Unlike the first case, a join is required and thus a key mapping is required.
+In the following mapping, the secondary table <code>PICTURES</code> is mapped using its <code>STUDENT_ID</code> field to the <code>ID</code> field
+of the main table.</p>
+
+<figure class='code'><figcaption><span>Mapping of the Student entity</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@SecondaryTable</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;PICTURES&quot;</span><span class="o">,</span>
+</span><span class='line'>    <span class="n">pkJoinColumns</span> <span class="o">=</span> <span class="nd">@PrimaryKeyJoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;STUDENT_ID&quot;</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">referencedColumnName</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">))</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'>    <span class="nd">@Id</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">mId</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** A picture of the student. */</span>
+</span><span class='line'>    <span class="nd">@Lob</span>
+</span><span class='line'>    <span class="nd">@Basic</span><span class="o">(</span><span class="n">optional</span> <span class="o">=</span> <span class="kc">true</span><span class="o">,</span> <span class="n">fetch</span> <span class="o">=</span> <span class="n">FetchType</span><span class="o">.</span><span class="na">EAGER</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">table</span> <span class="o">=</span> <span class="s">&quot;PICTURES&quot;</span><span class="o">,</span> <span class="n">name</span> <span class="o">=</span> <span class="s">&quot;PICTURE&quot;</span><span class="o">,</span> <span class="n">nullable</span> <span class="o">=</span> <span class="kc">true</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kt">byte</span><span class="o">[]</span> <span class="n">mPicture</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following SQL statement shows the code generated by the previous mapping.
+It joins the two tables according to the <code>@PrimaryKeyJoinColumn</code> annotation.</p>
+
+<figure class='code'><figcaption><span>SQL code generated by the previous mapping</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>  <span class="n">t0</span><span class="p">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">t1</span><span class="p">.</span><span class="n">STUDENT_ID</span><span class="p">,</span> <span class="n">t1</span><span class="p">.</span><span class="n">PICTURE</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">FIRST_NAME</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">PHONE_NUMBER</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">BIRTH_DATE</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">t0</span><span class="p">.</span><span class="n">LAST_NAME</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="nb">NUMBER</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">CITY</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">STREET</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">POSTAL_CODE</span>
+</span><span class='line'>  <span class="k">FROM</span>  <span class="n">STUDENTS</span> <span class="n">t0</span><span class="p">,</span> <span class="n">PICTURES</span> <span class="n">t1</span>
+</span><span class='line'> <span class="k">WHERE</span>  <span class="p">(</span><span class="n">t1</span><span class="p">.</span><span class="n">STUDENT_ID</span> <span class="o">=</span> <span class="n">t0</span><span class="p">.</span><span class="n">ID</span><span class="p">)</span>
+</span><span class='line'>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>The foreign key is in the host table</h3>
+
+<p>Similarly to the previous case, the data is split over several tables. The difference lies in the foreign key position.
+Here the foreign key is hosted in the primary table.
+<span class='caption-wrapper center'><img class='caption' src='/figures/one2oneVariante3.png' width='' height='' alt='Data is in different tables with the foreign key in the primary/host table' title='Data is in different tables with the foreign key in the primary/host table'><span class='caption-text'>Data is in different tables with the foreign key in the primary/host table</span></span></p>
+
+<p>From a mapping point of view, it is very similar to the previous case. Indeed only the key column names have to be changed
+to reflect the organization.</p>
+
+<figure class='code'><figcaption><span>Mapping of the Student entity</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@SecondaryTable</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;PICTURES&quot;</span><span class="o">,</span>
+</span><span class='line'>    <span class="n">pkJoinColumns</span> <span class="o">=</span> <span class="nd">@PrimaryKeyJoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;PICTURE_ID&quot;</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">referencedColumnName</span> <span class="o">=</span> <span class="s">&quot;PICTURE_ID&quot;</span><span class="o">))</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following SQL statement shows the code generated by the previous mapping.
+Again, the data are joined according to the content of the <code>@PrimaryKeyJoinColumn</code> annotation.</p>
+
+<figure class='code'><figcaption><span>SQL code generated by the previous mapping</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span>  <span class="n">t0</span><span class="p">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">PICTURE_ID</span><span class="p">,</span> <span class="n">t1</span><span class="p">.</span><span class="n">PICTURE_ID</span><span class="p">,</span> <span class="n">t1</span><span class="p">.</span><span class="n">PICTURE</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">FIRST_NAME</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">PHONE_NUMBER</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">BIRTH_DATE</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">t0</span><span class="p">.</span><span class="n">LAST_NAME</span><span class="p">,</span><span class="n">t0</span><span class="p">.</span><span class="nb">NUMBER</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">CITY</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">STREET</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">POSTAL_CODE</span>
+</span><span class='line'>  <span class="k">FROM</span>  <span class="n">STUDENTS</span> <span class="n">t0</span><span class="p">,</span> <span class="n">PICTURES</span> <span class="n">t1</span>
+</span><span class='line'> <span class="k">WHERE</span>  <span class="p">(</span><span class="n">t1</span><span class="p">.</span><span class="n">PICTURE_ID</span> <span class="o">=</span> <span class="n">t0</span><span class="p">.</span><span class="n">PICTURE_ID</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>First and second class JPA citizens</h2>
+
+<p>In the previous examples, the table <code>PICTURES</code> does not have a business existence in itself. It is a secondary table because its data only have meaning in relation to the data of the primary table. Sometimes, we may want to treat the second objects as first class JPA citizens and thus we must put the <code>@Entity</code> annotation on it. In this case, we have to use the <code>@OneToOne</code> annotation for the mapping. Unlike the previous mappings, <code>@OneToOne</code> enable bidirectional mapping.</p>
+
+<p>In the last example, the tables <code>STUDENTS</code> and  <code>BADGES</code> have a one to one relationship modeled with a foreign in the <code>BADGES</code> table to the <code>STUDENTS</code> table. In this case, the owning side is the <code>Badge</code> entity has it contains the foreign key.</p>
+
+<p>As mentioned before, the class <code>Badge</code> is now an entity has it has a business existence without <code>Student</code>.  The interesting part is the <code>@JoinColumn</code> annotation that specifies the local column that is the foreign key (<code>STUDENT_ID</code>) as well as to which column of the foreign table its corresponds (<code>ID</code>).</p>
+
+<figure class='code'><figcaption><span>Mapping of the Badge entity</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;BADGES&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Badge</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  
+</span><span class='line'>    <span class="nd">@Id</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">mId</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;SECURITY_LEVEL&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">mSecurityLevel</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@OneToOne</span>
+</span><span class='line'>    <span class="nd">@JoinColumn</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;STUDENT_ID&quot;</span><span class="o">,</span> <span class="n">referencedColumnName</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Student</span> <span class="n">mStudent</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>As we want the other side to be aware of the relation (bidirectional), it is required to add the <code>mappedBy</code> attribute to the <code>@OneToOne</code> annotation. This attribute references the (Java) property in the entity that is the owner of the relationship.</p>
+
+<figure class='code'><figcaption><span>Mapping of the Student entity</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>    <span class="nd">@Id</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">mId</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'>    <span class="cm">/** The Student&#39;s badge. */</span>
+</span><span class='line'>    <span class="nd">@OneToOne</span><span class="o">(</span><span class="n">mappedBy</span> <span class="o">=</span> <span class="s">&quot;mStudent&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Badge</span> <span class="n">mBadge</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Using the previous mapping, JPA 2.0 produces the following SQL statements to load the Student object.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='sql'><span class='line'><span class="k">SELECT</span> <span class="n">t0</span><span class="p">.</span><span class="n">ID</span><span class="p">,</span> <span class="n">t1</span><span class="p">.</span><span class="n">STUDENT_ID</span><span class="p">,</span> <span class="n">t1</span><span class="p">.</span><span class="n">PICTURE</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">FIRST_NAME</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">PHONE_NUMBER</span><span class="p">,</span>
+</span><span class='line'>       <span class="n">t0</span><span class="p">.</span><span class="n">BIRTH_DATE</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">LAST_NAME</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="nb">NUMBER</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">CITY</span><span class="p">,</span> <span class="n">t0</span><span class="p">.</span><span class="n">STREET</span><span class="p">,</span>
+</span><span class='line'>       <span class="n">t0</span><span class="p">.</span><span class="n">POSTAL_CODE</span>
+</span><span class='line'>  <span class="k">FROM</span> <span class="n">STUDENTS</span> <span class="n">t0</span><span class="p">,</span> <span class="n">PICTURES</span> <span class="n">t1</span>
+</span><span class='line'> <span class="k">WHERE</span> <span class="p">(</span><span class="n">t1</span><span class="p">.</span><span class="n">STUDENT_ID</span> <span class="o">=</span> <span class="n">t0</span><span class="p">.</span><span class="n">ID</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">SELECT</span> <span class="n">ID</span><span class="p">,</span> <span class="n">SECURITY_LEVEL</span><span class="p">,</span> <span class="n">STUDENT_ID</span>
+</span><span class='line'>  <span class="k">FROM</span> <span class="n">BADGES</span>
+</span><span class='line'> <span class="k">WHERE</span> <span class="p">(</span><span class="n">STUDENT_ID</span> <span class="o">=</span> <span class="o">?</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>JPA 2.0 offers many way to represent one to one relationships. This flexibility allows to handle many different scenarios that may happen when integrating legacy databases. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Steve Hostettler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-22T10:41:00+01:00" pubdate data-updated="true">Mar 22<span>nd</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/jee6/'>JEE6</a>, <a class='category' href='/blog/categories/jpa-2-dot-0/'>JPA 2.0</a>, <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/java-ee-6/'>Java EE 6</a>, <a class='category' href='/blog/categories/java-se/'>Java SE</a>, <a class='category' href='/blog/categories/or-mapping/'>OR Mapping</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/03/19/testing-jpa-in-java-se/" title="Previous Post: Testing JPA 2.0 entities in Java SE">&laquo; Testing JPA 2.0 entities in Java SE</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/03/25/improve-jsf-applications-startup-time/" title="Next Post: On JEE 6 webapps startup time">On JEE 6 webapps startup time &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/12/26/communication-between-java-enterprise-applications/">Communication between Java Enterprise Applications</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that/">Fakes, Stubs, Dummy, Mocks, Doubles and all that...</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/18/testing-levels/">Testing levels</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/31/jee6-tutorial/">JEE6 Tutorial</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/05/servicelocator/">Context Dependency Injection and the Rich Object Model</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/20/multi-tenancy/">Multi-Tenancy with EJB 3.1 and JPA 2.0</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/10/Sessions-GC-Conversations/">About Sessions, Conversations, and the Garbage Collector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/24/moxy/">Object-XML Mapping with JAXB & MOXy</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/18/verification-validation-and-all-that/">Verification & Validation</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/">A JEE6 security interceptor for Tomcat 7</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/116636069211041664299?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Steve Hostettler -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hostettlerblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://hostettler.github.io/blog/2012/03/22/one-to-one-relations-in-jpa-2-dot-0/';
+        var disqus_url = 'http://hostettler.github.io/blog/2012/03/22/one-to-one-relations-in-jpa-2-dot-0/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

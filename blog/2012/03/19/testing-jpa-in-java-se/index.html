@@ -1,0 +1,775 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Testing JPA 2.0 entities in Java SE - Steve Hostettler</title>
+  <meta name="author" content="Steve Hostettler">
+
+  
+  <meta name="description" content="In this article, we look how to test JPA 2.0 entities in Java SE. That is outside of the container.">
+  <meta name="keywords" content="JPA 2.0Java EE 6JEE6JavaTestJava SEJUnitDerbyJava DBIntegration Test">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://hostettler.github.io/blog/2012/03/19/testing-jpa-in-java-se">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Steve Hostettler" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30751319-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Steve Hostettler</a></h1>
+  
+    <h2>JEE and test automation</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:hostettler.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/about-me/">About Me</a></li>
+  <li><a href="http://publicationslist.org/steve.hostettler">Publications</a></li>
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Testing JPA 2.0 Entities in Java SE</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-19T13:40:00+01:00" pubdate data-updated="true">Mar 19<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Testing JPA components in Java SE has been greatly simplified since JEE6.
+Nevertheless, it is still not as simple as testing other components.
+Although there exist some frameworks such as <a href="http://www.jboss.org/arquillian">Arquillian</a> that solve that problematic,
+it is sometimes to much of hammer to test a couple of entities and simple services.
+Here is a post in which I digest some other posts and my own experience of how to test JPA components. The following example is part
+of a Demo project I use to teach the JEE stack that is located on Google Code Hosting and <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a>
+This project relies on <a href="http://maven.apache.org/">Maven 3</a> for build and dependency management. It does not use EJBs (at least for now) and thus it can be deployed in a Servlet engine.
+Please note, that to me the kind of tests we are doing here are not unit tests (though we use JUnit ). Actually, as a database is required,
+these  are integration tests.</p>
+
+<p>Let us assume that we want to test that the following model has been properly annotated and can be persisted according to a given DB schema:</p>
+
+<figure class='code'><figcaption><span>An annotated entity that represent a student</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// Get the entity manager for the tests.</span>
+</span><span class='line'><span class="nd">@Entity</span>
+</span><span class='line'><span class="nd">@Table</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;STUDENTS&quot;</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="o">-</span><span class="mi">6146935825517747043L</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Id</span>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;ID&quot;</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@GeneratedValue</span><span class="o">(</span><span class="n">strategy</span> <span class="o">=</span> <span class="n">GenerationType</span><span class="o">.</span><span class="na">IDENTITY</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">mId</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;LAST_NAME&quot;</span><span class="o">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">35</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">mLastName</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;FIRST_NAME&quot;</span><span class="o">,</span> <span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">,</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">35</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">mFirstName</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="nd">@Column</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;BIRTH_DATE&quot;</span><span class="o">,</span> <span class="n">nullable</span> <span class="o">=</span> <span class="kc">false</span><span class="o">)</span>
+</span><span class='line'>    <span class="nd">@Temporal</span><span class="o">(</span><span class="n">TemporalType</span><span class="o">.</span><span class="na">DATE</span><span class="o">)</span>
+</span><span class='line'>    <span class="kd">private</span> <span class="n">Date</span> <span class="n">mBirthDate</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>with the following persistence unit:</p>
+
+<figure class='code'><figcaption><span>An annotated entity that represent a student</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">&lt;?</span><span class="n">xml</span> <span class="n">version</span><span class="o">=</span><span class="s">&quot;1.0&quot;</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&quot;UTF-8&quot;</span><span class="o">?&gt;</span>
+</span><span class='line'><span class="o">&lt;</span><span class="n">persistence</span> <span class="n">version</span><span class="o">=</span><span class="s">&quot;1.0&quot;</span>
+</span><span class='line'>    <span class="n">xmlns</span><span class="o">=</span><span class="s">&quot;http://java.sun.com/xml/ns/persistence&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>    <span class="o">&lt;</span><span class="n">persistence</span><span class="o">-</span><span class="n">unit</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;JEE6Demo-Persistence&quot;</span>
+</span><span class='line'>        <span class="n">transaction</span><span class="o">-</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;RESOURCE_LOCAL&quot;</span><span class="o">&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="n">provider</span><span class="o">&gt;</span><span class="n">org</span><span class="o">.</span><span class="na">eclipse</span><span class="o">.</span><span class="na">persistence</span><span class="o">.</span><span class="na">jpa</span><span class="o">.</span><span class="na">PersistenceProvider</span><span class="o">&lt;/</span><span class="n">provider</span><span class="o">&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="n">class</span><span class="o">&gt;</span><span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">dom</span><span class="o">.</span><span class="na">Student</span><span class="o">&lt;/</span><span class="n">class</span><span class="o">&gt;</span>
+</span><span class='line'>        <span class="o">&lt;</span><span class="n">properties</span><span class="o">&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;eclipselink.target-database&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;MYSQL&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;javax.persistence.jdbc.driver&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;com.mysql.jdbc.Driver&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;javax.persistence.jdbc.url&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;jdbc:mysql://localhost:3306/Students_DB&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;javax.persistence.jdbc.user&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;root&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;javax.persistence.jdbc.password&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;eclipselink.ddl-generation&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;none&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>            <span class="o">&lt;</span><span class="n">property</span> <span class="n">name</span><span class="o">=</span><span class="s">&quot;eclipselink.logging.level&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s">&quot;INFO&quot;</span> <span class="o">/&gt;</span>
+</span><span class='line'>        <span class="o">&lt;/</span><span class="n">properties</span><span class="o">&gt;</span>
+</span><span class='line'>    <span class="o">&lt;/</span><span class="n">persistence</span><span class="o">-</span><span class="n">unit</span><span class="o">&gt;</span>
+</span><span class='line'><span class="o">&lt;/</span><span class="n">persistence</span><span class="o">&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>We use <a href="http://www.eclipse.org/eclipselink/">Eclipse-link</a> as it is the reference implementation for JPA 2.0</p>
+
+<figure class='code'><figcaption><span>Eclipse-Link dependencies</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;repositories&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;repository&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;id&gt;</span>EclipseLink Repo<span class="nt">&lt;/id&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;name&gt;</span>EclipseLink Repository<span class="nt">&lt;/name&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;url&gt;</span>http://download.eclipse.org/rt/eclipselink/maven.repo<span class="nt">&lt;/url&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/repository&gt;</span>
+</span><span class='line'><span class="nt">&lt;/repositories&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;dependencies&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;groupId&gt;</span>org.eclipse.persistence<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;artifactId&gt;</span>eclipselink<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;version&gt;</span>2.0.0<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;groupId&gt;</span>org.eclipse.persistence<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;artifactId&gt;</span>javax.persistence<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;version&gt;</span>2.0.0<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/dependency&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependencies&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since JEE 6, it is easy to start the JPA manager in a unit test. Let us look at the following listing. The first two lines initialize the persistence manager given a persistence unit. The name of the persistence unit must matched the declared persistence unit in <code>META-INF/persistence</code>. After what, the try block gets a transaction and starts it. The object student is persisted and the transaction is committed. If anything goes wrong, the transaction is roll-backed. Finally, the entity manager and the factory are closed.</p>
+
+<figure class='code'><figcaption><span>Start the JPA manager manually</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="c1">// Get the entity manager for the tests.</span>
+</span><span class='line'><span class="n">EntityManagerFactory</span> <span class="n">emf</span> <span class="o">=</span> <span class="n">Persistence</span><span class="o">.</span><span class="na">createEntityManagerFactory</span><span class="o">(</span><span class="s">&quot;JEE6Demo-Persistence&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="n">EntityManager</span> <span class="n">em</span> <span class="o">=</span> <span class="n">emf</span><span class="o">.</span><span class="na">createEntityManager</span><span class="o">();</span>
+</span><span class='line'><span class="k">try</span> <span class="o">{</span>
+</span><span class='line'>   <span class="c1">//Get a new transaction</span>
+</span><span class='line'>   <span class="n">EntityTransaction</span> <span class="n">trx</span> <span class="o">=</span> <span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>   <span class="c1">//Start the transaction</span>
+</span><span class='line'>   <span class="n">trx</span><span class="o">.</span><span class="na">begin</span><span class="o">();</span>
+</span><span class='line'>   <span class="c1">//Persist the object in the DB</span>
+</span><span class='line'>   <span class="n">em</span><span class="o">.</span><span class="na">persist</span><span class="o">(</span><span class="n">student</span><span class="o">);</span>
+</span><span class='line'>   <span class="c1">//Commit and end the transaction</span>
+</span><span class='line'>   <span class="n">trx</span><span class="o">.</span><span class="na">commit</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">RuntimeException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>   <span class="k">if</span> <span class="o">(</span><span class="n">trx</span> <span class="o">!=</span> <span class="kc">null</span> <span class="o">&amp;&amp;</span> <span class="n">trx</span><span class="o">.</span><span class="na">isActive</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">trx</span><span class="o">.</span><span class="na">rollback</span><span class="o">();</span>
+</span><span class='line'>   <span class="o">}</span>
+</span><span class='line'>   <span class="k">throw</span> <span class="n">e</span><span class="o">;</span>
+</span><span class='line'><span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+</span><span class='line'>   <span class="c1">//Close the manager</span>
+</span><span class='line'>   <span class="n">em</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>   <span class="n">emf</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>There are several open issues problems with this code:</p>
+
+<ol>
+<li>We do want to use a local in memory database. Indeed, we do not want to mess up with the information stored on the Mysql database. Finally, we need the test to be as autonomous as possible. That is that it does not depend on an external server (e.g. app server, database server).</li>
+<li>JUnit does not guarantee the order in which the tests are ran.
+Therefore, we must initialize the manager before each and every test of the fixture. Furthermore we must close it after the test to
+avoid session leaks.</li>
+<li>During tests, we must make sure that the database is in an acceptable state before running each unit.</li>
+</ol>
+
+
+<p>To limit the dependencies to other components and to keep the setting simple, we will use <a href="http://db.apache.org/derby/">Derby</a> as a pure in
+memory database. That is no file produced during the database execution and thus no cleaning afterwards. Please note that is only used for testing purposes.</p>
+
+<figure class='code'><figcaption><span>Derby in memory database dependencies</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.apache.derby<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>derby<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;version&gt;</span>10.8.2.2<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>   
+</span><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.apache.derby<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>derbyclient<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;version&gt;</span>10.8.2.2<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following <code>persistence.xml</code> file sets  <code>DERBY</code> as a target database language. Using Derby, selecting the embedded
+drivers in conjunction <code>org.apache.derby.jdbc.EmbeddedDriver</code> with a <code>jdbc:derby:memory</code> URL runs a database in memory without
+persisting anything to disk. This combination is important as it otherwise will store file on the disk.
+The following will be used by <code>Maven</code> during the test because it overrides the one in `/main/resources/META-INF/&#8220;. This is an elegant way to use a different database setting for the unit tests.</p>
+
+<figure class='code'><figcaption><span>Persistence descriptor</span><a href='/test/resources/META-INF/persistence.xml'>link</a></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;persistence</span> <span class="na">version=</span><span class="s">&quot;1.0&quot;</span>
+</span><span class='line'>    <span class="na">xmlns=</span><span class="s">&quot;http://java.sun.com/xml/ns/persistence&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;persistence-unit</span> <span class="na">name=</span><span class="s">&quot;JEE6Demo-Persistence&quot;</span>
+</span><span class='line'>        <span class="na">transaction-type=</span><span class="s">&quot;RESOURCE_LOCAL&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;provider&gt;</span>org.eclipse.persistence.jpa.PersistenceProvider<span class="nt">&lt;/provider&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;class&gt;</span>ch.demo.dom.Student<span class="nt">&lt;/class&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;properties&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;eclipselink.logging.level&quot;</span> <span class="na">value=</span><span class="s">&quot;FINE&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;eclipselink.target-database&quot;</span> <span class="na">value=</span><span class="s">&quot;DERBY&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;javax.persistence.jdbc.driver&quot;</span> <span class="na">value=</span><span class="s">&quot;org.apache.derby.jdbc.EmbeddedDriver&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;javax.persistence.jdbc.url&quot;</span> <span class="na">value=</span><span class="s">&quot;jdbc:derby:memory:StudentsDB;create=true&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;javax.persistence.jdbc.user&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;javax.persistence.jdbc.password&quot;</span> <span class="na">value=</span><span class="s">&quot;&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;eclipselink.logging.level&quot;</span> <span class="na">value=</span><span class="s">&quot;INFO&quot;</span> <span class="nt">/&gt;</span>
+</span><span class='line'>        <span class="nt">&lt;/properties&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/persistence-unit&gt;</span>
+</span><span class='line'><span class="nt">&lt;/persistence&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To solve the second issue, we must guarantee that each test fixture gets a fresh entity manager. JUnit 4+ executes whatever
+public static method annotated with <code>@BeforeClass</code> before firing up the class constructor. Similarly, methods annotated with <code>@AfterClass</code>
+are executed after all the tests and is therefore a good place for cleanup.</p>
+
+<figure class='code'><figcaption><span>Start the JPA manager before for each test fixture</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="cm">/** The factory that produces entity manager. */</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="n">EntityManagerFactory</span> <span class="n">mEmf</span><span class="o">;</span>
+</span><span class='line'><span class="cm">/** The entity manager that persists and queries the DB. */</span>
+</span><span class='line'><span class="kd">private</span> <span class="kd">static</span> <span class="n">EntityManager</span> <span class="n">mEntityManager</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@BeforeClass</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">initTestFixture</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// Get the entity manager for the tests.</span>
+</span><span class='line'>    <span class="n">mEmf</span> <span class="o">=</span> <span class="n">Persistence</span><span class="o">.</span><span class="na">createEntityManagerFactory</span><span class="o">(</span><span class="n">mPersistenceUnit</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">mEntityManager</span> <span class="o">=</span> <span class="n">mEmf</span><span class="o">.</span><span class="na">createEntityManager</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'> <span class="cm">/**</span>
+</span><span class='line'><span class="cm"> * Cleans up the session.</span>
+</span><span class='line'><span class="cm"> */</span>
+</span><span class='line'><span class="nd">@AfterClass</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">closeTestFixture</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="n">mEntityManager</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'>    <span class="n">mEmf</span><span class="o">.</span><span class="na">close</span><span class="o">();</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The problem with the pure in-memory approach is that schema has to recreated for each run. One solution would be to rely on the <code>Eclipse-link</code> DDL creation. I do not really like this solution as it usually not accepted by the customers that tend to want to have control
+of their schema. Thus, to have a test setting that is as close as possible to the production setting we need something to install the schema
+by running a SQL file. There are many solutions out there:</p>
+
+<ul>
+<li>Manually parsing the SQL file. I do not like this solution as it becomes rapidly intractable when the file contains comments and transactions.</li>
+<li>Using tools such as <a href="http://www.liquibase.org/">Liquibase</a>. Nice solution but to me it was to much of a hammer to that specific case.</li>
+<li>Using an API that does it for me.</li>
+</ul>
+
+
+<p>I propose the last approach by using <code>Derby Tools</code> and in particular the API of <code>ij</code>.</p>
+
+<figure class='code'><figcaption><span>DBUnit dependency</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;groupId&gt;</span>org.apache.derby<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;artifactId&gt;</span>derbytools<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;version&gt;</span>10.8.2.2<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p></p>
+
+<p>This allows to use <code>ij</code> directly in the test to parse the DDL file. This is shown in the following listing.
+First, it gets the underlying JDBC connection and then it run the file located in <code>test/resources/sql/</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@BeforeClass</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">initTestFixture</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">// Get the entity manager for the tests.</span>
+</span><span class='line'>    <span class="n">mEmf</span> <span class="o">=</span> <span class="n">Persistence</span><span class="o">.</span><span class="na">createEntityManagerFactory</span><span class="o">(</span><span class="n">mPersistenceUnit</span><span class="o">);</span>
+</span><span class='line'>    <span class="n">mEntityManager</span> <span class="o">=</span> <span class="n">mEmf</span><span class="o">.</span><span class="na">createEntityManager</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="o">((</span><span class="n">EntityManagerImpl</span><span class="o">)</span> <span class="o">(</span><span class="n">mEntityManager</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">getDelegate</span><span class="o">())).</span><span class="na">getServerSession</span><span class="o">().</span><span class="na">getAccessor</span><span class="o">()</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">getConnection</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">ij</span><span class="o">.</span><span class="na">runScript</span><span class="o">(</span><span class="n">connection</span><span class="o">,</span>
+</span><span class='line'>            <span class="n">AbstractDBTest</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="s">&quot;sql/studentSchema.ddl&quot;</span><span class="o">),</span>
+</span><span class='line'>            <span class="s">&quot;UTF-8&quot;</span><span class="o">,</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">,</span> <span class="s">&quot;UTF-8&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The third item asks for a way to properly initialize the data prior to the test. Remember that your tests should not rely on the success of
+previous ones. To that end, we cleanup the data prior any test execution. A rather easy way to do that is to use
+<a href="http://www.dbunit.org/">DBUnit</a>.</p>
+
+<figure class='code'><figcaption><span>DBUnit dependency</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;dependency&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;groupId&gt;</span>org.dbunit<span class="nt">&lt;/groupId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;artifactId&gt;</span>dbunit<span class="nt">&lt;/artifactId&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;version&gt;</span>2.4.8<span class="nt">&lt;/version&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;scope&gt;</span>test<span class="nt">&lt;/scope&gt;</span>
+</span><span class='line'><span class="nt">&lt;/dependency&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>
+It loads a file named `/test/resources/students-datasets.xml&#8220; from the test resources.</p>
+
+<figure class='code'><figcaption><span>Initialize the test dataset</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@BeforeClass</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="kt">void</span> <span class="nf">initTestFixture</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'><span class="c1">// Get the entity manager for the tests.</span>
+</span><span class='line'><span class="n">mEmf</span> <span class="o">=</span> <span class="n">Persistence</span><span class="o">.</span><span class="na">createEntityManagerFactory</span><span class="o">(</span><span class="n">mPersistenceUnit</span><span class="o">);</span>
+</span><span class='line'><span class="n">mEntityManager</span> <span class="o">=</span> <span class="n">mEmf</span><span class="o">.</span><span class="na">createEntityManager</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">Connection</span> <span class="n">connection</span> <span class="o">=</span> <span class="o">((</span><span class="n">EntityManagerImpl</span><span class="o">)</span> <span class="o">(</span><span class="n">mEntityManager</span>
+</span><span class='line'>        <span class="o">.</span><span class="na">getDelegate</span><span class="o">())).</span><span class="na">getServerSession</span><span class="o">().</span><span class="na">getAccessor</span><span class="o">()</span>
+</span><span class='line'>        <span class="o">.</span><span class="na">getConnection</span><span class="o">();</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">ij</span><span class="o">.</span><span class="na">runScript</span><span class="o">(</span><span class="n">connection</span><span class="o">,</span>
+</span><span class='line'>        <span class="n">AbstractDBTest</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="s">&quot;sql/studentSchema.ddl&quot;</span><span class="o">),</span>
+</span><span class='line'>        <span class="s">&quot;UTF-8&quot;</span><span class="o">,</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">,</span> <span class="s">&quot;UTF-8&quot;</span><span class="o">);</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="n">mDBUnitConnection</span> <span class="o">=</span> <span class="k">new</span> <span class="n">DatabaseConnection</span><span class="o">(</span><span class="n">connection</span><span class="o">);</span>
+</span><span class='line'>    <span class="c1">//Loads the data set from a file named students-datasets.xml</span>
+</span><span class='line'>    <span class="n">mDataset</span> <span class="o">=</span> <span class="k">new</span> <span class="n">FlatXmlDataSetBuilder</span><span class="o">().</span><span class="na">build</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">()</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">getContextClassLoader</span><span class="o">()</span>
+</span><span class='line'>            <span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="s">&quot;students-datasets.xml&quot;</span><span class="o">));</span>
+</span><span class='line'>
+</span><span class='line'>    <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>After what, clean test data are inserted for each and every test of the fixture:</p>
+
+<figure class='code'><figcaption><span>init of the test</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Before</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">initTest</span><span class="o">()</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
+</span><span class='line'>    <span class="c1">//Clean the data from previous test and insert new data test.</span>
+</span><span class='line'>    <span class="n">DatabaseOperation</span><span class="o">.</span><span class="na">CLEAN_INSERT</span><span class="o">.</span><span class="na">execute</span><span class="o">(</span><span class="n">mDBUnitConnection</span><span class="o">,</span> <span class="n">mDataset</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>In this post, I&#8217;ve showed how to test the persistence of an JPA 2.0 entity using JUnit 4. The test setting runs in memory without external server  and enforces a clean database state prior running the tests.</p>
+
+<p>To support my teaching activities on Java EE 6, I&#8217;ve setup a project on Google Code Hosting that contains all the presented sources and much more. Please give me feedbacks on how to improve that demo project and in particular its
+testability.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Steve Hostettler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-03-19T13:40:00+01:00" pubdate data-updated="true">Mar 19<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/derby/'>Derby</a>, <a class='category' href='/blog/categories/integration-test/'>Integration Test</a>, <a class='category' href='/blog/categories/jee6/'>JEE6</a>, <a class='category' href='/blog/categories/jpa-2-dot-0/'>JPA 2.0</a>, <a class='category' href='/blog/categories/junit/'>JUnit</a>, <a class='category' href='/blog/categories/java/'>Java</a>, <a class='category' href='/blog/categories/java-db/'>Java DB</a>, <a class='category' href='/blog/categories/java-ee-6/'>Java EE 6</a>, <a class='category' href='/blog/categories/java-se/'>Java SE</a>, <a class='category' href='/blog/categories/test/'>Test</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/03/22/one-to-one-relations-in-jpa-2-dot-0/" title="Next Post: One to One relations in JPA 2.0">One to One relations in JPA 2.0 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/12/26/communication-between-java-enterprise-applications/">Communication between Java Enterprise Applications</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that/">Fakes, Stubs, Dummy, Mocks, Doubles and all that...</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/18/testing-levels/">Testing levels</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/31/jee6-tutorial/">JEE6 Tutorial</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/05/servicelocator/">Context Dependency Injection and the Rich Object Model</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/20/multi-tenancy/">Multi-Tenancy with EJB 3.1 and JPA 2.0</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/10/Sessions-GC-Conversations/">About Sessions, Conversations, and the Garbage Collector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/24/moxy/">Object-XML Mapping with JAXB & MOXy</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/18/verification-validation-and-all-that/">Verification & Validation</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/">A JEE6 security interceptor for Tomcat 7</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/116636069211041664299?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Steve Hostettler -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hostettlerblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://hostettler.github.io/blog/2012/03/19/testing-jpa-in-java-se/';
+        var disqus_url = 'http://hostettler.github.io/blog/2012/03/19/testing-jpa-in-java-se/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

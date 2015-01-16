@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: JAXB | Steve Hostettler]]></title>
+  <link href="http://hostettler.github.io/blog/categories/jaxb/atom.xml" rel="self"/>
+  <link href="http://hostettler.github.io/"/>
+  <updated>2015-01-16T18:28:04+01:00</updated>
+  <id>http://hostettler.github.io/</id>
+  <author>
+    <name><![CDATA[Steve Hostettler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Object-XML Mapping with JAXB & MOXy]]></title>
+    <link href="http://hostettler.github.io/blog/2012/05/24/moxy/"/>
+    <updated>2012-05-24T19:17:00+02:00</updated>
+    <id>http://hostettler.github.io/blog/2012/05/24/moxy</id>
+    <content type="html"><![CDATA[<p>Object-Relational mapping is around for a while and its last incarnation, JPA 2.0, is easy to use
+yet powerful and adapted to most of the real-life situations. A problem that is similar to
+Object-Relational mapping (ORM) is Object-XML mapping (OXM). More precisely, it aims at mapping XML
+schemas to JAVA classes. JAXB (JSR 222) specifies how to maps classes to xml schemas.
+In this post, I demonstrate the ease of use of this approach using <a href="http://www.eclipse.org/eclipselink/moxy.php">MOXy</a>. MOXy is the Eclipse implementation of JAXB and I found it really easy to use.</p>
+
+<p>As always let us first look at the Maven dependencies:
+```xml Maven dependencies for using MOXy
+<repositories></p>
+
+<pre><code>    &lt;repository&gt;
+        &lt;id&gt;EclipseLink Repo&lt;/id&gt;
+        &lt;name&gt;EclipseLink Repository&lt;/name&gt;
+        &lt;url&gt;http://download.eclipse.org/rt/eclipselink/maven.repo&lt;/url&gt;
+    &lt;/repository&gt;
+</code></pre>
+
+<p></repositories></p>
+
+<p><dependencies></p>
+
+<pre><code>&lt;dependency&gt;
+    &lt;groupId&gt;org.eclipse.persistence&lt;/groupId&gt;
+    &lt;artifactId&gt;eclipselink&lt;/artifactId&gt;
+    &lt;version&gt;2.3.2&lt;/version&gt;
+    &lt;scope&gt;compile&lt;/scope&gt;
+&lt;/dependency&gt;
+...
+</code></pre>
+
+<p></dependencies>  <br/>
+```</p>
+
+<p>Eclipse-link provides an implementation for JAXB. The rest is in the JEE 6 SDK.</p>
+
+<p>In this post I only consider the case in which we have control over the schema.
+In this case, it is sufficient to annotate the fields and the classes you want to marshall to XML.
+Let us use the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project that can be found on Google
+Code. The following snippet shows a simple model that represents a student.</p>
+
+<p>As you can see there are few annotations. The first one <code>@XmlRootElement</code> simply declares what the  root element is. The second annotation specifies the mapping policy. We will come back on that later. The fields are either not annotated or annotated with @Transient. In the first case, they
+are marshaled if not null and in the second they are simply ignored. The only tricky part is that transient fields (in the Java sense) are ignored. For instance, this is the case of the <code>gender</code> property.</p>
+
+<p>```java A simple mapping from object to XML
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Student implements Serializable {</p>
+
+<pre><code>private Long id;
+
+private String lastName;
+
+private String firstName;
+
+private Date birthDate;
+
+@XmlTransient
+private PhoneNumber phoneNumber;
+
+private transient Gender gender;
+
+@XmlTransient
+private Address address;
+
+@XmlTransient
+private List&lt;Grade&gt; grades;
+
+...
+
+@XmlTransient
+private Badge badge;
+...
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Let us now test the mapping. The code below, creates a new <code>Student</code> and fills the associated
+fields. The second part of the snippet marshals the object into XML and streams it to <code>System.out</code>.</p>
+
+<p>```java Creation of student and its marshaling to XML</p>
+
+<pre><code>Student student = new Student("Lion Hearth", "Richard", new Date());
+Address address = new Address();
+address.setCity("Carouge");
+address.setNumber("7");
+address.setPostalCode("1227");
+address.setStreet("Drize");
+student.setAddress(address);
+Badge b = new Badge();
+b.setSecurityLevel(30L);
+b.setStudent(student);
+student.setBadge(b);
+student.setPhoneNumber(new PhoneNumber(0, 0, 0));
+for (Discipline d : Discipline.values()) {
+    Grade g = new Grade(d, 10);
+    student.getGrades().add(g);
+}
+
+JAXBContext jaxbContext = JAXBContext.newInstance(Student.class);       
+Marshaller marshaller = jaxbContext.createMarshaller();
+marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+marshaller.marshal(student, System.out);
+</code></pre>
+
+<p>```</p>
+
+<p>Finally, the result looks like the XML below. As you can see, it is pretty easy and straight-forward
+to produce XML from a Class description. Most of the fields that have been populated are not
+marshaled to XML. This is due to the <code>@XMLTransient</code> annotation that tells JAXB not to consider
+them for output.</p>
+
+<p>```xml Marshaled version of the previous Student object.
+&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<student></p>
+
+<pre><code>&lt;lastName&gt;Lion Hearth&lt;/lastName&gt;
+&lt;firstName&gt;Richard&lt;/firstName&gt;
+&lt;birthDate&gt;2012-06-04T11:12:34.751+02:00&lt;/birthDate&gt;
+</code></pre>
+
+<p></student>
+```</p>
+
+<h3>Mapping Overview</h3>
+
+<p>The previous example was as simple as possible. Obviously, sometimes it is important to be able to
+tweak the mapping. Let us look at some simple mapping options.</p>
+
+<h4>Element naming</h4>
+
+<p>The default mapping rule is to use the field name as XML element name. This policy can be overridden
+by the <code>@XmlElement(name = ...)</code> annotation. Applying the annotation <code>@XmlElement(name="last_name")</code> on the <code>lastName</code> field of the previous example would result in:
+```xml Example of named element
+&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<student></p>
+
+<pre><code>&lt;last_name&gt;Lion Hearth&lt;/last_name&gt;
+&lt;firstName&gt;Richard&lt;/firstName&gt;
+&lt;birthDate&gt;2012-06-04T11:12:34.751+02:00&lt;/birthDate&gt;
+</code></pre>
+
+<p></student>
+```</p>
+
+<h4>Attributes vs elements</h4>
+
+<p>By default fields are marshaled as XML elements. It is possible to ask JAXB to transform them to
+XML attributes by using <code>@XmlAttribute</code> annotation. Putting <code>@XmlAttribute</code> on the <code>lastName</code>
+field of the previous example would produce the following XML:
+```xml Example of using an attribute instead of an element
+&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<student lastName="Lion Hearth"></p>
+
+<pre><code>&lt;firstName&gt;Richard&lt;/firstName&gt;
+&lt;birthDate&gt;2012-06-04T11:12:34.751+02:00&lt;/birthDate&gt;
+</code></pre>
+
+<p></student>
+```
+Please note that as for an element, the attribute name can be customized.</p>
+
+<h4>Mapping strategy</h4>
+
+<p>As mentioned before, the default mapping strategy is declared by using the <code>@XmlAccessorType(XmlAccessType.*)</code> annotation.</p>
+
+<p>There exists four mapping policies. For more details, look at the <a href="http://docs.oracle.com/javaee/6/api/javax/xml/bind/annotation/XmlAccessType.html">Javadoc</a> for <code>XmlAccessorType</code>. Here is an excerpt
+from the Java doc.</p>
+
+<ol>
+<li><code>FIELD</code>: Every non static, non transient field in a JAXB-bound class will be automatically bound to XML, unless annotated by XmlTransient.</li>
+<li><code>NONE</code>: None of the fields or properties is bound to XML unless they are specifically annotated with some of the JAXB annotations.</li>
+<li><code>PROPERTY</code>: Every getter/setter pair in a JAXB-bound class will be automatically bound to XML, unless annotated by XmlTransient.</li>
+<li><code>PUBLIC_MEMBER</code>: Every public getter/setter pair and every public field will be automatically bound to XML, unless annotated by XmlTransient.</li>
+</ol>
+
+
+<h4>Name spaces</h4>
+
+<p>An important aspect of XML is its modularity. In particular, namespaces bring a nice way to organize
+the XML and the schemas. Namespaces can be specified at different levels. For more details look at the <a href="http://wiki.eclipse.org/EclipseLink/UserGuide/MOXy/Type_Level/Setting_Up_Namespace_Information">MOXy documentation</a>. For now, it is sufficient to known that the <code>@XmlType</code>, <code>@XmlElement</code>, and <code>@XmlAttribute</code> annotations support a namespace attribute.</p>
+
+<h3>One to one mapping</h3>
+
+<p>Now that we have mapped simple field, let us look at more complex mappings. First, a 1-1 mapping.
+The following example maps an address.</p>
+
+<p>```java Add a one to one mapping
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Student implements Serializable {</p>
+
+<pre><code>...
+
+private Address address;
+</code></pre>
+
+<p>}
+<code>
+To that end, it is sufficient to add the following annotations to the Address type.
+</code>
+@XmlRootElement(name = "address")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Address implements Serializable {</p>
+
+<pre><code>...
+/** house number. */
+private String number;
+
+/** the name of the street. */
+private String street;
+
+/** the city name. */
+private String city;
+
+/** the postal code. */
+private String postalCode;
+...
+</code></pre>
+
+<p>}
+```</p>
+
+<p>And the rest is handled by JAXB to produce the following result.</p>
+
+<p>```xml
+&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<student></p>
+
+<pre><code>...
+&lt;address&gt;
+    &lt;number&gt;7&lt;/number&gt;
+    &lt;street&gt;Drize&lt;/street&gt;
+    &lt;city&gt;Carouge&lt;/city&gt;
+    &lt;postalCode&gt;1227&lt;/postalCode&gt;
+&lt;/address&gt;
+</code></pre>
+
+<p></student>
+```</p>
+
+<h4>Bi-directional one to one</h4>
+
+<p>The next example is more tricky. The problem with bi-directional mapping is that they produce
+graphs. Of course, since XML are trees, we must avoid cycles. The solution is to annotate the reverse mapping (<code>Student student</code> in this case) with <code>@XMLTransient</code> causing the property to be ignored by JAXB.</p>
+
+<p>```java Add a one to one bidirectional mapping
+@XmlRootElement(name = "student")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Student implements Serializable {</p>
+
+<pre><code>...
+
+private Badge badge;
+</code></pre>
+
+<p>}
+```</p>
+
+<p>The following type describes the <code>Badge</code> that has a reverse mapping to <code>Student</code>.
+<code>`java Mapping of the type</code>Badge``
+@XmlRootElement(name = "badge")
+@XmlAccessorType(XmlAccessType.FIELD)
+public class Badge implements Serializable {</p>
+
+<pre><code>/** The unique id. */
+private Long id;
+
+/** The student's security level. */
+@XmlAttribute
+private Long securityLevel;
+
+/** The student that owns this badge. */
+@XmlTransient
+private Student student;
+</code></pre>
+
+<p>```
+And finally, here is the result.</p>
+
+<p>```xml Result of the bi-directional mapping
+&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<student></p>
+
+<pre><code>...
+&lt;badge securityLevel="30"/&gt;
+</code></pre>
+
+<p></student>
+```</p>
+
+<h3>One to many mapping</h3>
+
+<p>One to many mappings are handled automatically. There is nothing special to do. In our example,
+removing the <code>@XmlTransient</code> annotation on the <code>grades</code> property will generate the following output:</p>
+
+<p>```xml One to many example
+&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<student></p>
+
+<pre><code>&lt;last_name&gt;Lion Hearth&lt;/last_name&gt;
+&lt;firstName&gt;Richard&lt;/firstName&gt;
+&lt;birthDate&gt;2012-06-05T10:57:36.699+02:00&lt;/birthDate&gt;
+&lt;phoneNumber&gt;+00-0000-0000&lt;/phoneNumber&gt;
+&lt;address&gt;
+    &lt;number&gt;7&lt;number&gt;
+    &lt;street&gt;Drize&lt;/street&gt;
+    &lt;city&gt;Carouge&lt;/city&gt;
+    &lt;postalCode&gt;1227&lt;/postalCode&gt;
+&lt;/address&gt;
+&lt;grades&gt;
+    &lt;discipline&gt;MATHEMATICS&lt;/discipline&gt;
+    &lt;grade&gt;10&lt;/grade&gt;
+&lt;/grades&gt;
+&lt;grades&gt;
+    &lt;discipline&gt;BIOLOGY&lt;/discipline&gt;
+    &lt;grade&gt;10&lt;/grade&gt;
+&lt;/grades&gt;
+</code></pre>
+
+<p> ...</p>
+
+<pre><code>&lt;badge securityLevel="30"/&gt;
+</code></pre>
+
+<p></student>
+```</p>
+
+<h2>Custom mapping</h2>
+
+<p>Sometimes, it is difficult to map a given type to a given XML structure. This is the case of the <code>PhoneNumber</code> type in our example. To that end, it is possible to define a <code>XMLJavaTypeAdatper</code>
+that will convert XML to object and objects to XML manually. The adapter is not very difficult to implement. It is composed of two methods that respectively unmarshal from XML and marshal to XML.</p>
+
+<p>```java
+public class PhoneNumberAdapter extends XmlAdapter&lt;String, PhoneNumber> {</p>
+
+<pre><code>@Override
+public PhoneNumber unmarshal(final String value) throws Exception {
+    return PhoneNumber.getAsObject((String) value);
+}
+
+@Override
+public String marshal(final PhoneNumber value) throws Exception {
+    return PhoneNumber.getAsString((PhoneNumber) value);
+}
+</code></pre>
+
+<p>}
+<code>
+Then, it is required to annotated the property with this adapter:
+</code>java Using a custom XML-Object Adapter</p>
+
+<pre><code>...
+@XmlJavaTypeAdapter(PhoneNumberAdapter.class)
+private PhoneNumber mPhoneNumber;
+...
+</code></pre>
+
+<p>```</p>
+
+<p>This will produce the following result:
+```xml
+&lt;?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<student></p>
+
+<pre><code>&lt;last_name&gt;Lion Hearth&lt;/last_name&gt;
+&lt;firstName&gt;Richard&lt;/firstName&gt;
+&lt;birthDate&gt;2012-06-05T10:57:36.699+02:00&lt;/birthDate&gt;
+&lt;phoneNumber&gt;+00-0000-0000&lt;/phoneNumber&gt;
+...
+</code></pre>
+
+<p></student>  <br/>
+```</p>
+
+<h2>What about XML schemas</h2>
+
+<p>As mentioned previously, we assumed that you have total control over the schema. Nevertheless, it can
+be useful to be able to produce this schema. This is done by the following snippet.</p>
+
+<p>```java Output the underlying schema
+SchemaOutputResolver sor = new SchemaOutputResolver() {</p>
+
+<pre><code>@Override
+public Result createOutput(final String namespaceUri,
+        final String suggestedFileName) throws IOException {
+    Result result = new StreamResult(System.out);
+    result.setSystemId("System.out");
+    return result;
+}
+</code></pre>
+
+<p>};
+jaxbContext.generateSchema(sor);
+```</p>
+
+<h2>Write XML</h2>
+
+<p>Writing XML is fairly easy, just populate the objects that you want to marshal and then
+use the following code:
+<code>java How to marshal a given object
+JAXBContext jaxbContext = JAXBContext.newInstance(Student.class);       
+Marshaller marshaller = jaxbContext.createMarshaller();
+marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+marshaller.marshal(student, System.out);
+</code></p>
+
+<h2>Read XML</h2>
+
+<p>The reverse operation is as easy and straightforward (provided that use the same schema):
+<code>java How to unmarshal a given XML file to objects
+InputStream stream = StudentOXTest.class.getResourceAsStream("/student.xml");
+JAXBContext jaxbContext = JAXBContext.newInstance(Student.class);
+Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
+Student student = (Student) unmarshaller.unmarshal(stream);
+</code></p>
+
+<h2>Conclusion</h2>
+
+<p>We have seen how to use MOXy to map objects to XML. Using JAXB annotations, it is very easy to read and write XML. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>

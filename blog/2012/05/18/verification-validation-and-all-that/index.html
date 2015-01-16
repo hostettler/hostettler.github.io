@@ -1,0 +1,517 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Verification & Validation - Steve Hostettler</title>
+  <meta name="author" content="Steve Hostettler">
+
+  
+  <meta name="description" content="I&#8217;ve read many articles (tutorials, books, courses, forums&#8230;) about
+Verification &amp; Validation. One think that really strikes me is the &hellip;">
+  <meta name="keywords" content="testverificationvalidationdefinition">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://hostettler.github.io/blog/2012/05/18/verification-validation-and-all-that">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Steve Hostettler" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-30751319-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Steve Hostettler</a></h1>
+  
+    <h2>JEE and test automation</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:hostettler.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/about-me/">About Me</a></li>
+  <li><a href="http://publicationslist.org/steve.hostettler">Publications</a></li>
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Verification & Validation</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-18T10:51:00+02:00" pubdate data-updated="true">May 18<span>th</span>, 2012</time>
+        
+         | <a href="#disqus_thread">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I&#8217;ve read many articles (tutorials, books, courses, forums&#8230;) about
+Verification &amp; Validation. One think that really strikes me is the lack of consistency and the
+fuzziness among the definitions or more precisely among the interpretations. As I do think that
+something cannot be understood completely if it is not be expressed clearly, I propose a mini-serie of blog posts to clarify Verification &amp; Validation and the associated
+activities. I will try to give simple and consistent (at least in my point of view) definitions. Sure, this is a rehash of well-known stuff but putting everything at the same place seems worth to me. I do not pretend to know best and thus feel free to comment on this post to correct me or to suggest other explanations and definitions. My only purpose is to help to better understand these words and the underlying concepts.</p>
+
+<h2>Verification &amp; Validation</h2>
+
+<p>Most of the literature on the subject distinguish between <strong>Verification</strong> and <strong>Validation</strong>. The
+usual way (taken from Barry Boehm) to sum up the difference between the two is to say that:</p>
+
+<p><code>Verification  consist in checking that we are building the product right, and validation
+ consists in checking building the right product.</code></p>
+
+<p>I am not very satisfied with this definition. Although it sounds good, it raises the question of
+what it does mean to built a product right and what the right product is. Let&#8217;s go back to the roots
+by looking at the definitions of these words in the <a href="http://www.merriam-webster.com/">Merriam-Webster</a> dictionary.</p>
+
+<!---
+###Oxford dictionary
+**Verification**: the process of establishing the truth, accuracy, or validity of something.  
+**Validation**: check or prove the validity or accuracy of something.
+
+###Cambridge dictionary
+**Verification**: to prove that something exists or is true, or to make certain that something is correct.  
+**Validation**: to make something officially acceptable or approved, especially after examining it.
+-->
+
+
+<p><strong>Verification</strong>: the act or process of &#8220;establishing the truth, accuracy, or reality of a claim&#8221;.<br/>
+<strong>Validation</strong>: the act or process of &#8220;making legally valid&#8221;.</p>
+
+<!--- All three dictionaries agree (as far as I understand it) on the definition of verification.
+The 
+[Oxford] (http://oxforddictionaries.com/) dictionary does not really distinguish the two words.
+
+[Cambridge] (http://dictionary.cambridge.org/) and [Merriam-Webster]
+(http://www.merriam-webster.com/), on the other hand, describe **validation** as the act of making
+something legal or official. As French is my mother tongue and both **verification** and **validation**
+come from the middle French, I checked the definitions in a French dictionary ([Larousse](http://www.larousse.com/en/dictionaries/french/)).
+The Larousse's definition also makes a clear distinction that is along the same lines as the Cambridge 
+and the Merriam-Webster dictionary. 
+-->
+
+
+<p>To summarize, my understanding is that the general sense of <strong>verification</strong> is to prove a claim
+whereas <strong>validation</strong> aims at declaring something legal or official (i.e. something that comply to a
+set of rules or regulations). Of course this raises the question of what, in the context of software
+systems, is a claim and what is legal/official. This leads us to the next section that defines terms
+such as requirements, and specification.</p>
+
+<h2>Requirements &amp; Specification</h2>
+
+<!---
+###Oxford dictionary
+**Requirement**:   
+**Specification**: 
+
+###Cambridge dictionary
+**Requirement**:   
+**Specification**: 
+-->
+
+
+<p>Again, let&#8217;s lookup the meaning of these words in the <a href="http://www.merriam-webster.com/">Merriam-Webster</a> dictionary:</p>
+
+<p><strong>Requirement</strong>: the need for a particular purpose; depend on for success or survival.<br/>
+<strong>Specification</strong>: the act of describing or identifying something precisely or of stating a precise requirement.</p>
+
+<p>A requirement expresses a need upon which the success of the project depends. Whereas, a
+specification is a precise description of a requirement. Now let us look at the standard definitions
+in Software Engineering.</p>
+
+<h2>Software Requirements &amp; Specification</h2>
+
+<p>As a software systems is usually developed in response to someone needs (or supposed needs), it
+must satisfy that person, that group of person, or that organization needs. Furthermore, it must
+often comply to a set of regulations or other expectations. This leads us to the following concept:</p>
+
+<p><strong>Requirements</strong>  represent what the stakeholders expect from the system. It is important to note
+   that the stakeholders can be end-users, power-users or even internal or external regulatory
+   entities such as government agencies that enforce laws and regulations. Stakeholder requirements
+   do not take the feasibility into account nor do they take technical details into account. They
+   only state their problem or expectations.</p>
+
+<p>As it is not possible to have access to all stakeholders at any time during the development process
+(for instance, to ask questions), it is necessary to capture their requirements in a persistent form.
+In the following, I call the role that capture the stakeholder requirements: the business analyst.</p>
+
+<p><strong>Specifications</strong>  capture in a written form what a business analyst understood from the
+ requirements. This written form is usually expressed in natural language or is a mixed of natural
+ language and semi-formal, or formal description. The specifications describe implementable requirements and how to meet them. Therefore, they propose a solution to the problem.</p>
+
+<p>Interestingly enough, there is the same kind of semantical difference between <strong>requirements</strong> and <strong>specifications</strong>
+as between <strong>verification</strong> and <strong>validation</strong>. This is the basis that helps to understand the subtle
+yet important difference between the two terms, in particular in the context of the development of
+software systems.</p>
+
+<p> It is important to understand is that the specifications are derived from the interpreted <strong>requirements</strong>
+ and therefore <strong>specifications</strong> cannot be sound and complete. In other words, there may be things
+ that are over-specified (not sound) and things that are under-specified (not complete).</p>
+
+<p>Let&#8217;s imagine for a second that a perfect business analyst did capture exactly what the
+stakeholders had in mind. This perfect specification must still be implemented and therefore we must
+ensure that implementation does satisfy the specification (and by transitivity the stakeholders
+needs).</p>
+
+<p>A software system does reflect the stakeholder requirements if the following hypotheses hold:</p>
+
+<ol>
+<li>All stakeholders expresses their needs in a sound and complete set of requirements;</li>
+<li>a business analyst captures these requirements in a sound and complete specification (with respect to the requirements);</li>
+<li>the development team understands and implements this specification in a sound and complete way;</li>
+</ol>
+
+
+<p>Of course non of these hypotheses hold in a real industrial setting but we have to admit them to be
+able to realize a system. In order to minimize the risk of diverging from the stakeholders
+requirements to much we need a process to ensure that the final system agrees to a certain degree to
+the stakeholders requirements. This a the role of verification and validation.</p>
+
+<h2>Software Verification &amp; Validation</h2>
+
+<p>The figure below illustrates the difference between <strong>verification</strong> and <strong>validation</strong> and where
+they take place in the development process. Building a software system consists in capturing the
+stakeholders&#8217; requirements into a persistent description, called <strong>informal specifications</strong> (e.g.,
+Use Cases, storyboards, &#8230;). This specifies <strong>what</strong> problems the system addresses. At this stage a
+number of interpretation mistakes may have occurred leading to incorrect specifications. To limit
+these problems, the <strong>informal specifications</strong> must be explained to the user and validated.
+Developers require non-ambiguous specification to work on. Thus, a design (e.g., UML diagrams) are
+derived from the <strong>informal specifications</strong> . Similarly, the quality assurance team derives a <strong>formal
+specification</strong> (e.g, Petri nets, test cases, metrics, &#8230;). The design and later the implementation
+are then verified with respect to this <strong>formal specification</strong>. To a certain extend, the formal specification
+must itself be validated by the stakeholders.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/V&V.png' width='' height='' alt='Verification and Validation' title='Verification and Validation'><span class='caption-text'>Verification and Validation</span></span></p>
+
+<p><strong>Verification</strong>    stands for the process of evaluating whether a software system satisfies the <strong>specified
+requirements</strong>. On the design level, it can be achieved by simulation or model checking. On the implementation
+   level, it can be achieved by different kind of testing, code review, static analysis, and
+   metrics. In other words: &#8220;Did we build the system right (with respect to specified
+   requirements)?&#8221;.</p>
+
+<p><strong>Validation</strong>    stands for the process of evaluating whether a software system satisfies the <strong>stakeholder requirements</strong>
+   and <strong>intended uses</strong> . This is, for instance, achieved by <strong>User Acceptance Tests</strong> and by
+   submitting the final system to certification authorities. In other words: &#8220;Did we build the right
+   (with respect to stakeholder requirements) system?&#8221;.</p>
+
+<!---
+Validation is necessary because there will always be a gap (or discrepancy) between what the customer wants, and what has been captured and expressed in the requirements. There is inevitably some loss, or corruption, of information in its transmission between the customer and the analyst/developer.
+The essential point is that the customer or user must be directly involved in validation.
+--->
+
+
+<h2>Conclusion</h2>
+
+<p>Stakeholders cannot be available at any time of the development. Therefore, it is necessary to
+build a persistent view (i.e., specification) of their needs (i.e., requirements). The activity of
+checking whether the design and the implementation fulfill the specification is called
+<strong>Verification</strong>
+Some details may be lost in the translation from the requirements to the specification. Therefore,
+at each phase of the development of a software systems, we must check that what has been specified
+and later implemented during that phase reflect the stakeholders&#8217; expectations. This activity is
+called <strong>validation</strong> . Integrating these two concepts as first class citizen, is one of the major
+benefits of agile methods. Because the interpretation of the <strong>stakeholder requirements</strong> and later
+the translation from the <strong>informal specifications</strong> to the <strong>formal specifications</strong> may be
+incomplete or incorrect, it is necessary to often go back to the customer or the stakeholders to
+confirm that the product is on the good track. This is one of the major benefits of iterative and
+incremental development.</p>
+
+<!---
+The [Food and Drug Administration]() 
+
+**Software verification**  provides objective evidence that the design outputs of a particular phase
+ of the software development life cycle meet all of the specified requirements for that phase.
+ Software verification looks for consistency, completeness, and correctness of the software and its
+ supporting documentation, as it is being developed, and provides support for a subsequent
+ conclusion that software is validated. Software testing is one of many verification activities
+ intended to confirm that software development output meets its input requirements. Other
+ verification activities include various static and dynamic analyses, code and document inspections,
+ walkthroughs, and other techniques.
+
+**Software validation**  is a part of the design validation for a finished device, but is not
+ separately defined in the Quality System regulation. For purposes of this guidance, FDA considers
+ software validation to be ``confirmation by examination and provision of objective evidence that
+ software specifications conform to user needs and intended uses, and that the particular
+ requirements implemented through software can be consistently fulfilled.'' In practice, software
+ validation activities may occur both during, as well as at the end of the software development life
+ cycle to ensure that all requirements have been fulfilled. Since software is usually part of a
+ larger hardware system, the validation of software typically includes evidence that all software
+ requirements have been implemented correctly and completely and are traceable to system
+ requirements. A conclusion that software is validated is highly dependent upon comprehensive
+ software testing, inspections, analyses, and other verification tasks performed at each stage of
+ the software development life cycle. Testing of device software functionality in a simulated use
+ environment, and user site testing are typically included as components of an overall design
+ validation program for a software automated device.
+
+IEEE-829-2008 3.1.53 validation: (A) The process of evaluating a system or component during or at
+the end of the development process to determine whether it satisfies specified requirements.
+(adopted from IEEE Std 610.12-1990 [B3] ) (B) The process of providing evidence that the software and
+its associated products satisfy system requirements allocated to software at the end of each life
+cycle activity, solve the right problem (e.g., correctly model physical laws, implement business
+rules, or use the proper system assumptions), and satisfy intended use and user needs.
+
+3.1.54 verification: (A) The process of evaluating a system or component to determine whether the
+products of a given development phase satisfy the conditions imposed at the start of that phase.
+(adopted from IEEE Std 610.12-1990 [B3] ) (B) The process of providing objective evidence that the
+software and its associated products comply with requirements (e.g., for correctness, completeness,
+consistency, and accuracy) for all life cycle activities during each life cycle process
+(acquisition, supply, development, operation, and maintenance), satisfy standards, practices, and
+conventions during life cycle processes, and successfully complete each life cycle activity and
+satisfy all the criteria for initiating succeeding life cycle activities (e.g., building the
+software correctly).
+
+
+1. [IEEE-829-2008]()
+2. [ISTQB foundation]() and [advanced]() syllabus
+3. [ISO 9000:2000]()
+4. [ISO 8402:1994]()
+5. [ISO/IEC 14971-1 and IEC 60601-1-4]() 
+6. [General Principles of Software Validation; Final Guidance for Industry and FDA Staff]()
+-->
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Steve Hostettler</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-05-18T10:51:00+02:00" pubdate data-updated="true">May 18<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/definition/'>definition</a>, <a class='category' href='/blog/categories/test/'>test</a>, <a class='category' href='/blog/categories/validation/'>validation</a>, <a class='category' href='/blog/categories/verification/'>verification</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/" title="Previous Post: A JEE6 security interceptor for Tomcat 7">&laquo; A JEE6 security interceptor for Tomcat 7</a>
+      
+      
+        <a class="basic-alignment right" href="/blog/2012/05/24/moxy/" title="Next Post: Object-XML Mapping with JAXB & MOXy">Object-XML Mapping with JAXB & MOXy &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/12/26/communication-between-java-enterprise-applications/">Communication between Java Enterprise Applications</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that/">Fakes, Stubs, Dummy, Mocks, Doubles and all that...</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/04/18/testing-levels/">Testing levels</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/31/jee6-tutorial/">JEE6 Tutorial</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/12/05/servicelocator/">Context Dependency Injection and the Rich Object Model</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/11/20/multi-tenancy/">Multi-Tenancy with EJB 3.1 and JPA 2.0</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/06/10/Sessions-GC-Conversations/">About Sessions, Conversations, and the Garbage Collector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/24/moxy/">Object-XML Mapping with JAXB & MOXy</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/18/verification-validation-and-all-that/">Verification & Validation</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/">A JEE6 security interceptor for Tomcat 7</a>
+      </li>
+    
+  </ul>
+</section>
+
+
+
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/116636069211041664299?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2015 - Steve Hostettler -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'hostettlerblog';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://hostettler.github.io/blog/2012/05/18/verification-validation-and-all-that/';
+        var disqus_url = 'http://hostettler.github.io/blog/2012/05/18/verification-validation-and-all-that/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
