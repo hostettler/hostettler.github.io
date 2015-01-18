@@ -4,7 +4,7 @@
   <title><![CDATA[Category: RMI | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/rmi/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2015-01-18T09:49:56+01:00</updated>
+  <updated>2015-01-18T09:52:06+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -85,6 +85,29 @@
 <td align="center">   OK   </td>
 <td align="center">   OK   </td>
 <td align="right">       X       |</td>
+</tr>
+</tbody>
+</table>
+
+
+<table>
+<thead>
+<tr>
+<th></th>
+<th> First Header  </th>
+<th> Second Header </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td> Content Cell  </td>
+<td> Content Cell  |</td>
+</tr>
+<tr>
+<td></td>
+<td> Content Cell  </td>
+<td> Content Cell  |</td>
 </tr>
 </tbody>
 </table>
