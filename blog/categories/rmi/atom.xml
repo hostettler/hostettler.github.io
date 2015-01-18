@@ -4,7 +4,7 @@
   <title><![CDATA[Category: RMI | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/rmi/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2015-01-18T09:53:19+01:00</updated>
+  <updated>2015-01-18T09:59:31+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -41,6 +41,15 @@
 <p>3) Performance : to be useful, the information sharing must be ubiquitous and therefore it must cheap in terms of resources.</p>
 
 <p>4) Vendor Independence : as far as possible an application must rely on known and portable APIs such as JEE. Locking the application to a specific vendor is, in my opinions, is essentially a problem for maintenance. Migrating from one application server to another only happens rarely.</p>
+
+<table>
+<th> <td>Solution</td> <td>Async</td> <td>Scope</td> <td>RMI</td> <td>Vendor Indep.</td> </th>
+<tr> <td>Thread-Local</td> <td>X</td> <td>OK</td> <td>X</td> <td>OK</td> </tr>
+<tr> <td>JNDI</td> <td>OK</td> <td>X</td> <td>OK</td> <td>OK</td> </tr>
+<tr> <td>TSR</td> <td>X</td> <td>OK</td> <td>OK</td> <td>OK</td> </tr>
+<tr> <td>WAS</td> <td>OK</td> <td>OK</td> <td>OK</td> <td>X</td> </tr>
+</table>
+
 
 <table>
 <thead>
@@ -85,29 +94,6 @@
 <td align="center">   OK   </td>
 <td align="center">   OK   </td>
 <td align="right">       X       |</td>
-</tr>
-</tbody>
-</table>
-
-
-<table>
-<thead>
-<tr>
-<th></th>
-<th> First Header  </th>
-<th> Second Header </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td></td>
-<td> Content Cell  </td>
-<td> Content Cell  |</td>
-</tr>
-<tr>
-<td></td>
-<td> Content Cell  </td>
-<td> Content Cell  |</td>
 </tr>
 </tbody>
 </table>
