@@ -119,7 +119,7 @@
 
 <p>3) TransactionSynchronizationRegistry (TSR). This alternative is well documented <a href="http://www.adam-bien.com/roller/abien/entry/how_to_pass_context_in">here</a>. This solution works on an JEE application servers. It looks great at the first sight but it does not support any use case in which there is different transactions (or no transaction) involved. This invalidates any information sharing before a transaction as started, when a transaction has been suspended, or when a new transaction is started. Again, I can imagine that it would possible to propagate the content using interceptors but it is too much plumber code to me.</p>
 
-<p>4) Work Area Service (WAS). This is basically the IBM implementation of solution 2 with scoping. Documentation is clear and it seems easy to implement. Of course, the main drawback is that it is vendor-specific. IBM started a <a href="">JSR</a> long time ago but it was dropped.</p>
+<p>4) Work Area Service (WAS). This is basically the IBM implementation of solution 2 with scoping. Documentation is clear and it seems easy to implement. Of course, the main drawback is that it is vendor-specific. IBM started a <a href="https://jcp.org/en/jsr/detail?id=149">JSR</a> long time ago but it was dropped.</p>
 
 <p>Let us now enumerate several criteria to make a decision about which way to go:</p>
 
@@ -137,7 +137,7 @@
 <thead>
 <tr>
 <th></th>
-<th> Solution      </th>
+<th align="left"> Solution     </th>
 <th align="center"> Async  </th>
 <th align="right"> Scope  </th>
 <th align="right"> RMI    </th>
@@ -147,7 +147,7 @@
 <tbody>
 <tr>
 <td></td>
-<td> Thread-Local  </td>
+<td align="left"> Thread-Local </td>
 <td align="center">   X    </td>
 <td align="right">   OK   </td>
 <td align="right">   X    </td>
@@ -155,7 +155,7 @@
 </tr>
 <tr>
 <td></td>
-<td> JNDI          </td>
+<td align="left"> JNDI         </td>
 <td align="center">   OK   </td>
 <td align="right">   X    </td>
 <td align="right">   OK   </td>
@@ -163,7 +163,7 @@
 </tr>
 <tr>
 <td></td>
-<td> TSR           </td>
+<td align="left"> TSR          </td>
 <td align="center">   X    </td>
 <td align="right">   OK   </td>
 <td align="right">   OK   </td>
@@ -171,7 +171,7 @@
 </tr>
 <tr>
 <td></td>
-<td> WAS           </td>
+<td align="left"> WAS          </td>
 <td align="center">   OK   </td>
 <td align="right">   OK   </td>
 <td align="right">   OK   </td>
