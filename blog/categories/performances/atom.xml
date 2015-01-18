@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: performances | Steve Hostettler]]></title>
+  <title><![CDATA[Category: Performances | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/performances/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2015-01-16T18:28:04+01:00</updated>
+  <updated>2015-01-18T09:44:52+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[On JEE 6 webapps startup time]]></title>
+    <title type="html"><![CDATA[On JEE 6 Webapps Startup Time]]></title>
     <link href="http://hostettler.github.io/blog/2012/03/25/improve-jsf-applications-startup-time/"/>
     <updated>2012-03-25T23:20:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/03/25/improve-jsf-applications-startup-time</id>

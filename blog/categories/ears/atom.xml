@@ -4,7 +4,7 @@
   <title><![CDATA[Category: EARS | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/ears/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2015-01-16T18:28:04+01:00</updated>
+  <updated>2015-01-18T09:44:52+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Communication between Java Enterprise Applications]]></title>
+    <title type="html"><![CDATA[Communication Between Java Enterprise Applications]]></title>
     <link href="http://hostettler.github.io/blog/2014/12/26/communication-between-java-enterprise-applications/"/>
     <updated>2014-12-26T22:51:48+01:00</updated>
     <id>http://hostettler.github.io/blog/2014/12/26/communication-between-java-enterprise-applications</id>
@@ -42,11 +42,53 @@
 
 <p>4) Vendor Independence : as far as possible an application must rely on known and portable APIs such as JEE. Locking the application to a specific vendor is, in my opinions, is essentially a problem for maintenance. Migrating from one application server to another only happens rarely.</p>
 
-<p>Solution        Async   Scope   RMI     Vendor Indep.
-Thread-Local    KO      OK      KO      OK
-JNDI            OK      KO      OK      OK
-TSR             KO      OK      OK      OK
-WAS             OK      OK      OK      KO</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th> Solution      </th>
+<th align="center"> Async  </th>
+<th align="right"> Scope  </th>
+<th align="right"> RMI    </th>
+<th align="right"> Vendor Indep. </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td> Thread-Local  </td>
+<td align="center">   X    </td>
+<td align="right">   OK   </td>
+<td align="right">   X    </td>
+<td align="right">       OK      |</td>
+</tr>
+<tr>
+<td></td>
+<td> JNDI          </td>
+<td align="center">   OK   </td>
+<td align="right">   X    </td>
+<td align="right">   OK   </td>
+<td align="right">       OK      |</td>
+</tr>
+<tr>
+<td></td>
+<td> TSR           </td>
+<td align="center">   X    </td>
+<td align="right">   OK   </td>
+<td align="right">   OK   </td>
+<td align="right">       OK      |</td>
+</tr>
+<tr>
+<td></td>
+<td> WAS           </td>
+<td align="center">   OK   </td>
+<td align="right">   OK   </td>
+<td align="right">   OK   </td>
+<td align="right">       X       |</td>
+</tr>
+</tbody>
+</table>
+
 
 <p>As you can see there is no silver bullet here. I went for the vendor specific solution. It can be nicely encapsulated to isolate the dependency to vendor specific code. Furthermore, several servers have similar mechanism and it can be therefore adapted. Here is why it was not possible in my setup to use the other alternatives:</p>
 

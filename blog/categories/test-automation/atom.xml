@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: test automation | Steve Hostettler]]></title>
+  <title><![CDATA[Category: Test Automation | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/test-automation/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2015-01-16T18:28:04+01:00</updated>
+  <updated>2015-01-18T09:44:52+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Using Selenium for web integration testing]]></title>
+    <title type="html"><![CDATA[Using Selenium for Web Integration Testing]]></title>
     <link href="http://hostettler.github.io/blog/2012/04/16/using-selenium-for-web-integration-testing/"/>
     <updated>2012-04-16T18:57:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/04/16/using-selenium-for-web-integration-testing</id>

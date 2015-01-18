@@ -4,7 +4,7 @@
   <title><![CDATA[Category: JEE6 | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/jee6/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2015-01-16T18:28:04+01:00</updated>
+  <updated>2015-01-18T09:44:52+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -114,7 +114,7 @@ Nevertheless, this approach must be used with great care as it can blur the comp
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Multi-Tenancy with EJB 3.1 and JPA 2.0]]></title>
+    <title type="html"><![CDATA[Multi-Tenancy With EJB 3.1 and JPA 2.0]]></title>
     <link href="http://hostettler.github.io/blog/2012/11/20/multi-tenancy/"/>
     <updated>2012-11-20T05:18:00+01:00</updated>
     <id>http://hostettler.github.io/blog/2012/11/20/multi-tenancy</id>
@@ -387,7 +387,7 @@ This can be done with JSF's <code>@ConversationScoped</code> or with Spring Webf
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Object-XML Mapping with JAXB & MOXy]]></title>
+    <title type="html"><![CDATA[Object-XML Mapping With JAXB & MOXy]]></title>
     <link href="http://hostettler.github.io/blog/2012/05/24/moxy/"/>
     <updated>2012-05-24T19:17:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/05/24/moxy</id>
@@ -815,7 +815,7 @@ Student student = (Student) unmarshaller.unmarshal(stream);
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[A JEE6 security interceptor for Tomcat 7]]></title>
+    <title type="html"><![CDATA[A JEE6 Security Interceptor for Tomcat 7]]></title>
     <link href="http://hostettler.github.io/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7/"/>
     <updated>2012-05-02T18:23:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/05/02/a-jee6-security-interceptor-for-tomcat-7</id>

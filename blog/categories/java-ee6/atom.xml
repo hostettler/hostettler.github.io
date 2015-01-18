@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Java EE6 | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/java-ee6/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2015-01-16T18:28:04+01:00</updated>
+  <updated>2015-01-18T09:44:52+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -114,7 +114,7 @@ Nevertheless, this approach must be used with great care as it can blur the comp
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Multi-Tenancy with EJB 3.1 and JPA 2.0]]></title>
+    <title type="html"><![CDATA[Multi-Tenancy With EJB 3.1 and JPA 2.0]]></title>
     <link href="http://hostettler.github.io/blog/2012/11/20/multi-tenancy/"/>
     <updated>2012-11-20T05:18:00+01:00</updated>
     <id>http://hostettler.github.io/blog/2012/11/20/multi-tenancy</id>
@@ -326,7 +326,7 @@ a significant overhead.</p>
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Using Selenium for web integration testing]]></title>
+    <title type="html"><![CDATA[Using Selenium for Web Integration Testing]]></title>
     <link href="http://hostettler.github.io/blog/2012/04/16/using-selenium-for-web-integration-testing/"/>
     <updated>2012-04-16T18:57:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/04/16/using-selenium-for-web-integration-testing</id>
@@ -461,7 +461,7 @@ detect major problems. The examples used in this blog are to be found in the <a 
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Embedded Web Application integration testing using Tomcat 7 and JUnit]]></title>
+    <title type="html"><![CDATA[Embedded Web Application Integration Testing Using Tomcat 7 and JUnit]]></title>
     <link href="http://hostettler.github.io/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/"/>
     <updated>2012-04-09T14:39:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7</id>
@@ -629,7 +629,7 @@ The examples used in this blog are to be found in the <a href="http://code.googl
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Programmatically build web archives using ShrinkWrap]]></title>
+    <title type="html"><![CDATA[Programmatically Build Web Archives Using ShrinkWrap]]></title>
     <link href="http://hostettler.github.io/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/"/>
     <updated>2012-04-05T09:09:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap</id>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: JUnit | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/junit/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2015-01-16T18:28:04+01:00</updated>
+  <updated>2015-01-18T09:44:52+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Using Selenium for web integration testing]]></title>
+    <title type="html"><![CDATA[Using Selenium for Web Integration Testing]]></title>
     <link href="http://hostettler.github.io/blog/2012/04/16/using-selenium-for-web-integration-testing/"/>
     <updated>2012-04-16T18:57:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/04/16/using-selenium-for-web-integration-testing</id>
@@ -149,7 +149,7 @@ detect major problems. The examples used in this blog are to be found in the <a 
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Embedded Web Application integration testing using Tomcat 7 and JUnit]]></title>
+    <title type="html"><![CDATA[Embedded Web Application Integration Testing Using Tomcat 7 and JUnit]]></title>
     <link href="http://hostettler.github.io/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/"/>
     <updated>2012-04-09T14:39:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7</id>
@@ -317,7 +317,7 @@ The examples used in this blog are to be found in the <a href="http://code.googl
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[How to simulate CDI scopes and injection in Java SE.]]></title>
+    <title type="html"><![CDATA[How to Simulate CDI Scopes and Injection in Java SE.]]></title>
     <link href="http://hostettler.github.io/blog/2012/04/02/how-to-test-a-jsf-named-bean/"/>
     <updated>2012-04-02T21:37:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/04/02/how-to-test-a-jsf-named-bean</id>
@@ -472,7 +472,7 @@ Nevertheless, not everything is simple and we still have to do some tricks to ge
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[On JEE 6 webapps startup time]]></title>
+    <title type="html"><![CDATA[On JEE 6 Webapps Startup Time]]></title>
     <link href="http://hostettler.github.io/blog/2012/03/25/improve-jsf-applications-startup-time/"/>
     <updated>2012-03-25T23:20:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/03/25/improve-jsf-applications-startup-time</id>
@@ -569,7 +569,7 @@ As I use Weld and its <code>@Named</code>, <code>@SessionScoped</code>, and so o
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Testing JPA 2.0 entities in Java SE]]></title>
+    <title type="html"><![CDATA[Testing JPA 2.0 Entities in Java SE]]></title>
     <link href="http://hostettler.github.io/blog/2012/03/19/testing-jpa-in-java-se/"/>
     <updated>2012-03-19T13:40:00+01:00</updated>
     <id>http://hostettler.github.io/blog/2012/03/19/testing-jpa-in-java-se</id>

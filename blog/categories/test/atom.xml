@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Category: test | Steve Hostettler]]></title>
+  <title><![CDATA[Category: Test | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/test/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2015-01-16T18:28:04+01:00</updated>
+  <updated>2015-01-18T09:44:52+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -245,7 +245,7 @@ software correctly).
   </entry>
   
   <entry>
-    <title type="html"><![CDATA[Embedded Web Application integration testing using Tomcat 7 and JUnit]]></title>
+    <title type="html"><![CDATA[Embedded Web Application Integration Testing Using Tomcat 7 and JUnit]]></title>
     <link href="http://hostettler.github.io/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/"/>
     <updated>2012-04-09T14:39:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7</id>

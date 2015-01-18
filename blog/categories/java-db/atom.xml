@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Java DB | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/java-db/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2015-01-16T18:28:04+01:00</updated>
+  <updated>2015-01-18T09:44:52+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[Testing JPA 2.0 entities in Java SE]]></title>
+    <title type="html"><![CDATA[Testing JPA 2.0 Entities in Java SE]]></title>
     <link href="http://hostettler.github.io/blog/2012/03/19/testing-jpa-in-java-se/"/>
     <updated>2012-03-19T13:40:00+01:00</updated>
     <id>http://hostettler.github.io/blog/2012/03/19/testing-jpa-in-java-se</id>

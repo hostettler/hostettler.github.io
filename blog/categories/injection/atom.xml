@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Injection | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/injection/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2015-01-16T18:28:04+01:00</updated>
+  <updated>2015-01-18T09:44:52+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -14,7 +14,7 @@
 
   
   <entry>
-    <title type="html"><![CDATA[How to simulate CDI scopes and injection in Java SE.]]></title>
+    <title type="html"><![CDATA[How to Simulate CDI Scopes and Injection in Java SE.]]></title>
     <link href="http://hostettler.github.io/blog/2012/04/02/how-to-test-a-jsf-named-bean/"/>
     <updated>2012-04-02T21:37:00+02:00</updated>
     <id>http://hostettler.github.io/blog/2012/04/02/how-to-test-a-jsf-named-bean</id>
