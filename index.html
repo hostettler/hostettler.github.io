@@ -9,7 +9,7 @@
   <meta name="author" content="Steve Hostettler">
 
   
-  <meta name="description" content="Recently I came across the following problem : How to propagate information from one enterprise application to another in a transparent manner. &hellip;">
+  <meta name="description" content="Recently I came across the following problem : How to propagate information from one enterprise application to another in a transparent manner? &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -109,15 +109,15 @@
   </header>
 
 
-  <div class="entry-content"><p>Recently I came across the following problem : How to propagate information from one enterprise application to another in a transparent manner. Transparent meaning without changing the API, that is without adding transversal information to the services&#8217; parameters. The typical use case is to propagate information such as the language, applicative security roles information (not the JAAS role), or the session-id. Moreover, I would like the information to be &#8220;request scoped&#8221; and to be automatically cleaned up at the end of the request. This is important to avoid memory leak and to enforce isolation for security reasons. Let me add that I currently work with JEE6 on WebSphere 8.5.5.</p>
+  <div class="entry-content"><p>Recently I came across the following problem : How to propagate information from one enterprise application to another in a transparent manner? Transparent meaning without changing the API, that is without adding transversal information to the services&#8217; parameters. The typical use case is to propagate information such as the language, applicative security roles information (not the JAAS role), or the session-id. Moreover, I would like the information to be &#8220;request scoped&#8221; and to be automatically cleaned up at the end of the request. This is important to avoid memory leak and to enforce isolation for security reasons. Let me add that I currently work with JEE6 on WebSphere 8.5.5.</p>
 
 <p>I did some research among blogs and forums and I found the following solutions:</p>
 
-<p>1) Passing information in thread-local. This consists in putting information in a <code>Map</code> stored in <code>ThreadLocal</code>. Although this solution is very simple to implement, information is only transmitted inside the current thread. This means that <code>@Asynchronous</code> calls will not get access to the information. Similarly, it is not transmitted through RMI calls that spread on several VMs as it is usually the case on distributed applications.</p>
+<p>1) Passing information in thread-local. This consists in putting information in a <code>Map</code> stored in <code>ThreadLocal</code>. Although this solution is very simple to implement, information is only transmitted inside the current thread. This means that <code>@Asynchronous</code> calls will not get access to the information. Similarly, it is not transmitted through RMI calls that spread on several VMs, as it is usually the case on distributed applications.</p>
 
 <p>2) Using the JNDI. This solution does not suffer of the above limitations as it is distributed by nature but scoping must be implemented on top of the existing JNDI implementation. I think that it may be possible to implement something like a custom CDI scope but it seems rather complex.</p>
 
-<p>3) TransactionSynchronizationRegistry (TSR). This alternative is well documented <a href="http://www.adam-bien.com/roller/abien/entry/how_to_pass_context_in">here</a>. This solution works on an JEE application servers. It looks great at the first sight but it does not support any use case in which there is different transactions (or no transaction) involved. This invalidates any information sharing before a transaction as started, when a transaction has been suspended, or when a new transaction is started. Again, I can imagine that it would possible to propagate the content using interceptors but it is too much plumber code to me.</p>
+<p>3) TransactionSynchronizationRegistry (TSR). This alternative is well documented <a href="http://www.adam-bien.com/roller/abien/entry/how_to_pass_context_in">here</a>. This solution works on a JEE application servers. It looks great at the first sight but it does not support any use case in which there is different transactions (or no transaction) involved. This invalidates any information sharing before a transaction as started, when a transaction has been suspended, or when a new transaction is started. Again, I can imagine that it would possible to propagate the content using interceptors but it is too much plumber code to me.</p>
 
 <p>4) Work Area Service (WAS). This is basically the IBM implementation of solution 2 with scoping. Documentation is clear and it seems easy to implement. Of course, the main drawback is that it is vendor-specific. IBM started a <a href="https://jcp.org/en/jsr/detail?id=149">JSR</a> long time ago but it was dropped.</p>
 
@@ -133,52 +133,18 @@
 
 <p>4) Vendor Independence : as far as possible an application must rely on known and portable APIs such as JEE. Locking the application to a specific vendor is, in my opinions, is essentially a problem for maintenance. Migrating from one application server to another only happens rarely.</p>
 
-<table>
-<thead>
-<tr>
-<th></th>
-<th>  Solution      </th>
-<th align="center"> Async    </th>
-<th align="center">  Scope   </th>
-<th align="center"> RMI      </th>
-<th align="right"> Vendor Indep.   </th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td></td>
-<td>  Thread-Local  </td>
-<td align="center">   X      </td>
-<td align="center">   OK     </td>
-<td align="center">   X      </td>
-<td align="right">       OK        |</td>
-</tr>
-<tr>
-<td></td>
-<td>  JNDI          </td>
-<td align="center">   OK     </td>
-<td align="center">   X      </td>
-<td align="center">   OK     </td>
-<td align="right">       OK        |</td>
-</tr>
-<tr>
-<td></td>
-<td>  TSR           </td>
-<td align="center">   X      </td>
-<td align="center">   OK     </td>
-<td align="center">   OK     </td>
-<td align="right">       OK        |</td>
-</tr>
-<tr>
-<td></td>
-<td>  WAS           </td>
-<td align="center">   OK     </td>
-<td align="center">   OK     </td>
-<td align="center">   OK     </td>
-<td align="right">       X         |</td>
-</tr>
-</tbody>
+<table style="align:center;border-width:1px;border-style:solid;border-color:black;width:100%">
+<tr style="border-width:1px;border-style:solid;border-color:black;"> <th style="text-align:left;">Solution</th> <th style="text-align:center;">Async</th> <th style="text-align:center;">Scope</th> <th style="text-align:center;">RMI</th> <th style="text-align:center;">Vendor Indep.</th> </tr>
+<tr> <td style="text-align:left;">Thread-Local</td style="text-align:center;"> <td style="text-align:center;">X</td> <td style="text-align:center;">OK</td> <td style="text-align:center;">X</td> <td style="text-align:center;">OK</td> </tr>
+<tr> <td style="text-align:left;">JNDI</td> <td style="text-align:center;">OK</td> <td style="text-align:center;">X</td> <td style="text-align:center;">OK</td> <td style="text-align:center;">OK</td> </tr>
+<tr> <td style="text-align:left;">TSR</td> <td style="text-align:center;">X</td> <td style="text-align:center;">OK</td> <td style="text-align:center;">OK</td> <td style="text-align:center;">OK</td> </tr>
+<tr> <td style="text-align:left;">WAS</td> <td style="text-align:center;">OK</td> <td style="text-align:center;">OK</td> <td style="text-align:center;">OK</td> <td style="text-align:center;">X</td> </tr>
 </table>
+
+
+
+
+<br/>
 
 
 <p>As you can see there is no silver bullet here. I went for the vendor specific solution. It can be nicely encapsulated to isolate the dependency to vendor specific code. Furthermore, several servers have similar mechanism and it can be therefore adapted. Here is why it was not possible in my setup to use the other alternatives:</p>
@@ -186,7 +152,7 @@
 <ul>
 <li>The Thread-local solution is not acceptable because it does not support Remote Method Invocation on several virtual machines.</li>
 <li>The JNDI solution requires to implement the scoping mechanism. This can be tricky and it is definitely not my area of expertise.</li>
-<li>The TransactionSynchronizationRegistry is JEE compliant but it requires huge machinery to support asynchronous calls as well as transaction suspension and re-creation (REQUIRES_NEW, NOT_SUPPORTED, NEVER). Basically, it does not work if there is not one and only one transaction throughout the request.</li>
+<li>The TransactionSynchronizationRegistry is JEE compliant but it requires huge machinery to support asynchronous calls as well as transaction suspension and re-creation (<code>REQUIRES_NEW</code>, <code>NOT_SUPPORTED</code>, <code>NEVER</code>). Basically, it does not work if there is not one and only one transaction throughout the request.</li>
 </ul>
 
 
