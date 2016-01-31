@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Docker | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/docker/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2016-01-31T02:04:45+01:00</updated>
+  <updated>2016-01-31T09:51:51+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -28,7 +28,7 @@ In this post I won't talk about microservices specifically. I will rather focus 
 
 <h3>Why Docker?</h3>
 
-<p>As it serves as a example for a course, I want it to be super easy to install/re-install 20 times if necessary. To that end, Docker is great tool because I do not have to bother on what laptop/computer the students will work (provided they can run <a href="https://www.docker.com/products/docker-toolbox">Docker Toolbox</a>). Moreover, all the tools I am using for the course are already packaged as Docker images.</p>
+<p>As it serves as a example for a course, I want it to be super easy to install/re-install 20 times if necessary. To that end, Docker is a great tool because I do not have to bother on what laptop/computer the students work (provided they can run <a href="https://www.docker.com/products/docker-toolbox">Docker Toolbox</a>). Moreover, all the tools I am using for the course are already packaged as Docker images.</p>
 
 <h2>Building a  Docker image for a Wildfly Integration Test Server</h2>
 
