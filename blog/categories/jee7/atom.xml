@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: JEE7, | Steve Hostettler]]></title>
+  <link href="http://hostettler.github.io/blog/categories/jee7/atom.xml" rel="self"/>
+  <link href="http://hostettler.github.io/"/>
+  <updated>2016-01-31T01:53:19+01:00</updated>
+  <id>http://hostettler.github.io/</id>
+  <author>
+    <name><![CDATA[Steve Hostettler]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Integration Tests With Docker and Arquillian]]></title>
+    <link href="http://hostettler.github.io/blog/2016/01/30/integration-tests-with-docker-and-arquillian/"/>
+    <updated>2016-01-30T23:38:50+01:00</updated>
+    <id>http://hostettler.github.io/blog/2016/01/30/integration-tests-with-docker-and-arquillian</id>
+    <content type="html"><![CDATA[<p>Last month I decided to add a touch of <a href="http://martinfowler.com/articles/microservices.html">microservices</a> to the JEE course I teach at the University of Geneva.
+I ended up with a couple of microservices and as expected I came across the problem of testing their integration.
+In this post I won't talk about microservices specifically. I will rather focus on the integration testing experience I encountered while building my microservices. A dedicated blog post will follow on my journey through the building of microservices with JEE.</p>
+
+<h2>A short description of the architecture</h2>
+
+<p>From a technological perspective, I am using JEE 7 on <a href="http://wildfly.org/">Wildfly</a> with <a href="http://wildfly.org/">MySql</a>. Therefore, my microservices are wars composed of 1-2 EJBs plus a restful service that exposes the logic. Typically, my microservices are composed of 4-5 classes of max 150 lines of codes each. On my laptop, a microservice deploys in less than 5 seconds. I mainly need to test EJBs and their database calls. I also want to test integration between microservices.</p>
+
+<h3>Why Docker?</h3>
+
+<p>As it serves as a example for a course, I want it to be super easy to install/re-install 20 times if necessary. To that end, Docker is great tool because I do not have to bother on what laptop/computer the students will work (provided they can run <a href="https://www.docker.com/products/docker-toolbox">Docker Toolbox</a>). Moreover, all the tools I am using for the course are already packaged as Docker images.</p>
+
+<h2>Building a  Docker image for a Wildfly Integration Test Server</h2>
+
+<p>As mentioned previously, I propose to use Wildfly +  MySql as a runtime environment. However, at test time, I do not want to start both an application server and a database. More important I want to get a fresh database for each and every test suite. Moreover, I would like to use on a simpler setup for the application server. For instance, I do prefer to use an in memory H2 database instead of MySql. I also do not want to bother with LDAP/JAAS configuration.</p>
+
+<p>A great feature of Wildfly is that it  allows to configure almost everything through the command line.
+The first step is to configure a data source relying on H2 that has the same name as the production one.</p>
+
+<p>```bash</p>
+
+<h1>First step : Add the datasource</h1>
+
+<p>data-source add --name=StudentsDS --driver-name=h2 --jndi-name=$STUDENTS_DS --connection-url=$H2_URI --user-name=$H2_USER --password=$H2_PWD --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000
+<code>`
+Then, let's configure a realm.  This is helpful when the integration tests rely on principals and do verify the security.
+The file</code>jee7-demo-realm-users.properties<code>(resp.</code>jee7-demo-realm-roles.properties``) defines the users (resp. the roles) of the realm.</p>
+
+<p>```bash</p>
+
+<h1>Add a property file realm</h1>
+
+<p>/subsystem=security/security-domain=jee7-demo-realm:add(cache-type=default)
+/subsystem=security/security-domain=jee7-demo-realm/authentication=classic:add()
+/subsystem=security/security-domain=jee7-demo-realm/authentication=classic/login-module=UsersRoles       \</p>
+
+<pre><code>:add(code=UsersRoles, flag=required,                                                        \
+     module-options={"usersProperties"=&gt;"${JBOSS_CUSTOMIZATION}/jee7-demo-realm-users.properties",   \
+                     "rolesProperties"=&gt;"${JBOSS_CUSTOMIZATION}/jee7-demo-realm-roles.properties"})
+</code></pre>
+
+<p><code>
+Finally, let's add an admin user in order to allows Arquilian or an IDE to interact with this application server.
+</code>bash
+/opt/jboss/wildfly/bin/add-user.sh admin admin
+```</p>
+
+<p>Hereafter the complete configuration <code>config_wildfly.sh</code>.</p>
+
+<p>```bash</p>
+
+<h1>!/bin/bash</h1>
+
+<h1>Usage: execute.sh [WildFly mode] [configuration file]</h1>
+
+<p>#</p>
+
+<h1>The default mode is 'standalone' and default configuration is based on the</h1>
+
+<h1>mode. It can be 'standalone.xml' or 'domain.xml'.</h1>
+
+<p>JBOSS_HOME=/opt/jboss/wildfly
+JBOSS_CUSTOMIZATION=$JBOSS_HOME/customization
+JBOSS_STANDALONE_CONFIG=$JBOSS_HOME/standalone/configuration/
+JBOSS_CLI=$JBOSS_HOME/bin/jboss-cli.sh
+JBOSS_MODE=${1:-"standalone"}
+JBOSS_CONFIG=${2:-"$JBOSS_MODE.xml"}</p>
+
+<p>function wait_for_server() {
+  until <code>$JBOSS_CLI -c ":read-attribute(name=server-state)" 2&gt; /dev/null | grep -q running</code>; do</p>
+
+<pre><code>sleep 1
+</code></pre>
+
+<p>  done
+}</p>
+
+<p>echo "=> Starting WildFly server"
+$JBOSS_HOME/bin/$JBOSS_MODE.sh -b 0.0.0.0 -c $JBOSS_CONFIG &amp;</p>
+
+<p>echo "=> Waiting for the server to boot"
+wait_for_server</p>
+
+<p>echo "=> Executing the commands"
+export STUDENTS_DS="java:/StudentsDS"
+export H2_URI="jdbc:h2:mem:STUDENTS_DB;DB_CLOSE_DELAY=-1"
+export H2_USER="sa"
+export H2_PWD="sa"</p>
+
+<p>$JBOSS_CLI -c &lt;&lt; EOF
+batch</p>
+
+<p>echo "Connection URL: " $CONNECTION_URL</p>
+
+<h1>First step : Add the datasource</h1>
+
+<p>data-source add --name=StudentsDS --driver-name=h2 --jndi-name=$STUDENTS_DS --connection-url=$H2_URI --user-name=$H2_USER --password=$H2_PWD --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000</p>
+
+<h1>Then configure a realm that relies on property files</h1>
+
+<p>/subsystem=security/security-domain=jee7-demo-realm:add(cache-type=default)
+/subsystem=security/security-domain=jee7-demo-realm/authentication=classic:add()
+/subsystem=security/security-domain=jee7-demo-realm/authentication=classic/login-module=UsersRoles       \</p>
+
+<pre><code>:add(code=UsersRoles, flag=required,                                                        \
+     module-options={"usersProperties"=&gt;"${JBOSS_CUSTOMIZATION}/jee7-demo-realm-users.properties",   \
+                     "rolesProperties"=&gt;"${JBOSS_CUSTOMIZATION}/jee7-demo-realm-roles.properties"})
+</code></pre>
+
+<h1>Execute the batch</h1>
+
+<p>run-batch
+EOF</p>
+
+<h1>Finally, let's add an admin that can be used by the IDE to deploy the tests</h1>
+
+<p>/opt/jboss/wildfly/bin/add-user.sh admin admin</p>
+
+<p>echo "=> Shutting down WildFly"
+if [ "$JBOSS_MODE" = "standalone" ]; then
+  $JBOSS_CLI -c ":shutdown"
+else
+  $JBOSS_CLI -c "/host=*:shutdown"
+fi
+```</p>
+
+<p>The next step is to enhance the official Wildfly image called <code>jboss/wildfly:latest</code> with the specific configurations we need for integration testing. This following Dockerfile describes how to build the image that we will use for testing.
+First, it adds the previous configuration files <code>./config_wildfly.sh ./jee7-demo-realm-roles.properties ./jee7-demo-realm-users.properties</code> to the <code>/opt/jboss/wildfly/customization/</code> of the image. Then we tell Docker to run the configuration <code>config_wildfly.sh</code> and to do some cleanup. After what, it will record the states as a new image.</p>
+
+<p>```
+FROM jboss/wildfly:latest</p>
+
+<p>ADD ./config_wildfly.sh ./jee7-demo-realm-roles.properties ./jee7-demo-realm-users.properties /opt/jboss/wildfly/customization/</p>
+
+<p>RUN ["/opt/jboss/wildfly/customization/config_wildfly.sh"]
+RUN rm -rf  /opt/jboss/wildfly/standalone/configuration/standalone_xml_history
+CMD ["/opt/jboss/wildfly/bin/standalone.sh", "--debug", "-b", "0.0.0.0", "-bmanagement", "0.0.0.0"]
+EXPOSE 8787
+<code>
+Now we can build an image called ``jee7-test-wildfly`` using the following command (in the directory where the ``Dockerfile`` lives):
+</code>bash
+docker build --no-cache -rm -t jee7-test-wildfly .
+```</p>
+
+<p>The following command runs the image we just built, exposes the port 8080, 9090 and 8787, and mount the local directory <code>/Users/XXXXXXXXXX/tmp/docker-deploy</code> on the image's <code>/opt/jboss/wildfly/standalone/deployments/</code> directory. This is of course the directory in which the integration tests are to be deployed..</p>
+
+<p><code>bash
+docker run -d  -p 8080:8080 -p 9990:9990 -p 8787:8787 -v /Users/XXXXXXXXXX/tmp/docker-deploy:/opt/jboss/wildfly/standalone/deployments/:rw jee7-test-wildfly
+</code></p>
+
+<p>Now that we do have a container running an application server with in memory database and a simple realm, we can configure the test harness.</p>
+
+<h2>How to configure Arquillian</h2>
+
+<p><a href="http://arquillian.org/">Arquillian</a> is a JEE integration test framework. It allows to test JEE components such as EJBs or web services.
+The first step it to tell Arquillian where the Wildfly server lives. The following <code>arquillian.xml</code> file states that the integration tests should deploy on a Wildfly container that listens at <code>192.168.99.100</code> (which is the Docker container address) on port <code>9990</code> (which is the administration port). Furthermore, it declares the admin username and password.</p>
+
+<p>```xml
+&lt;?xml version="1.0"?>
+&lt;arquillian xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"</p>
+
+<pre><code>xmlns="http://jboss.org/schema/arquillian"
+xsi:schemaLocation="http://jboss.org/schema/arquillian
+</code></pre>
+
+<p>  http://jboss.org/schema/arquillian/arquillian_1_0.xsd"></p>
+
+<pre><code>&lt;container qualifier="wildfly" default="true"&gt;
+    &lt;configuration&gt;
+        &lt;property name="managementAddress"&gt;192.168.99.100&lt;/property&gt;
+        &lt;property name="managementPort"&gt;9990&lt;/property&gt;
+        &lt;property name="username"&gt;admin&lt;/property&gt;
+        &lt;property name="password"&gt;admin&lt;/property&gt;
+    &lt;/configuration&gt;
+    &lt;protocol type="Servlet 3.0"&gt;
+        &lt;property name="host"&gt;192.168.99.100&lt;/property&gt;
+        &lt;property name="port"&gt;8080&lt;/property&gt;
+    &lt;/protocol&gt;
+&lt;/container&gt;
+
+&lt;extension qualifier="jacoco"&gt;
+    &lt;property name="includes"&gt;ch.demo.*&lt;/property&gt;
+&lt;/extension&gt;
+</code></pre>
+
+<p></arquillian>
+```</p>
+
+<h2>A simple integration Test</h2>
+
+<p>Let us now write a simple integration test. First, we must tell Arquillian the it is in charge of running the test (<code>@RunWith(Arquillian.class)</code>).</p>
+
+<p><code>java
+@RunWith(Arquillian.class)
+public class StudentServiceImplTest {
+</code>
+To test a given component (let's say an EJB), arquillian expects a well-formed Java component (either a jar or a war).
+The following test is composend of a package contaning the EJB under test (<code>ch.demo</code>), an empty <code>beans.xml</code> to enable CDI and finally a <code>persistence.xml</code> to enable JPA.</p>
+
+<p>```java</p>
+
+<pre><code>@Deployment
+public static JavaArchive create() {
+    return ShrinkWrap.create(JavaArchive.class, "integration-test-demo.jar").addPackages(true, "ch.demo")
+            .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml")
+            .addAsManifestResource("test-persistence.xml", "persistence.xml");
+}
+</code></pre>
+
+<p><code>`
+The previous JAR as well as the tests are packaged as a WAR and deployed on the application server declared in the</code>arquillian.xml<code>file. The following test injects the EJB under test implementing the</code>StudentService<code>interface and tests its</code>add`` method.</p>
+
+<p>```java</p>
+
+<pre><code>@Inject
+StudentService service;
+
+@Test
+public void shouldAddReturnAllWithTheNewStudent() {
+    Integer nbStudentsBeforeTest = service.getNbStudent();
+    service.add(new Student("Doe", "Jane", new Date(), new PhoneNumber("+33698075273")));
+    Integer nbStudentsAfterTest = service.getAll().size();
+    Assert.assertSame(nbStudentsBeforeTest + 1, nbStudentsAfterTest);
+    Assert.assertEquals(service.getAll().get(nbStudentsAfterTest - 1).getLastName(), "Doe");
+}
+</code></pre>
+
+<p>```</p>
+
+<h2>Maven, IDE Integration and Coverage</h2>
+
+<p>Finally, let me add that it is possible to get coverage data from Arquillian by enabling extension. In the following, it enables<code>`jacoco</code> that can be used by the Eclipse ECL-EMMA plugin.</p>
+
+<p>```xml</p>
+
+<pre><code>   &lt;extension qualifier="jacoco"&gt;
+            &lt;property name="includes"&gt;ch.demo.*&lt;/property&gt;
+    &lt;/extension&gt;
+</code></pre>
+
+<p>```</p>
+
+<h2>Conclusion</h2>
+
+<p>Docker and Arquillian provide a nice and seamless way for JEE integration testing. Nevertheless, I had a hard time at the beginning because Arquillian error handling in case of undeployable test archive is not very good. In this case, make sure that you package your test correctly (in the method annotated <code>@Deployment</code>). In particular, double check <code>beans.xml</code>, <code>web.xml</code> and the JAR/WAR structure. It really helped me to unzip the deployed test archive to figure out what when wrong in my code.</p>
+]]></content>
+  </entry>
+  
+</feed>

@@ -4,7 +4,7 @@
   <title><![CDATA[Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2016-01-31T01:45:38+01:00</updated>
+  <updated>2016-01-31T01:53:19+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -18,17 +18,17 @@
     <link href="http://hostettler.github.io/blog/2016/01/30/integration-tests-with-docker-and-arquillian/"/>
     <updated>2016-01-30T23:38:50+01:00</updated>
     <id>http://hostettler.github.io/blog/2016/01/30/integration-tests-with-docker-and-arquillian</id>
-    <content type="html"><![CDATA[<p>Last month I decided to add a touch of microservices to the JEE course I teach at the University of Geneva.
+    <content type="html"><![CDATA[<p>Last month I decided to add a touch of <a href="http://martinfowler.com/articles/microservices.html">microservices</a> to the JEE course I teach at the University of Geneva.
 I ended up with a couple of microservices and as expected I came across the problem of testing their integration.
 In this post I won&#8217;t talk about microservices specifically. I will rather focus on the integration testing experience I encountered while building my microservices. A dedicated blog post will follow on my journey through the building of microservices with JEE.</p>
 
 <h2>A short description of the architecture</h2>
 
-<p>From a technological perspective, I am using JEE 7 on Wildfly with MySql. Therefore, my microservices are wars composed of 1-2 EJBs plus a restful service that exposes the logic. Typically, my microservices are composed of 4-5 classes of max 150 lines of codes each. On my laptop, a microservice deploys in less than 5 seconds. I mainly need to test EJBs and their database calls. I also want to test integration between microservices.</p>
+<p>From a technological perspective, I am using JEE 7 on <a href="http://wildfly.org/">Wildfly</a> with <a href="http://wildfly.org/">MySql</a>. Therefore, my microservices are wars composed of 1-2 EJBs plus a restful service that exposes the logic. Typically, my microservices are composed of 4-5 classes of max 150 lines of codes each. On my laptop, a microservice deploys in less than 5 seconds. I mainly need to test EJBs and their database calls. I also want to test integration between microservices.</p>
 
 <h3>Why Docker?</h3>
 
-<p>As it is a course, I want it to be super easy to install/re-install 20 times if necessary. To that end, Docker is great tool because I do not have to bother on what laptop/computer the students will work (provided they can run Docker or Boot2docker). Moreover, all the tools I am using for the course are already packaged as Docker images.</p>
+<p>As it serves as a example for a course, I want it to be super easy to install/re-install 20 times if necessary. To that end, Docker is great tool because I do not have to bother on what laptop/computer the students will work (provided they can run <a href="https://www.docker.com/products/docker-toolbox">Docker Toolbox</a>). Moreover, all the tools I am using for the course are already packaged as Docker images.</p>
 
 <h2>Building a  Docker image for a Wildfly Integration Test Server</h2>
 
@@ -238,7 +238,7 @@ First, it adds the previous configuration files <code>./config_wildfly.sh ./jee7
 
 <h2>How to configure Arquillian</h2>
 
-<p>Arquillian is a JEE integration test framework. It allows to test JEE components such as EJBs or web services.
+<p><a href="http://arquillian.org/">Arquillian</a> is a JEE integration test framework. It allows to test JEE components such as EJBs or web services.
 The first step it to tell Arquillian where the Wildfly server lives. The following <code>arquillian.xml</code> file states that the integration tests should deploy on a Wildfly container that listens at <code>192.168.99.100</code> (which is the Docker container address) on port <code>9990</code> (which is the administration port). Furthermore, it declares the admin username and password.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
