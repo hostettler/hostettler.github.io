@@ -4,7 +4,7 @@
   <title><![CDATA[Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2015-01-18T18:14:06+01:00</updated>
+  <updated>2016-01-31T01:23:49+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -12,6 +12,356 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Integration Tests With Docker and Arquillian]]></title>
+    <link href="http://hostettler.github.io/blog/2016/01/30/integration-tests-with-docker-and-arquillian/"/>
+    <updated>2016-01-30T23:38:50+01:00</updated>
+    <id>http://hostettler.github.io/blog/2016/01/30/integration-tests-with-docker-and-arquillian</id>
+    <content type="html"><![CDATA[<p>Last month I decided to add a touch of microservices to the JEE course I teach at the University of Geneva.
+So I ended up with a couple of microservices and as expected I came accross the problem of testing their integration.
+In this post I won&#8217;t talk about microservices speciffically. I will rather focus on the integration testing experience I encountered while building my microservices. A dedicated blog post will follow on my journey through the building of microservices with JEE.</p>
+
+<h2>A short description on the architecture</h2>
+
+<p>From a technological perspective, I am using JEE 7 on Wildfly with MySql. Therefore, my microservices are wars composed of 1-2 EJBs plus a restful service that exposes the logic. Typically my microservices are composed of 4-5 classes of max 150 lines of codes each. On my laptop, a microservice deploys in less than 5 seconds.</p>
+
+<h3>Why Docker?</h3>
+
+<p>As it is a course, I want it to be super easy to install/re-install 20 times if necessary. To that end, Docker is great tool because I do not have to bother on what laptop/computer the students will work (provided they can run Docker or Boot2docker). Moreover, all the tools I am using for the course are already packaged as Docker images.</p>
+
+<h2>A Docker Image for a Wildfly Integration Test Server</h2>
+
+<p>As mentionned previously, I propose to use Wildfly +  MySql as a runtime environnement. However at test time, I do not want to start both an application server and a database. More important I want to get a fresh database for each and every test suite. Moreover, I would like to use on a simpler setup for the application server. For instance, I do prefer to use an in memory H2 database instead of MySql. I also do not want to bother with LDAP/JAAS configuration.</p>
+
+<p>A great feature of Wildfly is that it  allows to configure almost everything through the command line.
+The first step is to configure a data source relying on H2 that has the same name as the production one.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># First step : Add the datasource</span>
+</span><span class='line'>data-source add --name<span class="o">=</span>StudentsDS --driver-name<span class="o">=</span>h2 --jndi-name<span class="o">=</span><span class="nv">$STUDENTS_DS</span> --connection-url<span class="o">=</span><span class="nv">$H2_URI</span> --user-name<span class="o">=</span><span class="nv">$H2_USER</span> --password<span class="o">=</span><span class="nv">$H2_PWD</span> --use-ccm<span class="o">=</span><span class="nb">false</span> --max-pool-size<span class="o">=</span>25 --blocking-timeout-wait-millis<span class="o">=</span>5000
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then, let&#8217;s configure a realm so that the integration tests can rely on principals and verify the security.
+The file <code>jee7-demo-realm-users.properties</code> (resp. <code>jee7-demo-realm-roles.properties</code>) defines the users (resp. the roles) of the realm.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>/subsystem<span class="o">=</span>security/security-domain<span class="o">=</span>jee7-demo-realm:add<span class="o">(</span>cache-type<span class="o">=</span>default<span class="o">)</span>
+</span><span class='line'>/subsystem<span class="o">=</span>security/security-domain<span class="o">=</span>jee7-demo-realm/authentication<span class="o">=</span>classic:add<span class="o">()</span>
+</span><span class='line'>/subsystem<span class="o">=</span>security/security-domain<span class="o">=</span>jee7-demo-realm/authentication<span class="o">=</span>classic/login-module<span class="o">=</span>UsersRoles       <span class="se">\</span>
+</span><span class='line'>    :add<span class="o">(</span><span class="nv">code</span><span class="o">=</span>UsersRoles, <span class="nv">flag</span><span class="o">=</span>required,                                                        <span class="se">\</span>
+</span><span class='line'>         module-options<span class="o">={</span><span class="s2">&quot;usersProperties&quot;</span><span class="o">=</span>&gt;<span class="s2">&quot;${JBOSS_CUSTOMIZATION}/jee7-demo-realm-users.properties&quot;</span>,   <span class="se">\</span>
+</span><span class='line'>                         <span class="s2">&quot;rolesProperties&quot;</span><span class="o">=</span>&gt;<span class="s2">&quot;${JBOSS_CUSTOMIZATION}/jee7-demo-realm-roles.properties&quot;</span><span class="o">})</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Finally, let&#8217;s add an admin user in order to allows Arquilian or an IDE to interract with this application server.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>/opt/jboss/wildfly/bin/add-user.sh admin admin
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Hereafter the complete configuration &#8220;config_wildfly.sh&#8220;`.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Usage: execute.sh [WildFly mode] [configuration file]</span>
+</span><span class='line'><span class="c">#</span>
+</span><span class='line'><span class="c"># The default mode is &#39;standalone&#39; and default configuration is based on the</span>
+</span><span class='line'><span class="c"># mode. It can be &#39;standalone.xml&#39; or &#39;domain.xml&#39;.</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">JBOSS_HOME</span><span class="o">=</span>/opt/jboss/wildfly
+</span><span class='line'><span class="nv">JBOSS_CUSTOMIZATION</span><span class="o">=</span><span class="nv">$JBOSS_HOME</span>/customization
+</span><span class='line'><span class="nv">JBOSS_STANDALONE_CONFIG</span><span class="o">=</span><span class="nv">$JBOSS_HOME</span>/standalone/configuration/
+</span><span class='line'><span class="nv">JBOSS_CLI</span><span class="o">=</span><span class="nv">$JBOSS_HOME</span>/bin/jboss-cli.sh
+</span><span class='line'><span class="nv">JBOSS_MODE</span><span class="o">=</span><span class="k">${</span><span class="nv">1</span><span class="k">:-</span><span class="s2">&quot;standalone&quot;</span><span class="k">}</span>
+</span><span class='line'><span class="nv">JBOSS_CONFIG</span><span class="o">=</span><span class="k">${</span><span class="nv">2</span><span class="k">:-</span><span class="s2">&quot;$JBOSS_MODE.xml&quot;</span><span class="k">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">function </span>wait_for_server<span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">until</span> <span class="sb">`</span><span class="nv">$JBOSS_CLI</span> -c <span class="s2">&quot;:read-attribute(name=server-state)&quot;</span> 2&gt; /dev/null | grep -q running<span class="sb">`</span>; <span class="k">do</span>
+</span><span class='line'><span class="k">    </span>sleep 1
+</span><span class='line'>  <span class="k">done</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;=&gt; Starting WildFly server&quot;</span>
+</span><span class='line'><span class="nv">$JBOSS_HOME</span>/bin/<span class="nv">$JBOSS_MODE</span>.sh -b 0.0.0.0 -c <span class="nv">$JBOSS_CONFIG</span> &amp;
+</span><span class='line'>
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;=&gt; Waiting for the server to boot&quot;</span>
+</span><span class='line'>wait_for_server
+</span><span class='line'>
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;=&gt; Executing the commands&quot;</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">STUDENTS_DS</span><span class="o">=</span><span class="s2">&quot;java:/StudentsDS&quot;</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">H2_URI</span><span class="o">=</span><span class="s2">&quot;jdbc:h2:mem:STUDENTS_DB;DB_CLOSE_DELAY=-1&quot;</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">H2_USER</span><span class="o">=</span><span class="s2">&quot;sa&quot;</span>
+</span><span class='line'><span class="nb">export </span><span class="nv">H2_PWD</span><span class="o">=</span><span class="s2">&quot;sa&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">$JBOSS_CLI</span> -c <span class="s">&lt;&lt; EOF</span>
+</span><span class='line'><span class="s">batch</span>
+</span><span class='line'>
+</span><span class='line'><span class="s">echo &quot;Connection URL: &quot; $CONNECTION_URL</span>
+</span><span class='line'>
+</span><span class='line'><span class="s"># First step : Add the datasource</span>
+</span><span class='line'><span class="s">data-source add --name=StudentsDS --driver-name=h2 --jndi-name=$STUDENTS_DS --connection-url=$H2_URI --user-name=$H2_USER --password=$H2_PWD --use-ccm=false --max-pool-size=25 --blocking-timeout-wait-millis=5000 </span>
+</span><span class='line'>
+</span><span class='line'><span class="s"># Then configure a realm that relies on property files</span>
+</span><span class='line'><span class="s">/subsystem=security/security-domain=jee7-demo-realm:add(cache-type=default)</span>
+</span><span class='line'><span class="s">/subsystem=security/security-domain=jee7-demo-realm/authentication=classic:add()</span>
+</span><span class='line'><span class="s">/subsystem=security/security-domain=jee7-demo-realm/authentication=classic/login-module=UsersRoles       \</span>
+</span><span class='line'><span class="s">    :add(code=UsersRoles, flag=required,                                                        \</span>
+</span><span class='line'><span class="s">         module-options={&quot;usersProperties&quot;=&gt;&quot;${JBOSS_CUSTOMIZATION}/jee7-demo-realm-users.properties&quot;,   \</span>
+</span><span class='line'><span class="s">                         &quot;rolesProperties&quot;=&gt;&quot;${JBOSS_CUSTOMIZATION}/jee7-demo-realm-roles.properties&quot;})</span>
+</span><span class='line'>
+</span><span class='line'><span class="s"># Execute the batch</span>
+</span><span class='line'><span class="s">run-batch</span>
+</span><span class='line'><span class="s">EOF</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Finally, let&#39;s add an admin that can be used by the IDE to deploy the tests</span>
+</span><span class='line'>/opt/jboss/wildfly/bin/add-user.sh admin admin
+</span><span class='line'>
+</span><span class='line'><span class="nb">echo</span> <span class="s2">&quot;=&gt; Shutting down WildFly&quot;</span>
+</span><span class='line'><span class="k">if</span> <span class="o">[</span> <span class="s2">&quot;$JBOSS_MODE&quot;</span> <span class="o">=</span> <span class="s2">&quot;standalone&quot;</span> <span class="o">]</span>; <span class="k">then</span>
+</span><span class='line'>  <span class="nv">$JBOSS_CLI</span> -c <span class="s2">&quot;:shutdown&quot;</span>
+</span><span class='line'><span class="k">else</span>
+</span><span class='line'>  <span class="nv">$JBOSS_CLI</span> -c <span class="s2">&quot;/host=*:shutdown&quot;</span>
+</span><span class='line'><span class="k">fi</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The next step is to enhance the official Wildfly image called <code>`jboss/wildfly:latest</code> with the specific configurations we need for integration testing. This following Dockerfile describes how to build the image that we will use for testing.
+First, it adds the previous configuration files <code>./config_wildfly.sh ./jee7-demo-realm-roles.properties ./jee7-demo-realm-users.properties</code> to the <code>/opt/jboss/wildfly/customization/</code> of the image. Then we tell Docker to run the configuration <code>config_wildfly.sh</code> and to do some cleanup. After what, it will record the states as a new image.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>FROM jboss/wildfly:latest
+</span><span class='line'>
+</span><span class='line'>ADD ./config_wildfly.sh ./jee7-demo-realm-roles.properties ./jee7-demo-realm-users.properties /opt/jboss/wildfly/customization/
+</span><span class='line'>
+</span><span class='line'>RUN <span class="o">[</span><span class="s2">&quot;/opt/jboss/wildfly/customization/config_wildfly.sh&quot;</span><span class="o">]</span>
+</span><span class='line'>RUN rm -rf  /opt/jboss/wildfly/standalone/configuration/standalone_xml_history
+</span><span class='line'>CMD <span class="o">[</span><span class="s2">&quot;/opt/jboss/wildfly/bin/standalone.sh&quot;</span>, <span class="s2">&quot;--debug&quot;</span>, <span class="s2">&quot;-b&quot;</span>, <span class="s2">&quot;0.0.0.0&quot;</span>, <span class="s2">&quot;-bmanagement&quot;</span>, <span class="s2">&quot;0.0.0.0&quot;</span><span class="o">]</span>
+</span><span class='line'>EXPOSE 8787
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then you can build an image a <code>jee7-test-wildfly</code> using the following command (in the directory where the <code>Dockerfile</code> lives):</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>docker build --no-cache -rm -t jee7-test-wildfly .
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The following command runs the image we just build, exposes the port 8080, 9090 and 8787, and mound the local directory <code>ì/Users/XXXXXXXXXX/tmp/docker-deploy</code> on <code>i/opt/jboss/wildfly/standalone/deployments/</code>. This is of course the directory in which the integration tests are to be deployed..</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>docker run -d  -p 8080:8080 -p 9990:9990 -p 8787:8787 -v /Users/XXXXXXXXXX/tmp/docker-deploy:/opt/jboss/wildfly/standalone/deployments/:rw jee7-test-wildfly
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that we do have a container running an application server with in memory database and a simple realm, we can configure the test harness.</p>
+
+<h2>How to configure Arquillian</h2>
+
+<p>Arquillian is a JEE integration test framework. It allows to test JEE components such as EJBs or web services.
+The first step it to tell Arquillian where is wildfly. The following <code>arquillian.xml</code> file states that the integration tests should use a`wildfly container that listens at ip <code>192.168.99.100</code> ( which is the address of the docker container) on port &#8220;9990&#8220;`(which is the administration port). Furthermore, it declares the admin user and password. This is enough to allow Arquillian to deploy the integration tests.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot;?&gt;</span>
+</span><span class='line'><span class="nt">&lt;arquillian</span> <span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+</span><span class='line'>  <span class="na">xmlns=</span><span class="s">&quot;http://jboss.org/schema/arquillian&quot;</span>
+</span><span class='line'>  <span class="na">xsi:schemaLocation=</span><span class="s">&quot;http://jboss.org/schema/arquillian</span>
+</span><span class='line'><span class="s">  http://jboss.org/schema/arquillian/arquillian_1_0.xsd&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nt">&lt;container</span> <span class="na">qualifier=</span><span class="s">&quot;wildfly&quot;</span> <span class="na">default=</span><span class="s">&quot;true&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;configuration&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;managementAddress&quot;</span><span class="nt">&gt;</span>192.168.99.100<span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;managementPort&quot;</span><span class="nt">&gt;</span>9990<span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;username&quot;</span><span class="nt">&gt;</span>admin<span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;password&quot;</span><span class="nt">&gt;</span>admin<span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/configuration&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;protocol</span> <span class="na">type=</span><span class="s">&quot;Servlet 3.0&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;host&quot;</span><span class="nt">&gt;</span>192.168.99.100<span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>          <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;port&quot;</span><span class="nt">&gt;</span>8080<span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;/protocol&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/container&gt;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="nt">&lt;extension</span> <span class="na">qualifier=</span><span class="s">&quot;jacoco&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>      <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;includes&quot;</span><span class="nt">&gt;</span>ch.demo.*<span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>  <span class="nt">&lt;/extension&gt;</span>
+</span><span class='line'><span class="nt">&lt;/arquillian&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>A simple integration Test</h2>
+
+<p>Let us now write a simple integration test. First, we must tell Arquillian the it is in charge of running the test (<code>@RunWith(Arquillian.class)</code>).</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@RunWith</span><span class="o">(</span><span class="n">Arquillian</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceImplTest</span> <span class="o">{</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To test a given component (let&#8217;s say an EJB), arquillian expects the a well-formed Java component (either a jar or a war).
+The following test is composend of a package contaning the EJB under test (<code>ch.demo</code>), an empty <code>beans.xml</code> to enable CDI and finally a <code>persistence.xml</code> to enable JPA.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Deployment</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">JavaArchive</span> <span class="nf">create</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">ShrinkWrap</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">JavaArchive</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">&quot;integration-test-demo.jar&quot;</span><span class="o">).</span><span class="na">addPackages</span><span class="o">(</span><span class="kc">true</span><span class="o">,</span> <span class="s">&quot;ch.demo&quot;</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">.</span><span class="na">addAsManifestResource</span><span class="o">(</span><span class="n">EmptyAsset</span><span class="o">.</span><span class="na">INSTANCE</span><span class="o">,</span> <span class="s">&quot;beans.xml&quot;</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">.</span><span class="na">addAsManifestResource</span><span class="o">(</span><span class="s">&quot;test-persistence.xml&quot;</span><span class="o">,</span> <span class="s">&quot;persistence.xml&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The previous JAR as well as the tests are packaged as a WAR and deployed on the application server declared in the <code>arquillian.xml</code> file. The following test injects the EJB under test <code>StudentService</code> and tests the &#8220;add&#8220;`method.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@Inject</span>
+</span><span class='line'><span class="n">StudentService</span> <span class="n">service</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nd">@Test</span>
+</span><span class='line'><span class="kd">public</span> <span class="kt">void</span> <span class="nf">shouldAddReturnAllWithTheNewStudent</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">Integer</span> <span class="n">nbStudentsBeforeTest</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">getNbStudent</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">service</span><span class="o">.</span><span class="na">add</span><span class="o">(</span><span class="k">new</span> <span class="n">Student</span><span class="o">(</span><span class="s">&quot;Doe&quot;</span><span class="o">,</span> <span class="s">&quot;Jane&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">Date</span><span class="o">(),</span> <span class="k">new</span> <span class="n">PhoneNumber</span><span class="o">(</span><span class="s">&quot;+33698075273&quot;</span><span class="o">)));</span>
+</span><span class='line'>  <span class="n">Integer</span> <span class="n">nbStudentsAfterTest</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="na">getAll</span><span class="o">().</span><span class="na">size</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">Assert</span><span class="o">.</span><span class="na">assertSame</span><span class="o">(</span><span class="n">nbStudentsBeforeTest</span> <span class="o">+</span> <span class="mi">1</span><span class="o">,</span> <span class="n">nbStudentsAfterTest</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="n">service</span><span class="o">.</span><span class="na">getAll</span><span class="o">().</span><span class="na">get</span><span class="o">(</span><span class="n">nbStudentsAfterTest</span> <span class="o">-</span> <span class="mi">1</span><span class="o">).</span><span class="na">getLastName</span><span class="o">(),</span> <span class="s">&quot;Doe&quot;</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>IDE Integration and Coverage</h2>
+
+<p>Finally, let me add that it is possible to get coverage data from Arquillian by enabling extension. In the following, it enables <code>`jacoco</code> that can be used by the Eclipse ECL-EMMA plugin.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='xml'><span class='line'>   <span class="nt">&lt;extension</span> <span class="na">qualifier=</span><span class="s">&quot;jacoco&quot;</span><span class="nt">&gt;</span>
+</span><span class='line'>            <span class="nt">&lt;property</span> <span class="na">name=</span><span class="s">&quot;includes&quot;</span><span class="nt">&gt;</span>ch.demo.*<span class="nt">&lt;/property&gt;</span>
+</span><span class='line'>    <span class="nt">&lt;/extension&gt;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Conclusion</h2>
+
+<p>Docker and Arquillian provide a nice a seamless way to do integration testing. Nevertheless, I had a hard time at the beginning because the error handling in case of undeployed test is not very good. In case of problem, make sure that you package your test correctly. In particular, double check <code>beans.xml</code>, <code>web.xml</code> and the JAR/WAR structure. It really helped me to unzip the deployed test archive to figure out what when wrong in my code.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Communication Between Java Enterprise Applications]]></title>
