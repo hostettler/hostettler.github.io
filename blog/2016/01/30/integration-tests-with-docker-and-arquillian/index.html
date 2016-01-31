@@ -10,7 +10,7 @@
 
   
   <meta name="description" content="Last month I decided to add a touch of microservices to the JEE course I teach at the University of Geneva.
-So I ended up with a couple of &hellip;">
+I ended up with a couple of microservices &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -108,12 +108,12 @@ So I ended up with a couple of &hellip;">
 
 
 <div class="entry-content"><p>Last month I decided to add a touch of microservices to the JEE course I teach at the University of Geneva.
-So I ended up with a couple of microservices and as expected I came accross the problem of testing their integration.
-In this post I won&#8217;t talk about microservices speciffically. I will rather focus on the integration testing experience I encountered while building my microservices. A dedicated blog post will follow on my journey through the building of microservices with JEE.</p>
+I ended up with a couple of microservices and as expected I came across the problem of testing their integration.
+In this post I won&#8217;t talk about microservices specifically. I will rather focus on the integration testing experience I encountered while building my microservices. A dedicated blog post will follow on my journey through the building of microservices with JEE.</p>
 
-<h2>A short description on the architecture</h2>
+<h2>A short description of the architecture</h2>
 
-<p>From a technological perspective, I am using JEE 7 on Wildfly with MySql. Therefore, my microservices are wars composed of 1-2 EJBs plus a restful service that exposes the logic. Typically my microservices are composed of 4-5 classes of max 150 lines of codes each. On my laptop, a microservice deploys in less than 5 seconds.</p>
+<p>From a technological perspective, I am using JEE 7 on Wildfly with MySql. Therefore, my microservices are wars composed of 1-2 EJBs plus a restful service that exposes the logic. Typically, my microservices are composed of 4-5 classes of max 150 lines of codes each. On my laptop, a microservice deploys in less than 5 seconds. I mainly need to test EJBs and their database calls. I also want to test integration between microservices.</p>
 
 <h3>Why Docker?</h3>
 
@@ -133,7 +133,7 @@ The first step is to configure a data source relying on H2 that has the same nam
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Then, let&#8217;s configure a realm so that the integration tests can rely on principals and verify the security.
+<p>Then, let&#8217;s configure a realm.  This is helpful when the integration tests rely on principals and do verify the security.
 The file <code>jee7-demo-realm-users.properties</code> (resp. <code>jee7-demo-realm-roles.properties</code>) defines the users (resp. the roles) of the realm.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -142,7 +142,9 @@ The file <code>jee7-demo-realm-users.properties</code> (resp. <code>jee7-demo-re
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>/subsystem<span class="o">=</span>security/security-domain<span class="o">=</span>jee7-demo-realm:add<span class="o">(</span>cache-type<span class="o">=</span>default<span class="o">)</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># Add a property file realm</span>
+</span><span class='line'>/subsystem<span class="o">=</span>security/security-domain<span class="o">=</span>jee7-demo-realm:add<span class="o">(</span>cache-type<span class="o">=</span>default<span class="o">)</span>
 </span><span class='line'>/subsystem<span class="o">=</span>security/security-domain<span class="o">=</span>jee7-demo-realm/authentication<span class="o">=</span>classic:add<span class="o">()</span>
 </span><span class='line'>/subsystem<span class="o">=</span>security/security-domain<span class="o">=</span>jee7-demo-realm/authentication<span class="o">=</span>classic/login-module<span class="o">=</span>UsersRoles       <span class="se">\</span>
 </span><span class='line'>    :add<span class="o">(</span><span class="nv">code</span><span class="o">=</span>UsersRoles, <span class="nv">flag</span><span class="o">=</span>required,                                                        <span class="se">\</span>
