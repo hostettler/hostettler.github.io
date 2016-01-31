@@ -9,7 +9,8 @@
   <meta name="author" content="Steve Hostettler">
 
   
-  <meta name="description" content="I recently started to use Docker. It is a great tool that significantly increases developer&#8217;s productivity. However, I regularly encouter disk &hellip;">
+  <meta name="description" content="Last month I decided to add a touch of microservices to the JEE course I teach at the University of Geneva.
+I ended up with a couple of microservices &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -77,56 +78,6 @@
     <div id="content">
       <div class="blog-index">
   
-  
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2016/12/02/cleaning-intermediate-docker-images/">Cleaning Intermediate Docker Images]</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2016-12-02T01:56:34+01:00" pubdate data-updated="true">Dec 2<span>nd</span>, 2016</time>
-        
-           | <a href="/blog/2016/12/02/cleaning-intermediate-docker-images/#disqus_thread"
-             data-disqus-identifier="http://hostettler.github.io/blog/2016/12/02/cleaning-intermediate-docker-images/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>I recently started to use Docker. It is a great tool that significantly increases developer&#8217;s productivity. However, I regularly encouter disk space problems when developping new images. Indeed, I sometimes end up with dangling images and containers. Hereafter, a simple script that cleans up most of them.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/bash</span>
-</span><span class='line'>docker rmi -f <span class="sb">`</span>docker images | grep <span class="s2">&quot;^&lt;none&gt;&quot;</span> | cut -c41-52<span class="sb">`</span>
-</span><span class='line'>docker rmi <span class="k">$(</span>docker images -q -f <span class="nv">dangling</span><span class="o">=</span><span class="nb">true</span><span class="k">)</span>
-</span><span class='line'>docker rm -v <span class="k">$(</span><span class="nb">echo</span> <span class="k">$(</span>docker ps -q --no-trunc<span class="k">)</span> <span class="k">$(</span>docker ps -a -q --no-trunc<span class="k">)</span> | sed <span class="s1">&#39;s|\s|\n|g&#39;</span>  | sort | uniq -u<span class="k">)</span>
-</span></code></pre></td></tr></table></div></figure>
-
-</div>
-  
-  
-
-
-    </article>
   
   
     <article>
@@ -503,6 +454,56 @@ The following test is composend of a package contaning the EJB under test (<code
 <h2>Conclusion</h2>
 
 <p>Docker and Arquillian provide a nice and seamless way for JEE integration testing. Nevertheless, I had a hard time at the beginning because Arquillian error handling in case of undeployable test archive is not very good. In this case, make sure that you package your test correctly (in the method annotated <code>@Deployment</code>). In particular, double check <code>beans.xml</code>, <code>web.xml</code> and the JAR/WAR structure. It really helped me to unzip the deployed test archive to figure out what when wrong in my code.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2015/12/02/cleaning-intermediate-docker-images/">Cleaning Intermediate Docker Images</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2015-12-02T01:56:34+01:00" pubdate data-updated="true">Dec 2<span>nd</span>, 2015</time>
+        
+           | <a href="/blog/2015/12/02/cleaning-intermediate-docker-images/#disqus_thread"
+             data-disqus-identifier="http://hostettler.github.io/blog/2015/12/02/cleaning-intermediate-docker-images/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I recently started to use Docker. It is a great tool that significantly increases developer&#8217;s productivity. However, I regularly encounter disk space problems when developing new images. Indeed, I sometimes end up with dangling images and containers. Hereafter, a simple script that cleans up most of them.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c">#!/bin/bash</span>
+</span><span class='line'>docker rmi -f <span class="sb">`</span>docker images | grep <span class="s2">&quot;^&lt;none&gt;&quot;</span> | cut -c41-52<span class="sb">`</span>
+</span><span class='line'>docker rmi <span class="k">$(</span>docker images -q -f <span class="nv">dangling</span><span class="o">=</span><span class="nb">true</span><span class="k">)</span>
+</span><span class='line'>docker rm -v <span class="k">$(</span><span class="nb">echo</span> <span class="k">$(</span>docker ps -q --no-trunc<span class="k">)</span> <span class="k">$(</span>docker ps -a -q --no-trunc<span class="k">)</span> | sed <span class="s1">&#39;s|\s|\n|g&#39;</span>  | sort | uniq -u<span class="k">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
 </div>
   
   
@@ -3868,11 +3869,11 @@ use the following code:</p>
   <ul id="recent_posts">
     
       <li class="post">
-        <a href="/blog/2016/12/02/cleaning-intermediate-docker-images/">Cleaning Intermediate Docker Images]</a>
+        <a href="/blog/2016/01/30/integration-tests-with-docker-and-arquillian/">Integration Tests With Docker and Arquillian</a>
       </li>
     
       <li class="post">
-        <a href="/blog/2016/01/30/integration-tests-with-docker-and-arquillian/">Integration Tests With Docker and Arquillian</a>
+        <a href="/blog/2015/12/02/cleaning-intermediate-docker-images/">Cleaning Intermediate Docker Images</a>
       </li>
     
       <li class="post">

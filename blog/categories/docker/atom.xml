@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Docker | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/docker/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2016-01-31T02:03:02+01:00</updated>
+  <updated>2016-01-31T02:04:45+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -12,24 +12,6 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
-  
-  <entry>
-    <title type="html"><![CDATA[Cleaning Intermediate Docker Images]]]></title>
-    <link href="http://hostettler.github.io/blog/2016/12/02/cleaning-intermediate-docker-images/"/>
-    <updated>2016-12-02T01:56:34+01:00</updated>
-    <id>http://hostettler.github.io/blog/2016/12/02/cleaning-intermediate-docker-images</id>
-    <content type="html"><![CDATA[<p>I recently started to use Docker. It is a great tool that significantly increases developer's productivity. However, I regularly encouter disk space problems when developping new images. Indeed, I sometimes end up with dangling images and containers. Hereafter, a simple script that cleans up most of them.</p>
-
-<p>```bash</p>
-
-<h1>!/bin/bash</h1>
-
-<p>docker rmi -f <code>docker images | grep "^&lt;none&gt;" | cut -c41-52</code>
-docker rmi $(docker images -q -f dangling=true)
-docker rm -v $(echo $(docker ps -q --no-trunc) $(docker ps -a -q --no-trunc) | sed 's|\s|\n|g'  | sort | uniq -u)
-```</p>
-]]></content>
-  </entry>
   
   <entry>
     <title type="html"><![CDATA[Integration Tests With Docker and Arquillian]]></title>
@@ -281,6 +263,24 @@ public void shouldAddReturnAllWithTheNewStudent() {
 <h2>Conclusion</h2>
 
 <p>Docker and Arquillian provide a nice and seamless way for JEE integration testing. Nevertheless, I had a hard time at the beginning because Arquillian error handling in case of undeployable test archive is not very good. In this case, make sure that you package your test correctly (in the method annotated <code>@Deployment</code>). In particular, double check <code>beans.xml</code>, <code>web.xml</code> and the JAR/WAR structure. It really helped me to unzip the deployed test archive to figure out what when wrong in my code.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Cleaning Intermediate Docker Images]]></title>
+    <link href="http://hostettler.github.io/blog/2015/12/02/cleaning-intermediate-docker-images/"/>
+    <updated>2015-12-02T01:56:34+01:00</updated>
+    <id>http://hostettler.github.io/blog/2015/12/02/cleaning-intermediate-docker-images</id>
+    <content type="html"><![CDATA[<p>I recently started to use Docker. It is a great tool that significantly increases developer's productivity. However, I regularly encounter disk space problems when developing new images. Indeed, I sometimes end up with dangling images and containers. Hereafter, a simple script that cleans up most of them.</p>
+
+<p>```bash</p>
+
+<h1>!/bin/bash</h1>
+
+<p>docker rmi -f <code>docker images | grep "^&lt;none&gt;" | cut -c41-52</code>
+docker rmi $(docker images -q -f dangling=true)
+docker rm -v $(echo $(docker ps -q --no-trunc) $(docker ps -a -q --no-trunc) | sed 's|\s|\n|g'  | sort | uniq -u)
+```</p>
 ]]></content>
   </entry>
   
