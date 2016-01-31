@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Docker | Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/blog/categories/docker/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2016-01-31T01:53:19+01:00</updated>
+  <updated>2016-01-31T02:03:02+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -12,6 +12,24 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Cleaning Intermediate Docker Images]]]></title>
+    <link href="http://hostettler.github.io/blog/2016/12/02/cleaning-intermediate-docker-images/"/>
+    <updated>2016-12-02T01:56:34+01:00</updated>
+    <id>http://hostettler.github.io/blog/2016/12/02/cleaning-intermediate-docker-images</id>
+    <content type="html"><![CDATA[<p>I recently started to use Docker. It is a great tool that significantly increases developer's productivity. However, I regularly encouter disk space problems when developping new images. Indeed, I sometimes end up with dangling images and containers. Hereafter, a simple script that cleans up most of them.</p>
+
+<p>```bash</p>
+
+<h1>!/bin/bash</h1>
+
+<p>docker rmi -f <code>docker images | grep "^&lt;none&gt;" | cut -c41-52</code>
+docker rmi $(docker images -q -f dangling=true)
+docker rm -v $(echo $(docker ps -q --no-trunc) $(docker ps -a -q --no-trunc) | sed 's|\s|\n|g'  | sort | uniq -u)
+```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Integration Tests With Docker and Arquillian]]></title>
