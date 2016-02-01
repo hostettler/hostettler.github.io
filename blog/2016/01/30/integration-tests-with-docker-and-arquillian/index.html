@@ -108,8 +108,8 @@ I ended up with a couple of microservices &hellip;">
 
 
 <div class="entry-content"><p>Last month I decided to add a touch of <a href="http://martinfowler.com/articles/microservices.html">microservices</a> to the JEE course I teach at the University of Geneva.
-I ended up with a couple of microservices and as expected I came across the problem of testing their integration.
-In this post I won&#8217;t talk about microservices specifically. I will rather focus on the integration testing experience I encountered while building my microservices. A dedicated blog post will follow on my journey through the building of microservices with JEE.</p>
+I ended up with a couple of microservices and as expected I came across the challenge of their integration testing.
+This post is specifically about microservices. It rathers focuses on the JEE integration testing experience I encountered while building the microservices. A dedicated blog post will follow on my journey through the building of microservices with JEE.</p>
 
 <h2>A short description of the architecture</h2>
 
@@ -117,13 +117,14 @@ In this post I won&#8217;t talk about microservices specifically. I will rather 
 
 <h3>Why Docker?</h3>
 
-<p>As it serves as a example for a course, I want it to be super easy to install/re-install 20 times if necessary. To that end, Docker is a great tool because I do not have to bother on what laptop/computer the students work (provided they can run <a href="https://www.docker.com/products/docker-toolbox">Docker Toolbox</a>). Moreover, all the tools I am using for the course are already packaged as Docker images.</p>
+<p>As it serves as a example for a course, I want it to be super easy to install/re-install 20 times if necessary. Furthermore, I want fast-paced deployment. To that end, Docker is a great tool because I do not have to bother on what laptop/computer the students work (provided they can run <a href="https://www.docker.com/products/docker-toolbox">Docker Toolbox</a>). Moreover, all the tools/middlewares I am using for the course are already packaged as Docker images.</p>
 
 <h2>Building a  Docker image for a Wildfly Integration Test Server</h2>
 
-<p>As mentioned previously, I propose to use Wildfly +  MySql as a runtime environment. However, at test time, I do not want to start both an application server and a database. More important I want to get a fresh database for each and every test suite. Moreover, I would like to use on a simpler setup for the application server. For instance, I do prefer to use an in memory H2 database instead of MySql. I also do not want to bother with LDAP/JAAS configuration.</p>
+<p>As mentioned previously, I propose to use Wildfly +  MySql as the runtime environment. However, at test time, I do not want to start both an application server and a database. More important, I want to get a fresh database for each and every test suite. Futhermore, I would like to use on a simpler setup for the application server. For instance, I do prefer to use an in memory H2 database instead of MySql. I also do not want to bother with LDAP/JAAS configuration, clustering, etc&#8230;.
+Of course, datasource name, realm name and more generally all the resources required by the microservices must be present with their production name.</p>
 
-<p>A great feature of Wildfly is that it  allows to configure almost everything through the command line.
+<p>Ones of Wildfly&#8217;s great features is its ability to be configured using the command line.
 The first step is to configure a data source relying on H2 that has the same name as the production one.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -133,7 +134,7 @@ The first step is to configure a data source relying on H2 that has the same nam
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Then, let&#8217;s configure a realm.  This is helpful when the integration tests rely on principals and do verify the security.
+<p>Then, let&#8217;s configure a realm.  This is helpful when integration tests rely on principals and do verify the security.
 The file <code>jee7-demo-realm-users.properties</code> (resp. <code>jee7-demo-realm-roles.properties</code>) defines the users (resp. the roles) of the realm.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -287,7 +288,7 @@ The file <code>jee7-demo-realm-users.properties</code> (resp. <code>jee7-demo-re
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The next step is to enhance the official Wildfly image called <code>jboss/wildfly:latest</code> with the specific configurations we need for integration testing. This following Dockerfile describes how to build the image that we will use for testing.
+<p>The next step is to enhance the official Wildfly image called <code>jboss/wildfly:latest</code> with the specific configurations required for integration testing. This following Dockerfile describes how to build the image that we will use for testing.
 First, it adds the previous configuration files <code>./config_wildfly.sh ./jee7-demo-realm-roles.properties ./jee7-demo-realm-users.properties</code> to the <code>/opt/jboss/wildfly/customization/</code> of the image. Then we tell Docker to run the configuration <code>config_wildfly.sh</code> and to do some cleanup. After what, it will record the states as a new image.</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -316,7 +317,7 @@ First, it adds the previous configuration files <code>./config_wildfly.sh ./jee7
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>The following command runs the image we just built, exposes the port 8080, 9090 and 8787, and mount the local directory <code>/Users/XXXXXXXXXX/tmp/docker-deploy</code> on the image&#8217;s <code>/opt/jboss/wildfly/standalone/deployments/</code> directory. This is of course the directory in which the integration tests are to be deployed..</p>
+<p>The following command runs the image we just built, exposes (and map) the port 8080, 9090 and 8787, and mount the local directory <code>/Users/XXXXXXXXXX/tmp/docker-deploy</code> on the image&#8217;s <code>/opt/jboss/wildfly/standalone/deployments/</code> directory. This is of course the directory in which the integration tests are to be deployed..</p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'>docker run -d  -p 8080:8080 -p 9990:9990 -p 8787:8787 -v /Users/XXXXXXXXXX/tmp/docker-deploy:/opt/jboss/wildfly/standalone/deployments/:rw jee7-test-wildfly
