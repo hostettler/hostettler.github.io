@@ -9,8 +9,7 @@
   <meta name="author" content="Steve Hostettler">
 
   
-  <meta name="description" content="Last month I decided to add a touch of microservices to the JEE course I teach at the University of Geneva.
-I ended up with a couple of microservices &hellip;">
+  <meta name="description" content="In my current assignment, I had the opportunity to discuss with Data Warehouse (DW) experts about the DW integration with the rest of the information &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -78,6 +77,124 @@ I ended up with a couple of microservices &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2016/02/10/data-warehouse/">A Hitchhiker&#8217;s Guide to the Data Warehouse Glossary</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2016-02-10T14:07:42+01:00" pubdate data-updated="true">Feb 10<span>th</span>, 2016</time>
+        
+           | <a href="/blog/2016/02/10/data-warehouse/#disqus_thread"
+             data-disqus-identifier="http://hostettler.github.io/blog/2016/02/10/data-warehouse/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>In my current assignment, I had the opportunity to discuss with Data Warehouse (DW) experts about the DW integration with the rest of the information system.
+I noticed that not every people (included Data Warehouse professionals) uses the same vocabulary.
+During the discussions, people raised words such as &#8220;Data Warehouse&#8221;, &#8220;Data Marts&#8221;, ODS, &#8220;Data Lake&#8221; and so on. Some of the words were used interchangeably which does not help to follow the discussion. As I was not familiar  with several  of them, I decided to do my homework and to come up with a small glossary to provide a common ground for further discussions.</p>
+
+<blockquote><p>Disclaimer : I am not an expert in the field, I only tried to come up with a couple of definitions to get a common ground for further discussions.  Please experts in the field, help me to improve this!</p></blockquote>
+
+<h2>Business Intelligence (B.I.)</h2>
+
+<blockquote><p>Business intelligence is a set of methodologies, processes, architectures, and technologies that transform raw data into meaningful and useful information. It allows business users to make informed business decisions with real-time data that can put a company ahead of its competitors.</p>
+
+<p><cite>Boris Evelson - Forrester</cite></p></blockquote>
+
+<p>Business Intelligence Systems usually (but not always) rely on a Data Warehouse to provide information out of raw operational data.
+The following diagram shows the relationships between the different levels involved in making a  decision.
+<span class='caption-wrapper center'><img class='caption' src='/figures/B.I.png' width='' height='' alt='How B.I. helps Decision making' title='How B.I. helps Decision making'><span class='caption-text'>How B.I. helps Decision making</span></span></p>
+
+<p>Business Intelligence Systems have the following properties:</p>
+
+<ul>
+<li>It leverages raw heterogeneous operational data</li>
+<li>It enables multi-dimensional information and operations on it</li>
+<li>It is driven by the business</li>
+<li>It has to be performant and must not interfere with daily operations</li>
+</ul>
+
+
+<h2>Data Warehouse (DWH)</h2>
+
+<p>DWHs are central repositories of integrated data from one or more disparate sources. Its purpose is to organize and homogenize data into information. User can then leverage this information into knowledge and therefore make informed decision (see B.I.).</p>
+
+<p>There are  three main approaches on how to build a data warehouse.</p>
+
+<h3>William Inmon&#8217;s approach</h3>
+
+<p>According to <a href="http://www.amazon.com/Building-Data-Warehouse-W-Inmon/dp/0471141615">William Inmon</a> that originally coined the term &#8220;Data Warehouse&#8221;, a data warehouse has the following properties:
+- Subject oriented : This implies that data are organized around the business and not around the sources. For instance, several accounting data sources are consolidated into one accounting data warehouse. The purpose of which is to letting information emerge out of data.
+- Integrated : Coming from different sources, data must be standardized to enable consistency and thus letting information emerge. For instance, customer identification must be normalized across different sources.
+- Non-volatile : Once in the data warehouse, data must not be altered. Therefore, data is available for future comparison.
+- Time-variant : Changes made on data over time are tracked. For instance, each and every change to a customer country of residence are tracked.</p>
+
+<p>Inmon’s model follows a top-down approach. First, a complete (enterprise wide) Data Warehouse (DW) is created in 3NF and then, if required, datamarts (DM) are provisioned out of the DW. Datamarts in Inmon’s model are in 3NF from which the OLAP cubes are built.
+For Inmon, data quality and coherency is paramount and thus the 3NF in the DW and the DMs.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/Imnon.png' width='' height='' alt='The Imnon Top-Down model' title='The Imnon Top-Down model'><span class='caption-text'>The Imnon Top-Down model</span></span></p>
+
+<h3>Ralph Kimball&#8217;s approach</h3>
+
+<p>According to <a href="http://www.amazon.com/The-Data-Warehouse-Toolkit-Dimensional-ebook/dp/B004GXBZFQ">Kimball</a> another prominent actor in this field, &#8220;Data Warehouse is a system that extracts, cleans, conforms, and delivers source data into a dimensional data store and then supports and implements querying and analysis for the purpose of decision making.&#8221; This definition does not contradict Inmon&#8217;s properties. The difference lies in the architecture.</p>
+
+<p>Kimball’s model follows a bottom-up approach. First, some Datamarts (DM) emerge directly sourced from OLTP systems usually follow the company processes and organization.<br/>
+The Datamarts are usually de-normalized star schemas. The OLAP cubes are built on top of them.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/Kimball.png' width='' height='' alt='The Kimball Bottum-Up model' title='The Kimball Bottum-Up model'><span class='caption-text'>The Kimball Bottum-Up model</span></span></p>
+
+<h3>The Hybrid model - A typical architecture</h3>
+
+<p>Both of these approaches have their pros and cons. Kimball’s model is easy to start with because of the bottom-up approach and hence you can start small and scale-up eventually. Moreover, the ROI is usually better with Kimball’s model.
+Because of this approach it is difficult to created re-usable data structures and operations (extraction) for different datamarts. Finally, you may end-up with consistency problems.
+On the other hand, Inmon’s approach is structured and easier to maintain at the cost of being rigid and more expensive.</p>
+
+<p>Real-life DWH implementation often end-up using a hybrid architecure. The following architecture relies on the following biulding blocks:</p>
+
+<ul>
+<li>a staging layer to extract and sanitize data</li>
+<li>an ODS to enable &#8220;close to the operation&#8221; data mining</li>
+<li>an 3NF DWH with full history to enable the creation unanticipated datamarts</li>
+<li>datamarts that rely on the star schema for better performances</li>
+</ul>
+
+
+<p><span class='caption-wrapper center'><img class='caption' src='/figures/DWHArchitecture.png' width='' height='' alt='A typical Hybrid Architecture' title='A typical Hybrid Architecture'><span class='caption-text'>A typical Hybrid Architecture</span></span></p>
+
+<h2>Data Mart (DMT)</h2>
+
+<p>A datamart is essentially a basic building block of the data warehouse.
+The term &#8220;data mart&#8221; has become somewhat ambiguous, but it is traditionally associated with a subject-oriented subset of an organization&#8217;s information systems. Data mart does not explicitly imply the presence of a multi-dimensional technology such as OLAP and data mart does not explicitly imply the presence of summarized numerical data.</p>
+
+<h2>Operational Data Store (ODS)</h2>
+
+<p>An operational data store (ODS) is building block of Data warehouse used for immediate reporting with operational data.  An ODS contains lightly transformed and lightly integrated operational data with a (rather) short time window. The ODS is usually used when looking for specific events (settling a banking movement or looking for a specific operation). Full history is available in the DWH.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -3215,646 +3332,6 @@ This can be done with JSF&#8217;s <code>@ConversationScoped</code> or with Sprin
 
     </article>
   
-  
-    <article>
-      
-  <header>
-    
-      <h1 class="entry-title"><a href="/blog/2012/05/24/moxy/">Object-XML Mapping With JAXB & MOXy</a></h1>
-    
-    
-      <p class="meta">
-        
-
-
-
-
-
-
-
-
-  
-
-
-<time datetime="2012-05-24T19:17:00+02:00" pubdate data-updated="true">May 24<span>th</span>, 2012</time>
-        
-           | <a href="/blog/2012/05/24/moxy/#disqus_thread"
-             data-disqus-identifier="http://hostettler.github.io/blog/2012/05/24/moxy/">Comments</a>
-        
-      </p>
-    
-  </header>
-
-
-  <div class="entry-content"><p>Object-Relational mapping is around for a while and its last incarnation, JPA 2.0, is easy to use
-yet powerful and adapted to most of the real-life situations. A problem that is similar to
-Object-Relational mapping (ORM) is Object-XML mapping (OXM). More precisely, it aims at mapping XML
-schemas to JAVA classes. JAXB (JSR 222) specifies how to maps classes to xml schemas.
-In this post, I demonstrate the ease of use of this approach using <a href="http://www.eclipse.org/eclipselink/moxy.php">MOXy</a>. MOXy is the Eclipse implementation of JAXB and I found it really easy to use.</p>
-
-<p>As always let us first look at the Maven dependencies:</p>
-
-<figure class='code'><figcaption><span>Maven dependencies for using MOXy</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="nt">&lt;repositories&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;repository&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;id&gt;</span>EclipseLink Repo<span class="nt">&lt;/id&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;name&gt;</span>EclipseLink Repository<span class="nt">&lt;/name&gt;</span>
-</span><span class='line'>            <span class="nt">&lt;url&gt;</span>http://download.eclipse.org/rt/eclipselink/maven.repo<span class="nt">&lt;/url&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;/repository&gt;</span>
-</span><span class='line'><span class="nt">&lt;/repositories&gt;</span>
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;dependencies&gt;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nt">&lt;dependency&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;groupId&gt;</span>org.eclipse.persistence<span class="nt">&lt;/groupId&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;artifactId&gt;</span>eclipselink<span class="nt">&lt;/artifactId&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;version&gt;</span>2.3.2<span class="nt">&lt;/version&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;scope&gt;</span>compile<span class="nt">&lt;/scope&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/dependency&gt;</span>
-</span><span class='line'>    ...
-</span><span class='line'>
-</span><span class='line'><span class="nt">&lt;/dependencies&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Eclipse-link provides an implementation for JAXB. The rest is in the JEE 6 SDK.</p>
-
-<p>In this post I only consider the case in which we have control over the schema.
-In this case, it is sufficient to annotate the fields and the classes you want to marshall to XML.
-Let us use the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project that can be found on Google
-Code. The following snippet shows a simple model that represents a student.</p>
-
-<p>As you can see there are few annotations. The first one <code>@XmlRootElement</code> simply declares what the  root element is. The second annotation specifies the mapping policy. We will come back on that later. The fields are either not annotated or annotated with @Transient. In the first case, they
-are marshaled if not null and in the second they are simply ignored. The only tricky part is that transient fields (in the Java sense) are ignored. For instance, this is the case of the <code>gender</code> property.</p>
-
-<figure class='code'><figcaption><span>A simple mapping from object to XML</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-<span class='line-number'>24</span>
-<span class='line-number'>25</span>
-<span class='line-number'>26</span>
-<span class='line-number'>27</span>
-<span class='line-number'>28</span>
-<span class='line-number'>29</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@XmlRootElement</span>
-</span><span class='line'><span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="n">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">id</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">lastName</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">firstName</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">Date</span> <span class="n">birthDate</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@XmlTransient</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">PhoneNumber</span> <span class="n">phoneNumber</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">private</span> <span class="kd">transient</span> <span class="n">Gender</span> <span class="n">gender</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@XmlTransient</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">Address</span> <span class="n">address</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@XmlTransient</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Grade</span><span class="o">&gt;</span> <span class="n">grades</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@XmlTransient</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">Badge</span> <span class="n">badge</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Let us now test the mapping. The code below, creates a new <code>Student</code> and fills the associated
-fields. The second part of the snippet marshals the object into XML and streams it to <code>System.out</code>.</p>
-
-<figure class='code'><figcaption><span>Creation of student and its marshaling to XML</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Student</span> <span class="n">student</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Student</span><span class="o">(</span><span class="s">&quot;Lion Hearth&quot;</span><span class="o">,</span> <span class="s">&quot;Richard&quot;</span><span class="o">,</span> <span class="k">new</span> <span class="n">Date</span><span class="o">());</span>
-</span><span class='line'><span class="n">Address</span> <span class="n">address</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Address</span><span class="o">();</span>
-</span><span class='line'><span class="n">address</span><span class="o">.</span><span class="na">setCity</span><span class="o">(</span><span class="s">&quot;Carouge&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">address</span><span class="o">.</span><span class="na">setNumber</span><span class="o">(</span><span class="s">&quot;7&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">address</span><span class="o">.</span><span class="na">setPostalCode</span><span class="o">(</span><span class="s">&quot;1227&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">address</span><span class="o">.</span><span class="na">setStreet</span><span class="o">(</span><span class="s">&quot;Drize&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">student</span><span class="o">.</span><span class="na">setAddress</span><span class="o">(</span><span class="n">address</span><span class="o">);</span>
-</span><span class='line'><span class="n">Badge</span> <span class="n">b</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Badge</span><span class="o">();</span>
-</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="na">setSecurityLevel</span><span class="o">(</span><span class="mi">30L</span><span class="o">);</span>
-</span><span class='line'><span class="n">b</span><span class="o">.</span><span class="na">setStudent</span><span class="o">(</span><span class="n">student</span><span class="o">);</span>
-</span><span class='line'><span class="n">student</span><span class="o">.</span><span class="na">setBadge</span><span class="o">(</span><span class="n">b</span><span class="o">);</span>
-</span><span class='line'><span class="n">student</span><span class="o">.</span><span class="na">setPhoneNumber</span><span class="o">(</span><span class="k">new</span> <span class="n">PhoneNumber</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">));</span>
-</span><span class='line'><span class="k">for</span> <span class="o">(</span><span class="n">Discipline</span> <span class="n">d</span> <span class="o">:</span> <span class="n">Discipline</span><span class="o">.</span><span class="na">values</span><span class="o">())</span> <span class="o">{</span>
-</span><span class='line'>    <span class="n">Grade</span> <span class="n">g</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Grade</span><span class="o">(</span><span class="n">d</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
-</span><span class='line'>    <span class="n">student</span><span class="o">.</span><span class="na">getGrades</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">g</span><span class="o">);</span>
-</span><span class='line'><span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'><span class="n">JAXBContext</span> <span class="n">jaxbContext</span> <span class="o">=</span> <span class="n">JAXBContext</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="n">Student</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'><span class="n">Marshaller</span> <span class="n">marshaller</span> <span class="o">=</span> <span class="n">jaxbContext</span><span class="o">.</span><span class="na">createMarshaller</span><span class="o">();</span>
-</span><span class='line'><span class="n">marshaller</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">Marshaller</span><span class="o">.</span><span class="na">JAXB_FORMATTED_OUTPUT</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-</span><span class='line'><span class="n">marshaller</span><span class="o">.</span><span class="na">marshal</span><span class="o">(</span><span class="n">student</span><span class="o">,</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Finally, the result looks like the XML below. As you can see, it is pretty easy and straight-forward
-to produce XML from a Class description. Most of the fields that have been populated are not
-marshaled to XML. This is due to the <code>@XMLTransient</code> annotation that tells JAXB not to consider
-them for output.</p>
-
-<figure class='code'><figcaption><span>Marshaled version of the previous Student object.</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;student&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;lastName&gt;</span>Lion Hearth<span class="nt">&lt;/lastName&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;firstName&gt;</span>Richard<span class="nt">&lt;/firstName&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;birthDate&gt;</span>2012-06-04T11:12:34.751+02:00<span class="nt">&lt;/birthDate&gt;</span>
-</span><span class='line'><span class="nt">&lt;/student&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>Mapping Overview</h3>
-
-<p>The previous example was as simple as possible. Obviously, sometimes it is important to be able to
-tweak the mapping. Let us look at some simple mapping options.</p>
-
-<h4>Element naming</h4>
-
-<p>The default mapping rule is to use the field name as XML element name. This policy can be overridden
-by the <code>@XmlElement(name = ...)</code> annotation. Applying the annotation <code>@XmlElement(name="last_name")</code> on the <code>lastName</code> field of the previous example would result in:</p>
-
-<figure class='code'><figcaption><span>Example of named element</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;student&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;last_name&gt;</span>Lion Hearth<span class="nt">&lt;/last_name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;firstName&gt;</span>Richard<span class="nt">&lt;/firstName&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;birthDate&gt;</span>2012-06-04T11:12:34.751+02:00<span class="nt">&lt;/birthDate&gt;</span>
-</span><span class='line'><span class="nt">&lt;/student&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>Attributes vs elements</h4>
-
-<p>By default fields are marshaled as XML elements. It is possible to ask JAXB to transform them to
-XML attributes by using <code>@XmlAttribute</code> annotation. Putting <code>@XmlAttribute</code> on the <code>lastName</code>
-field of the previous example would produce the following XML:</p>
-
-<figure class='code'><figcaption><span>Example of using an attribute instead of an element</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;student</span> <span class="na">lastName=</span><span class="s">&quot;Lion Hearth&quot;</span><span class="nt">&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;firstName&gt;</span>Richard<span class="nt">&lt;/firstName&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;birthDate&gt;</span>2012-06-04T11:12:34.751+02:00<span class="nt">&lt;/birthDate&gt;</span>
-</span><span class='line'><span class="nt">&lt;/student&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Please note that as for an element, the attribute name can be customized.</p>
-
-<h4>Mapping strategy</h4>
-
-<p>As mentioned before, the default mapping strategy is declared by using the <code>@XmlAccessorType(XmlAccessType.*)</code> annotation.</p>
-
-<p>There exists four mapping policies. For more details, look at the <a href="http://docs.oracle.com/javaee/6/api/javax/xml/bind/annotation/XmlAccessType.html">Javadoc</a> for <code>XmlAccessorType</code>. Here is an excerpt
-from the Java doc.</p>
-
-<ol>
-<li><code>FIELD</code>: Every non static, non transient field in a JAXB-bound class will be automatically bound to XML, unless annotated by XmlTransient.</li>
-<li><code>NONE</code>: None of the fields or properties is bound to XML unless they are specifically annotated with some of the JAXB annotations.</li>
-<li><code>PROPERTY</code>: Every getter/setter pair in a JAXB-bound class will be automatically bound to XML, unless annotated by XmlTransient.</li>
-<li><code>PUBLIC_MEMBER</code>: Every public getter/setter pair and every public field will be automatically bound to XML, unless annotated by XmlTransient.</li>
-</ol>
-
-
-<h4>Name spaces</h4>
-
-<p>An important aspect of XML is its modularity. In particular, namespaces bring a nice way to organize
-the XML and the schemas. Namespaces can be specified at different levels. For more details look at the <a href="http://wiki.eclipse.org/EclipseLink/UserGuide/MOXy/Type_Level/Setting_Up_Namespace_Information">MOXy documentation</a>. For now, it is sufficient to known that the <code>@XmlType</code>, <code>@XmlElement</code>, and <code>@XmlAttribute</code> annotations support a namespace attribute.</p>
-
-<h3>One to one mapping</h3>
-
-<p>Now that we have mapped simple field, let us look at more complex mappings. First, a 1-1 mapping.
-The following example maps an address.</p>
-
-<figure class='code'><figcaption><span>Add a one to one mapping</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@XmlRootElement</span>
-</span><span class='line'><span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="n">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">Address</span> <span class="n">address</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>To that end, it is sufficient to add the following annotations to the Address type.</p>
-
-<figure class='code'><figcaption><span>Add a one to one mapping</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@XmlRootElement</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;address&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="n">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Address</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'>    <span class="cm">/** house number. */</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">number</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** the name of the street. */</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">street</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** the city name. */</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">city</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** the postal code. */</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">String</span> <span class="n">postalCode</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And the rest is handled by JAXB to produce the following result.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;student&gt;</span>
-</span><span class='line'>    ...
-</span><span class='line'>    <span class="nt">&lt;address&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;number&gt;</span>7<span class="nt">&lt;/number&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;street&gt;</span>Drize<span class="nt">&lt;/street&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;city&gt;</span>Carouge<span class="nt">&lt;/city&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;postalCode&gt;</span>1227<span class="nt">&lt;/postalCode&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/address&gt;</span>
-</span><span class='line'><span class="nt">&lt;/student&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h4>Bi-directional one to one</h4>
-
-<p>The next example is more tricky. The problem with bi-directional mapping is that they produce
-graphs. Of course, since XML are trees, we must avoid cycles. The solution is to annotate the reverse mapping (<code>Student student</code> in this case) with <code>@XMLTransient</code> causing the property to be ignored by JAXB.</p>
-
-<figure class='code'><figcaption><span>Add a one to one bidirectional mapping</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@XmlRootElement</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;student&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="n">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="o">...</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">Badge</span> <span class="n">badge</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>The following type describes the <code>Badge</code> that has a reverse mapping to <code>Student</code>.</p>
-
-<figure class='code'><figcaption><span>Mapping of the type &#8220;Badge&#8220;</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nd">@XmlRootElement</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">&quot;badge&quot;</span><span class="o">)</span>
-</span><span class='line'><span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="n">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
-</span><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Badge</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** The unique id. */</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">id</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** The student&#39;s security level. */</span>
-</span><span class='line'>    <span class="nd">@XmlAttribute</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">Long</span> <span class="n">securityLevel</span><span class="o">;</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="cm">/** The student that owns this badge. */</span>
-</span><span class='line'>    <span class="nd">@XmlTransient</span>
-</span><span class='line'>    <span class="kd">private</span> <span class="n">Student</span> <span class="n">student</span><span class="o">;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>And finally, here is the result.</p>
-
-<figure class='code'><figcaption><span>Result of the bi-directional mapping</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;student&gt;</span>
-</span><span class='line'>    ...
-</span><span class='line'>    <span class="nt">&lt;badge</span> <span class="na">securityLevel=</span><span class="s">&quot;30&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/student&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h3>One to many mapping</h3>
-
-<p>One to many mappings are handled automatically. There is nothing special to do. In our example,
-removing the <code>@XmlTransient</code> annotation on the <code>grades</code> property will generate the following output:</p>
-
-<figure class='code'><figcaption><span>One to many example</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-<span class='line-number'>13</span>
-<span class='line-number'>14</span>
-<span class='line-number'>15</span>
-<span class='line-number'>16</span>
-<span class='line-number'>17</span>
-<span class='line-number'>18</span>
-<span class='line-number'>19</span>
-<span class='line-number'>20</span>
-<span class='line-number'>21</span>
-<span class='line-number'>22</span>
-<span class='line-number'>23</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;student&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;last_name&gt;</span>Lion Hearth<span class="nt">&lt;/last_name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;firstName&gt;</span>Richard<span class="nt">&lt;/firstName&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;birthDate&gt;</span>2012-06-05T10:57:36.699+02:00<span class="nt">&lt;/birthDate&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;phoneNumber&gt;</span>+00-0000-0000<span class="nt">&lt;/phoneNumber&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;address&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;number&gt;</span>7<span class="nt">&lt;number&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;street&gt;</span>Drize<span class="nt">&lt;/street&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;city&gt;</span>Carouge<span class="nt">&lt;/city&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;postalCode&gt;</span>1227<span class="nt">&lt;/postalCode&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/address&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;grades&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;discipline&gt;</span>MATHEMATICS<span class="nt">&lt;/discipline&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;grade&gt;</span>10<span class="nt">&lt;/grade&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/grades&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;grades&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;discipline&gt;</span>BIOLOGY<span class="nt">&lt;/discipline&gt;</span>
-</span><span class='line'>        <span class="nt">&lt;grade&gt;</span>10<span class="nt">&lt;/grade&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;/grades&gt;</span>
-</span><span class='line'> ...
-</span><span class='line'>    <span class="nt">&lt;badge</span> <span class="na">securityLevel=</span><span class="s">&quot;30&quot;</span><span class="nt">/&gt;</span>
-</span><span class='line'><span class="nt">&lt;/student&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Custom mapping</h2>
-
-<p>Sometimes, it is difficult to map a given type to a given XML structure. This is the case of the <code>PhoneNumber</code> type in our example. To that end, it is possible to define a <code>XMLJavaTypeAdatper</code>
-that will convert XML to object and objects to XML manually. The adapter is not very difficult to implement. It is composed of two methods that respectively unmarshal from XML and marshal to XML.</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-<span class='line-number'>11</span>
-<span class='line-number'>12</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PhoneNumberAdapter</span> <span class="kd">extends</span> <span class="n">XmlAdapter</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">PhoneNumber</span><span class="o">&gt;</span> <span class="o">{</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="n">PhoneNumber</span> <span class="nf">unmarshal</span><span class="o">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">value</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">PhoneNumber</span><span class="o">.</span><span class="na">getAsObject</span><span class="o">((</span><span class="n">String</span><span class="o">)</span> <span class="n">value</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'>
-</span><span class='line'>    <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="n">String</span> <span class="nf">marshal</span><span class="o">(</span><span class="kd">final</span> <span class="n">PhoneNumber</span> <span class="n">value</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">PhoneNumber</span><span class="o">.</span><span class="na">getAsString</span><span class="o">((</span><span class="n">PhoneNumber</span><span class="o">)</span> <span class="n">value</span><span class="o">);</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">}</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>Then, it is required to annotated the property with this adapter:</p>
-
-<figure class='code'><figcaption><span>Using a custom XML-Object Adapter</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="o">...</span>
-</span><span class='line'><span class="nd">@XmlJavaTypeAdapter</span><span class="o">(</span><span class="n">PhoneNumberAdapter</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
-</span><span class='line'><span class="kd">private</span> <span class="n">PhoneNumber</span> <span class="n">mPhoneNumber</span><span class="o">;</span>
-</span><span class='line'><span class="o">...</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>This will produce the following result:</p>
-
-<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-</pre></td><td class='code'><pre><code class='xml'><span class='line'><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;</span>
-</span><span class='line'><span class="nt">&lt;student&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;last_name&gt;</span>Lion Hearth<span class="nt">&lt;/last_name&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;firstName&gt;</span>Richard<span class="nt">&lt;/firstName&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;birthDate&gt;</span>2012-06-05T10:57:36.699+02:00<span class="nt">&lt;/birthDate&gt;</span>
-</span><span class='line'>    <span class="nt">&lt;phoneNumber&gt;</span>+00-0000-0000<span class="nt">&lt;/phoneNumber&gt;</span>
-</span><span class='line'>    ...
-</span><span class='line'><span class="nt">&lt;/student&gt;</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>What about XML schemas</h2>
-
-<p>As mentioned previously, we assumed that you have total control over the schema. Nevertheless, it can
-be useful to be able to produce this schema. This is done by the following snippet.</p>
-
-<figure class='code'><figcaption><span>Output the underlying schema</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-<span class='line-number'>5</span>
-<span class='line-number'>6</span>
-<span class='line-number'>7</span>
-<span class='line-number'>8</span>
-<span class='line-number'>9</span>
-<span class='line-number'>10</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">SchemaOutputResolver</span> <span class="n">sor</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SchemaOutputResolver</span><span class="o">()</span> <span class="o">{</span>
-</span><span class='line'>    <span class="nd">@Override</span>
-</span><span class='line'>    <span class="kd">public</span> <span class="n">Result</span> <span class="nf">createOutput</span><span class="o">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">namespaceUri</span><span class="o">,</span>
-</span><span class='line'>            <span class="kd">final</span> <span class="n">String</span> <span class="n">suggestedFileName</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-</span><span class='line'>        <span class="n">Result</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StreamResult</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">);</span>
-</span><span class='line'>        <span class="n">result</span><span class="o">.</span><span class="na">setSystemId</span><span class="o">(</span><span class="s">&quot;System.out&quot;</span><span class="o">);</span>
-</span><span class='line'>        <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
-</span><span class='line'>    <span class="o">}</span>
-</span><span class='line'><span class="o">};</span>
-</span><span class='line'><span class="n">jaxbContext</span><span class="o">.</span><span class="na">generateSchema</span><span class="o">(</span><span class="n">sor</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p></p>
-
-<h2>Write XML</h2>
-
-<p>Writing XML is fairly easy, just populate the objects that you want to marshal and then
-use the following code:</p>
-
-<figure class='code'><figcaption><span>How to marshal a given object</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">JAXBContext</span> <span class="n">jaxbContext</span> <span class="o">=</span> <span class="n">JAXBContext</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="n">Student</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'><span class="n">Marshaller</span> <span class="n">marshaller</span> <span class="o">=</span> <span class="n">jaxbContext</span><span class="o">.</span><span class="na">createMarshaller</span><span class="o">();</span>
-</span><span class='line'><span class="n">marshaller</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">Marshaller</span><span class="o">.</span><span class="na">JAXB_FORMATTED_OUTPUT</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-</span><span class='line'><span class="n">marshaller</span><span class="o">.</span><span class="na">marshal</span><span class="o">(</span><span class="n">student</span><span class="o">,</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Read XML</h2>
-
-<p>The reverse operation is as easy and straightforward (provided that use the same schema):</p>
-
-<figure class='code'><figcaption><span>How to unmarshal a given XML file to objects</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-<span class='line-number'>2</span>
-<span class='line-number'>3</span>
-<span class='line-number'>4</span>
-</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">InputStream</span> <span class="n">stream</span> <span class="o">=</span> <span class="n">StudentOXTest</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="s">&quot;/student.xml&quot;</span><span class="o">);</span>
-</span><span class='line'><span class="n">JAXBContext</span> <span class="n">jaxbContext</span> <span class="o">=</span> <span class="n">JAXBContext</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="n">Student</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-</span><span class='line'><span class="n">Unmarshaller</span> <span class="n">unmarshaller</span> <span class="o">=</span> <span class="n">jaxbContext</span><span class="o">.</span><span class="na">createUnmarshaller</span><span class="o">();</span>
-</span><span class='line'><span class="n">Student</span> <span class="n">student</span> <span class="o">=</span> <span class="o">(</span><span class="n">Student</span><span class="o">)</span> <span class="n">unmarshaller</span><span class="o">.</span><span class="na">unmarshal</span><span class="o">(</span><span class="n">stream</span><span class="o">);</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<h2>Conclusion</h2>
-
-<p>We have seen how to use MOXy to map objects to XML. Using JAXB annotations, it is very easy to read and write XML. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
-</div>
-  
-  
-
-
-    </article>
-  
   <div class="pagination">
     
       <a class="prev" href="/blog/page/2/">&larr; Older</a>
@@ -3868,6 +3345,10 @@ use the following code:</p>
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2016/02/10/data-warehouse/">A Hitchhiker&#8217;s Guide to the Data Warehouse Glossary</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2016/01/30/integration-tests-with-docker-and-arquillian/">Integration Tests With Docker and Arquillian</a>
@@ -3903,10 +3384,6 @@ use the following code:</p>
     
       <li class="post">
         <a href="/blog/2012/06/10/Sessions-GC-Conversations/">About Sessions, Conversations, and the Garbage Collector</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/05/24/moxy/">Object-XML Mapping With JAXB & MOXy</a>
       </li>
     
   </ul>

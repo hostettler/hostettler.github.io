@@ -4,7 +4,7 @@
   <title><![CDATA[Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2016-02-01T09:55:30+01:00</updated>
+  <updated>2016-02-16T16:35:56+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -12,6 +12,94 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Hitchhiker's Guide to the Data Warehouse Glossary]]></title>
+    <link href="http://hostettler.github.io/blog/2016/02/10/data-warehouse/"/>
+    <updated>2016-02-10T14:07:42+01:00</updated>
+    <id>http://hostettler.github.io/blog/2016/02/10/data-warehouse</id>
+    <content type="html"><![CDATA[<p>In my current assignment, I had the opportunity to discuss with Data Warehouse (DW) experts about the DW integration with the rest of the information system.
+I noticed that not every people (included Data Warehouse professionals) uses the same vocabulary.
+During the discussions, people raised words such as &#8220;Data Warehouse&#8221;, &#8220;Data Marts&#8221;, ODS, &#8220;Data Lake&#8221; and so on. Some of the words were used interchangeably which does not help to follow the discussion. As I was not familiar  with several  of them, I decided to do my homework and to come up with a small glossary to provide a common ground for further discussions.</p>
+
+<blockquote><p>Disclaimer : I am not an expert in the field, I only tried to come up with a couple of definitions to get a common ground for further discussions.  Please experts in the field, help me to improve this!</p></blockquote>
+
+<h2>Business Intelligence (B.I.)</h2>
+
+<blockquote><p>Business intelligence is a set of methodologies, processes, architectures, and technologies that transform raw data into meaningful and useful information. It allows business users to make informed business decisions with real-time data that can put a company ahead of its competitors.</p>
+
+<p><cite>Boris Evelson - Forrester</cite></p></blockquote>
+
+<p>Business Intelligence Systems usually (but not always) rely on a Data Warehouse to provide information out of raw operational data.
+The following diagram shows the relationships between the different levels involved in making a  decision.
+<span class='caption-wrapper center'><img class='caption' src='http://hostettler.github.io/figures/B.I.png' width='' height='' alt='How B.I. helps Decision making' title='How B.I. helps Decision making'><span class='caption-text'>How B.I. helps Decision making</span></span></p>
+
+<p>Business Intelligence Systems have the following properties:</p>
+
+<ul>
+<li>It leverages raw heterogeneous operational data</li>
+<li>It enables multi-dimensional information and operations on it</li>
+<li>It is driven by the business</li>
+<li>It has to be performant and must not interfere with daily operations</li>
+</ul>
+
+
+<h2>Data Warehouse (DWH)</h2>
+
+<p>DWHs are central repositories of integrated data from one or more disparate sources. Its purpose is to organize and homogenize data into information. User can then leverage this information into knowledge and therefore make informed decision (see B.I.).</p>
+
+<p>There are  three main approaches on how to build a data warehouse.</p>
+
+<h3>William Inmon&#8217;s approach</h3>
+
+<p>According to <a href="http://www.amazon.com/Building-Data-Warehouse-W-Inmon/dp/0471141615">William Inmon</a> that originally coined the term &#8220;Data Warehouse&#8221;, a data warehouse has the following properties:
+- Subject oriented : This implies that data are organized around the business and not around the sources. For instance, several accounting data sources are consolidated into one accounting data warehouse. The purpose of which is to letting information emerge out of data.
+- Integrated : Coming from different sources, data must be standardized to enable consistency and thus letting information emerge. For instance, customer identification must be normalized across different sources.
+- Non-volatile : Once in the data warehouse, data must not be altered. Therefore, data is available for future comparison.
+- Time-variant : Changes made on data over time are tracked. For instance, each and every change to a customer country of residence are tracked.</p>
+
+<p>Inmon’s model follows a top-down approach. First, a complete (enterprise wide) Data Warehouse (DW) is created in 3NF and then, if required, datamarts (DM) are provisioned out of the DW. Datamarts in Inmon’s model are in 3NF from which the OLAP cubes are built.
+For Inmon, data quality and coherency is paramount and thus the 3NF in the DW and the DMs.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='http://hostettler.github.io/figures/Imnon.png' width='' height='' alt='The Imnon Top-Down model' title='The Imnon Top-Down model'><span class='caption-text'>The Imnon Top-Down model</span></span></p>
+
+<h3>Ralph Kimball&#8217;s approach</h3>
+
+<p>According to <a href="http://www.amazon.com/The-Data-Warehouse-Toolkit-Dimensional-ebook/dp/B004GXBZFQ">Kimball</a> another prominent actor in this field, &#8220;Data Warehouse is a system that extracts, cleans, conforms, and delivers source data into a dimensional data store and then supports and implements querying and analysis for the purpose of decision making.&#8221; This definition does not contradict Inmon&#8217;s properties. The difference lies in the architecture.</p>
+
+<p>Kimball’s model follows a bottom-up approach. First, some Datamarts (DM) emerge directly sourced from OLTP systems usually follow the company processes and organization.<br/>
+The Datamarts are usually de-normalized star schemas. The OLAP cubes are built on top of them.</p>
+
+<p><span class='caption-wrapper center'><img class='caption' src='http://hostettler.github.io/figures/Kimball.png' width='' height='' alt='The Kimball Bottum-Up model' title='The Kimball Bottum-Up model'><span class='caption-text'>The Kimball Bottum-Up model</span></span></p>
+
+<h3>The Hybrid model - A typical architecture</h3>
+
+<p>Both of these approaches have their pros and cons. Kimball’s model is easy to start with because of the bottom-up approach and hence you can start small and scale-up eventually. Moreover, the ROI is usually better with Kimball’s model.
+Because of this approach it is difficult to created re-usable data structures and operations (extraction) for different datamarts. Finally, you may end-up with consistency problems.
+On the other hand, Inmon’s approach is structured and easier to maintain at the cost of being rigid and more expensive.</p>
+
+<p>Real-life DWH implementation often end-up using a hybrid architecure. The following architecture relies on the following biulding blocks:</p>
+
+<ul>
+<li>a staging layer to extract and sanitize data</li>
+<li>an ODS to enable &#8220;close to the operation&#8221; data mining</li>
+<li>an 3NF DWH with full history to enable the creation unanticipated datamarts</li>
+<li>datamarts that rely on the star schema for better performances</li>
+</ul>
+
+
+<p><span class='caption-wrapper center'><img class='caption' src='http://hostettler.github.io/figures/DWHArchitecture.png' width='' height='' alt='A typical Hybrid Architecture' title='A typical Hybrid Architecture'><span class='caption-text'>A typical Hybrid Architecture</span></span></p>
+
+<h2>Data Mart (DMT)</h2>
+
+<p>A datamart is essentially a basic building block of the data warehouse.
+The term &#8220;data mart&#8221; has become somewhat ambiguous, but it is traditionally associated with a subject-oriented subset of an organization&#8217;s information systems. Data mart does not explicitly imply the presence of a multi-dimensional technology such as OLAP and data mart does not explicitly imply the presence of summarized numerical data.</p>
+
+<h2>Operational Data Store (ODS)</h2>
+
+<p>An operational data store (ODS) is building block of Data warehouse used for immediate reporting with operational data.  An ODS contains lightly transformed and lightly integrated operational data with a (rather) short time window. The ODS is usually used when looking for specific events (settling a banking movement or looking for a specific operation). Full history is available in the DWH.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Integration Tests With Docker and Arquillian]]></title>
