@@ -120,6 +120,7 @@ During the discussions, people raised words such as &#8220;Data Warehouse&#8221;
 
 <p>Business Intelligence Systems usually (but not always) rely on a Data Warehouse to provide information out of raw operational data.
 The following diagram shows the relationships between the different levels involved in making a  decision.
+Information emerge from consolidated data thus helping the user to improve her knowledge on a given subject. Using this knowledge, she then can make a informed decision.
 <span class='caption-wrapper center'><img class='caption' src='/figures/B.I.png' width='' height='' alt='How B.I. helps Decision making' title='How B.I. helps Decision making'><span class='caption-text'>How B.I. helps Decision making</span></span></p>
 
 <p>Business Intelligence Systems have the following properties:</p>
@@ -140,11 +141,15 @@ The following diagram shows the relationships between the different levels invol
 
 <h3>William Inmon&#8217;s approach</h3>
 
-<p>According to <a href="http://www.amazon.com/Building-Data-Warehouse-W-Inmon/dp/0471141615">William Inmon</a> that originally coined the term &#8220;Data Warehouse&#8221;, a data warehouse has the following properties:
-- Subject oriented : This implies that data are organized around the business and not around the sources. For instance, several accounting data sources are consolidated into one accounting data warehouse. The purpose of which is to letting information emerge out of data.
-- Integrated : Coming from different sources, data must be standardized to enable consistency and thus letting information emerge. For instance, customer identification must be normalized across different sources.
-- Non-volatile : Once in the data warehouse, data must not be altered. Therefore, data is available for future comparison.
-- Time-variant : Changes made on data over time are tracked. For instance, each and every change to a customer country of residence are tracked.</p>
+<p>According to <a href="http://www.amazon.com/Building-Data-Warehouse-W-Inmon/dp/0471141615">William Inmon</a> that originally coined the term &#8220;Data Warehouse&#8221;, a data warehouse has the following properties:</p>
+
+<ul>
+<li>Subject oriented : This implies that data are organized around the business and not around the sources. For instance, several accounting data sources are consolidated into one accounting data warehouse. The purpose of which is to letting information emerge out of data.</li>
+<li>Integrated : Coming from different sources, data must be standardized to enable consistency and thus letting information emerge. For instance, customer identification must be normalized across different sources.</li>
+<li>Non-volatile : Once in the data warehouse, data must not be altered. Therefore, data is available for future comparison.</li>
+<li>Time-variant : Changes made on data over time are tracked. For instance, each and every change to a customer country of residence are tracked.</li>
+</ul>
+
 
 <p>Inmon’s model follows a top-down approach. First, a complete (enterprise wide) Data Warehouse (DW) is created in 3NF and then, if required, datamarts (DM) are provisioned out of the DW. Datamarts in Inmon’s model are in 3NF from which the OLAP cubes are built.
 For Inmon, data quality and coherency is paramount and thus the 3NF in the DW and the DMs.</p>
