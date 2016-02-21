@@ -4,7 +4,7 @@
   <title><![CDATA[Steve Hostettler]]></title>
   <link href="http://hostettler.github.io/atom.xml" rel="self"/>
   <link href="http://hostettler.github.io/"/>
-  <updated>2016-02-21T23:02:51+01:00</updated>
+  <updated>2016-02-21T23:08:11+01:00</updated>
   <id>http://hostettler.github.io/</id>
   <author>
     <name><![CDATA[Steve Hostettler]]></name>
@@ -20,7 +20,7 @@
     <id>http://hostettler.github.io/blog/2016/02/10/data-warehouse</id>
     <content type="html"><![CDATA[<p>In my current assignment, I had the opportunity to discuss with Data Warehouse (DW) experts about the DW integration with the rest of the information system.
 I noticed that not every people (included Data Warehouse professionals) uses the same vocabulary.
-During the discussions, people raised words such as &#8220;Data Warehouse&#8221;, &#8220;Data Marts&#8221;, ODS, &#8220;Data Lake&#8221; and so on. Some of the words were used interchangeably which does not help to follow the discussion. As I was not familiar  with several  of them, I decided to do my homework and to come up with a small glossary to provide a common ground for further discussions.</p>
+During the discussions, people raised words such as <a href="#dwh">&#8220;Data Warehouse&#8221;</a>, <a href="#dmt">&#8220;Data Marts&#8221;</a>, <a href="#ods">ODS</a>, &#8220;Data Lake&#8221; and so on. Some of the words were used interchangeably which does not help to follow the discussion. As I was not familiar  with several  of them, I decided to do my homework and to come up with a small glossary to provide a common ground for further discussions.</p>
 
 <blockquote><p>Disclaimer : I am not an expert in the field, I only tried to come up with a couple of definitions to get a common ground for further discussions.  Please experts in the field, help me to improve this!</p></blockquote>
 
@@ -45,7 +45,7 @@ Information emerge from consolidated data thus helping the user to improve her k
 </ul>
 
 
-<h2>Data Warehouse (DWH)</h2>
+<h2>Data Warehouse (DWH) <a id="dwh"></a></h2>
 
 <p>DWHs are central repositories of integrated data from one or more disparate sources. Its purpose is to organize and homogenize data into information. User can then leverage this information into knowledge and therefore make informed decision (see B.I.).</p>
 
@@ -72,24 +72,24 @@ For Inmon, data quality and coherency is paramount and thus the 3NF in the DW an
 
 <p>According to <a href="http://www.amazon.com/The-Data-Warehouse-Toolkit-Dimensional-ebook/dp/B004GXBZFQ">Kimball</a> another prominent actor in this field, &#8220;Data Warehouse is a system that extracts, cleans, conforms, and delivers source data into a dimensional data store and then supports and implements querying and analysis for the purpose of decision making.&#8221; This definition does not contradict Inmon&#8217;s properties. The difference lies in the architecture.</p>
 
-<p>Kimball’s model follows a bottom-up approach. First, some Datamarts (DM) emerge directly sourced from <a href="https://en.wikipedia.org/wiki/Online_transaction_processing">OLTP</a> (Online Transaction Processing Systems) systems usually follow the company processes and organization.<br/>
-The Datamarts are either in 3NF (OLAP cubes are built on top of them) or de-normalized star schemas.</p>
+<p>Kimball’s model follows a bottom-up approach. First, some (Datamarts)(#dmt) (DM) emerge directly sourced from <a href="https://en.wikipedia.org/wiki/Online_transaction_processing">OLTP</a> (Online Transaction Processing Systems) systems usually follow the company processes and organization.<br/>
+The <a href="#dmt">Datamarts</a> are either in 3NF (<a href="#cube">OLAP cubes</a> are built on top of them) or de-normalized star schemas.</p>
 
 <p><span class='caption-wrapper center'><img class='caption' src='http://hostettler.github.io/figures/Kimball.png' width='' height='' alt='The Kimball Bottum-Up model' title='The Kimball Bottum-Up model'><span class='caption-text'>The Kimball Bottum-Up model</span></span></p>
 
 <h3>The Hybrid model - A typical architecture</h3>
 
 <p>Both of these approaches have their pros and cons. Kimball’s model is easy to start with because of the bottom-up approach and hence you can start small and scale-up eventually. Moreover, the ROI is usually better with Kimball’s model.
-Because of this approach it is difficult to created re-usable data structures and operations (extraction) for different datamarts. Finally, you may end-up with consistency problems.
+Because of this approach it is difficult to created re-usable data structures and operations (extraction) for different <a href="#dmt">datamarts</a>. Finally, you may end-up with consistency problems.
 On the other hand, Inmon’s approach is structured and easier to maintain at the cost of being rigid and more expensive.</p>
 
 <p>Real-life DWH implementation often end-up using a hybrid architecure. The following architecture relies on the following biulding blocks:</p>
 
 <ul>
 <li>a staging layer to extract and sanitize data</li>
-<li>an ODS to enable &#8220;close to the operation&#8221; data mining</li>
-<li>an 3NF DWH with full history to enable the creation unanticipated datamarts</li>
-<li>datamarts that rely either on 3NF or on the star schema for better performances</li>
+<li>an <a href="#ods">ODS</a> to enable &#8220;close to the operation&#8221; data mining</li>
+<li>an 3NF DWH with full history to enable the creation unanticipated <a href="#dmt">datamarts</a></li>
+<li><a href="#dmt">datamarts</a> that rely either on 3NF or on the star schema for better performances</li>
 </ul>
 
 
@@ -100,11 +100,11 @@ On the other hand, Inmon’s approach is structured and easier to maintain at th
 <p>A datamart is essentially a basic building block of the data warehouse.
 It is subject-oriented subset of a Data Warehouse. Data mart does not explicitly imply the presence of a multi-dimensional technology such as OLAP and data mart does not explicitly imply the presence of summarized numerical data.</p>
 
-<h2>Operational Data Store (ODS)</h2>
+<h2>Operational Data Store (ODS) <a id="ods"></a></h2>
 
 <p>An operational data store (ODS) is building block of Data warehouse used for immediate reporting with operational data.  An ODS contains lightly transformed and lightly integrated operational data with a (rather) short time window. The ODS is usually used when looking for specific events (settling a banking movement or looking for a specific operation). Full history is available in the DWH.</p>
 
-<h2>OLAP Cubes</h2>
+<h2>OLAP Cubes <a id="cube"></a></h2>
 
 <p>OLAP Cubes are multidimensional arrays of data comming from a relational database. It enables operations such as slicing and dicing (projection), drill down/up, roll-up. A datamart relying on a star schema provides equivalent functionalities. However, in a cube every projection/aggregation are pre-computed (this enables to discover new patterns) whether in a star schema only some projections/aggregations (the one you know are interrested) are pre-computed.</p>
 
