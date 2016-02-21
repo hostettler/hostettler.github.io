@@ -126,10 +126,10 @@ Information emerge from consolidated data thus helping the user to improve her k
 <p>Business Intelligence Systems have the following properties:</p>
 
 <ul>
-<li>It leverages raw heterogeneous operational data</li>
-<li>It enables multi-dimensional information and operations on it</li>
-<li>It is driven by the business</li>
-<li>It has to be performant and must not interfere with daily operations</li>
+<li>They leverage raw heterogeneous operational data</li>
+<li>They enable multi-dimensional information and operations on it</li>
+<li>They are driven by the business</li>
+<li>They have to be performant and must not interfere with daily operations</li>
 </ul>
 
 
@@ -151,7 +151,7 @@ Information emerge from consolidated data thus helping the user to improve her k
 </ul>
 
 
-<p>Inmon’s model follows a top-down approach. First, a complete (enterprise wide) Data Warehouse (DW) is created in 3NF and then, if required, datamarts (DM) are provisioned out of the DW. Datamarts in Inmon’s model are in 3NF from which the OLAP cubes are built.
+<p>Inmon’s model follows a top-down approach. First, a complete (enterprise wide) Data Warehouse (DW) is created in i<a href="https://en.wikipedia.org/wiki/Third_normal_form">third normal form</a> (3NF : avoiding duplication and having referential integrity) and then, if required, <a href="#Datamarts">datamarts</a> (DM) are provisioned out of the DW. Datamarts in Inmon’s model are in 3NF from which the <a href="https://en.wikipedia.org/wiki/Online_transaction_processing">OLAP</a> cubes are built.
 For Inmon, data quality and coherency is paramount and thus the 3NF in the DW and the DMs.</p>
 
 <p><span class='caption-wrapper center'><img class='caption' src='/figures/Imnon.png' width='' height='' alt='The Imnon Top-Down model' title='The Imnon Top-Down model'><span class='caption-text'>The Imnon Top-Down model</span></span></p>
@@ -160,8 +160,8 @@ For Inmon, data quality and coherency is paramount and thus the 3NF in the DW an
 
 <p>According to <a href="http://www.amazon.com/The-Data-Warehouse-Toolkit-Dimensional-ebook/dp/B004GXBZFQ">Kimball</a> another prominent actor in this field, &#8220;Data Warehouse is a system that extracts, cleans, conforms, and delivers source data into a dimensional data store and then supports and implements querying and analysis for the purpose of decision making.&#8221; This definition does not contradict Inmon&#8217;s properties. The difference lies in the architecture.</p>
 
-<p>Kimball’s model follows a bottom-up approach. First, some Datamarts (DM) emerge directly sourced from OLTP systems usually follow the company processes and organization.<br/>
-The Datamarts are usually de-normalized star schemas. The OLAP cubes are built on top of them.</p>
+<p>Kimball’s model follows a bottom-up approach. First, some Datamarts (DM) emerge directly sourced from <a href="https://en.wikipedia.org/wiki/Online_transaction_processing">OLTP</a> (Online Transaction Processing Systems) systems usually follow the company processes and organization.<br/>
+The Datamarts are either in 3NF (OLAP cubes are built on top of them) or de-normalized star schemas.</p>
 
 <p><span class='caption-wrapper center'><img class='caption' src='/figures/Kimball.png' width='' height='' alt='The Kimball Bottum-Up model' title='The Kimball Bottum-Up model'><span class='caption-text'>The Kimball Bottum-Up model</span></span></p>
 
@@ -191,6 +191,14 @@ It is subject-oriented subset of a Data Warehouse. Data mart does not explicitly
 <h2>Operational Data Store (ODS)</h2>
 
 <p>An operational data store (ODS) is building block of Data warehouse used for immediate reporting with operational data.  An ODS contains lightly transformed and lightly integrated operational data with a (rather) short time window. The ODS is usually used when looking for specific events (settling a banking movement or looking for a specific operation). Full history is available in the DWH.</p>
+
+<h2>OLAP Cubes</h2>
+
+<p>OLAP Cubes are multidimensional arrays of data comming from a relational database. It enables operations such as slicing and dicing (projection), drill down/up, roll-up. A datamart relying on a star schema provides equivalent functionalities. However, in a cube every projection/aggregation are pre-computed (this enables to discover new patterns) whether in a star schema only some projections/aggregations (the one you know are interrested) are pre-computed.</p>
+
+<h1>Conclusion</h1>
+
+<p>Business Intelligence is a set of practices/methodologies that leverage raw data into decisions. Data warehouses, data marts and cubes are building blocks used to build Busines Intelligence system.</p>
 </div>
 
 
