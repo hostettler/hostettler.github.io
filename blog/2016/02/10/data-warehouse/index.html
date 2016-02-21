@@ -151,7 +151,7 @@ Information emerge from consolidated data thus helping the user to improve her k
 </ul>
 
 
-<p>Inmon’s model follows a top-down approach. First, a complete (enterprise wide) Data Warehouse (DW) is created in <a href="https://en.wikipedia.org/wiki/Third_normal_form">third normal form</a> (3NF : avoiding duplication and having referential integrity) and then, if required, <a href="Data%20Mart%20(DMT">datamarts</a>) (DMT) are provisioned out of the DW. Datamarts in Inmon’s model are in 3NF from which the <a href="https://en.wikipedia.org/wiki/Online_transaction_processing">OLAP</a> cubes are built.
+<p>Inmon’s model follows a top-down approach. First, a complete (enterprise wide) Data Warehouse (DW) is created in <a href="https://en.wikipedia.org/wiki/Third_normal_form">third normal form</a> (3NF : avoiding duplication and having referential integrity) and then, if required, <a href="#dmt">datamarts</a> (DMT) are provisioned out of the DW. Datamarts in Inmon’s model are in 3NF from which the <a href="https://en.wikipedia.org/wiki/Online_transaction_processing">OLAP</a> cubes are built.
 For Inmon, data quality and coherency is paramount and thus the 3NF in the DW and the DMs.</p>
 
 <p><span class='caption-wrapper center'><img class='caption' src='/figures/Imnon.png' width='' height='' alt='The Imnon Top-Down model' title='The Imnon Top-Down model'><span class='caption-text'>The Imnon Top-Down model</span></span></p>
@@ -177,13 +177,13 @@ On the other hand, Inmon’s approach is structured and easier to maintain at th
 <li>a staging layer to extract and sanitize data</li>
 <li>an ODS to enable &#8220;close to the operation&#8221; data mining</li>
 <li>an 3NF DWH with full history to enable the creation unanticipated datamarts</li>
-<li>datamarts that rely on the star schema for better performances</li>
+<li>datamarts that rely either on 3NF or on the star schema for better performances</li>
 </ul>
 
 
 <p><span class='caption-wrapper center'><img class='caption' src='/figures/DWHArchitecture.png' width='' height='' alt='A typical Hybrid Architecture' title='A typical Hybrid Architecture'><span class='caption-text'>A typical Hybrid Architecture</span></span></p>
 
-<h2>Data Mart (DMT)</h2>
+<h2>Data Mart (DMT) <a id="dmt"></a></h2>
 
 <p>A datamart is essentially a basic building block of the data warehouse.
 It is subject-oriented subset of a Data Warehouse. Data mart does not explicitly imply the presence of a multi-dimensional technology such as OLAP and data mart does not explicitly imply the presence of summarized numerical data.</p>
