@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>About Sessions, Conversations, and the Garbage Collector | Steve Hostettler</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="About Sessions, Conversations, and the Garbage Collector" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="A couple of days ago, I had a discussion with a developer about the notion of web conversation. More precisely, about its utility. During this discussion, we ran into some basic misconceptions that, IMHO, no web developer must do. Conversation (or flows) are good features of the recent frameworks (Spring, JSF) because they allow to save information across several user requests without putting them into the session. For instance, this can be very useful for wizards. Putting these information into the session asks for manual maintenance, and in particular for manual collection. This is usual error prone and should be avoided. The problem being that the user rarely logs out before closing the browser. Thus, HttpSession.invalidate() does not get a chance to be called and the session remains active until the timeout occurs (usually 20 minutes later)." />
+<meta property="og:description" content="A couple of days ago, I had a discussion with a developer about the notion of web conversation. More precisely, about its utility. During this discussion, we ran into some basic misconceptions that, IMHO, no web developer must do. Conversation (or flows) are good features of the recent frameworks (Spring, JSF) because they allow to save information across several user requests without putting them into the session. For instance, this can be very useful for wizards. Putting these information into the session asks for manual maintenance, and in particular for manual collection. This is usual error prone and should be avoided. The problem being that the user rarely logs out before closing the browser. Thus, HttpSession.invalidate() does not get a chance to be called and the session remains active until the timeout occurs (usually 20 minutes later)." />
+<link rel="canonical" href="http://hostettler.net/java%20ee%206/jee6/java/session/conversation/garbage%20collector/2012/06/10/Sessions-GC-Conversations.html" />
+<meta property="og:url" content="http://hostettler.net/java%20ee%206/jee6/java/session/conversation/garbage%20collector/2012/06/10/Sessions-GC-Conversations.html" />
+<meta property="og:site_name" content="Steve Hostettler" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2012-06-10T18:51:00+02:00" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"About Sessions, Conversations, and the Garbage Collector","dateModified":"2012-06-10T18:51:00+02:00","url":"http://hostettler.net/java%20ee%206/jee6/java/session/conversation/garbage%20collector/2012/06/10/Sessions-GC-Conversations.html","datePublished":"2012-06-10T18:51:00+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/java%20ee%206/jee6/java/session/conversation/garbage%20collector/2012/06/10/Sessions-GC-Conversations.html"},"description":"A couple of days ago, I had a discussion with a developer about the notion of web conversation. More precisely, about its utility. During this discussion, we ran into some basic misconceptions that, IMHO, no web developer must do. Conversation (or flows) are good features of the recent frameworks (Spring, JSF) because they allow to save information across several user requests without putting them into the session. For instance, this can be very useful for wizards. Putting these information into the session asks for manual maintenance, and in particular for manual collection. This is usual error prone and should be avoided. The problem being that the user rarely logs out before closing the browser. Thus, HttpSession.invalidate() does not get a chance to be called and the session remains active until the timeout occurs (usually 20 minutes later).","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about-me/">About me</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">About Sessions, Conversations, and the Garbage Collector</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2012-06-10T18:51:00+02:00" itemprop="datePublished">Jun 10, 2012
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>A couple of days ago, I had a discussion with a developer about the notion of web conversation.
+More precisely, about its utility. During this discussion, we ran into some basic misconceptions
+that, IMHO, no web developer must do. Conversation (or flows) are good features of the recent
+frameworks (Spring, JSF) because they allow to save information across several user requests without
+putting them into the session. For instance, this can be very useful for wizards. Putting these
+information into the session asks for manual maintenance, and in particular for manual collection.
+This is usual error prone and should be avoided. The problem being that the user rarely logs out
+before closing the browser. Thus, <code class="highlighter-rouge">HttpSession.invalidate()</code> does not get a chance to be called
+and the session remains active until the timeout occurs (usually 20 minutes later).</p>
+
+<p>The person I was talking with, though that it is not necessary to care about that. In his view, 
+the garbage collector will take care of this and that it can be forced. We discuss the matter a bit
+deeper and here are some myths that I think must be rebutted.</p>
+
+<h4 id="first-assumption-i-can-force-the-garbage-collection">First assumption: I can force the garbage collection</h4>
+
+<p>This is not true, actually according to the Java documentation:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Calling the gc method suggests that the Java Virtual Machine expend effort toward recycling unused objects in order to make the memory they currently occupy available for quick reuse. When control returns from the method call, the Java Virtual Machine has made a best effort to reclaim space from all discarded objects.
+</code></pre></div></div>
+
+<p><code class="highlighter-rouge">System.gc()</code> <strong>suggests</strong> the garbage collection, it does not enforce it. This signals that you
+would like the garbage collector to do its job, but there is no guarantee whatsoever. It is only
+possible to enforce garbage collection by writing your own garbage collector, but you cannot expect
+all garbage collectors of all the possible VM to act similarly. Therefore, relying on this
+assumption is not portable.</p>
+
+<h4 id="second-assumption-if-i-close-the-browser-the-session-and-its-objects-are-collected">Second assumption: If I close the browser the session and its objects are collected</h4>
+<p>Even If it would be possible to enforce the garbage collection, it is of no use as long as there
+remains a single reference to the objects to collect. Again, this is absolutely not the case.
+Remember that closing the browser does not mean anything to the server. It would, in theory possible
+to imagine something with an ajax call that traps the close event of the browser and does a 
+<code class="highlighter-rouge">HttpSession.invalidate()</code> . This is quite complex to do in a cross-browser manner and gives no
+guarantee. Therefore, the data attached to the session will be kept in memory until the session
+timeout. This is precisely the beauty of conversation scopes, the developer just tells when the
+conversation starts and when it ends. Usually, user do not stop in the middle of a conversation,
+they tend to finish it. At least, more often that they click on logout.</p>
+
+<h4 id="third-assumption-anyway-this-does-not-represent-a-huge-amount-of-memory">Third assumption: Anyway this does not represent a huge amount of memory.</h4>
+<p>Let us take a simple example: a standard business application that, at some point in the business
+process, requires a tree for shop selection. This kind of interactions requires several client-server
+communications and therefore several requests. A temptation would be to put the tree in the session
+scope. Let us say that 10,000 (logical) users log into the application, for instance from 09:00 am to 09:30
+am. If each session requires 100 KB (trees are huge even with lazy loading), we end up with 1G memory(only for the tree).
+As most of the users do not click on logout, you rely on the timeout to free these objects.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Using request scope of conversation scope over session scope is a good practice as it frees you
+from managing the garbage collection. The code is therefore cleaner and more efficient.
+This can be done with JSF’s <code class="highlighter-rouge">@ConversationScoped</code> or with Spring Webflow’s <code class="highlighter-rouge">Conversation</code>.</p>
+
+  </div><a class="u-url" href="/java%20ee%206/jee6/java/session/conversation/garbage%20collector/2012/06/10/Sessions-GC-Conversations.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Steve Hostettler</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Steve Hostettler</li><li><a class="u-email" href="mailto:steve.hostettler@gmail.com">steve.hostettler@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/hostettler"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">hostettler</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Steve Hostettler&#39;s personal blog about automatic testing, Java, Java EE, and Architecture.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

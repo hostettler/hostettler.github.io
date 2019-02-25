@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Multi-Tenancy with EJB 3.1 and JPA 2.0 | Steve Hostettler</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Multi-Tenancy with EJB 3.1 and JPA 2.0" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="In this post, we look at how to simulate multi-tenancy with several datasources using JPA 2.0" />
+<meta property="og:description" content="In this post, we look at how to simulate multi-tenancy with several datasources using JPA 2.0" />
+<link rel="canonical" href="http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html" />
+<meta property="og:url" content="http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html" />
+<meta property="og:site_name" content="Steve Hostettler" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2012-11-20T05:18:00+01:00" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Multi-Tenancy with EJB 3.1 and JPA 2.0","dateModified":"2012-11-20T05:18:00+01:00","url":"http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html","datePublished":"2012-11-20T05:18:00+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html"},"description":"In this post, we look at how to simulate multi-tenancy with several datasources using JPA 2.0","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about-me/">About me</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Multi-Tenancy with EJB 3.1 and JPA 2.0</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2012-11-20T05:18:00+01:00" itemprop="datePublished">Nov 20, 2012
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Multi-tenancy is a recurrent non functional requirement. Indeed, many important IT-systems are meant to be shared among multiple tenants. The data are often distributed over several databases or schemas. This, for different reasons:</p>
+
+<ul>
+  <li>Security: The data belong to different customers and some level of isolation is required;</li>
+  <li>Performances: Distributing the data over multiple systems may help to master performance issues;</li>
+  <li>Legacy: Sometimes, old and new systems must cohabit for a (long) time;</li>
+  <li>Maintenability: A database or a schema can be updated without putting the rest of the application at risk.</li>
+</ul>
+
+<p>Although data are distributed, the application code should remain tenant agnostic. Furthermore, choosing between the different tenants is often made at runtime based on credentials (e.g. user Joe has access to customer AAAA while user Jane sees data of customer BBB). <a href="/https://blogs.oracle.com/arungupta/entry/java_ee_7_key_features">Java EE 7 will address this problem and much more</a>, but in the mean time here is the way that I use to address this problematic using EJB 3.1 and JPA 2.0</p>
+
+<h2 id="overall-architecture">Overall architecture</h2>
+
+<p>First, let me start with the overall architecture as described below.</p>
+
+<figure class="image">
+  <img src="/figures/multi-tenancy-architecture.png" alt="Multi-tenancy architecture with serveral datasources " />
+  <figcaption>Multi-tenancy architecture with serveral datasources </figcaption>
+</figure>
+
+<p>In the above figure, the database is organized in schemas, with one application server datasource (DS) per schema and one persistence unit (PU) per datasource. 
+It is also possible to use only one datasoure and to discriminate between schemas by setting the <code class="highlighter-rouge">&lt;property name="openjpa.jdbc.Schema" value="TenantX" /&gt;</code> property for each persistence unit (PU). This sets the default schema for the PU.
+Here is a <code class="highlighter-rouge">persistence.xml</code> file that provides one persistence unit per tenant.</p>
+
+<p>The following code has been tested for Open-JPA but there is nothing specific to this implementation outside of the <code class="highlighter-rouge">&lt;provider&gt;</code>tag in the <code class="highlighter-rouge">persistence.xml</code>file.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;persistence</span> <span class="na">version=</span><span class="s">"2.0"</span>
+   <span class="na">xmlns=</span><span class="s">"http://java.sun.com/xml/ns/persistence"</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+   <span class="na">xsi:schemaLocation=</span><span class="s">"http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"</span><span class="nt">&gt;</span>
+
+   <span class="nt">&lt;persistence-unit</span> <span class="na">name=</span><span class="s">"Tenant1"</span> <span class="na">transaction-type=</span><span class="s">"JTA"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;provider&gt;</span>
+         org.apache.openjpa.persistence.PersistenceProviderImpl
+      <span class="nt">&lt;/provider&gt;</span>
+      <span class="nt">&lt;jta-data-source&gt;</span>jdbc/Tenant1_DS<span class="nt">&lt;/jta-data-source&gt;</span>
+      <span class="nt">&lt;exclude-unlisted-classes&gt;</span>false<span class="nt">&lt;/exclude-unlisted-classes&gt;</span>
+   <span class="nt">&lt;/persistence-unit&gt;</span>
+
+
+   <span class="nt">&lt;persistence-unit</span> <span class="na">name=</span><span class="s">"Tenant2"</span> <span class="na">transaction-type=</span><span class="s">"JTA"</span><span class="nt">&gt;</span>
+      <span class="nt">&lt;provider&gt;</span>
+         org.apache.openjpa.persistence.PersistenceProviderImpl
+      <span class="nt">&lt;/provider&gt;</span>
+      <span class="nt">&lt;jta-data-source&gt;</span>jdbc/Tenant2_DS<span class="nt">&lt;/jta-data-source&gt;</span>
+      <span class="nt">&lt;exclude-unlisted-classes&gt;</span>false<span class="nt">&lt;/exclude-unlisted-classes&gt;</span>
+   <span class="nt">&lt;/persistence-unit&gt;</span>
+
+<span class="nt">&lt;/persistence&gt;</span>
+</code></pre></div></div>
+
+<p>The basic idea is that, instead of using <code class="highlighter-rouge">@PersistenceContext</code>, we inject our “own” multi tenant entity manager wraper.
+Then, at runtime, the multi-tenant entity manager loads the persistence context that corresponds to the current user context from JNDI.
+Please note that this only works for JTA-based persistence-units. Otherwise, the persistence context is not container-basd and therefore not exposed to JNDI. Moreover, without JTA, we loose container based transaction demarcation.</p>
+
+<p>Let us first start with the client code. In other words, how to use the Multi-Tenant Entity manager.</p>
+
+<h2 id="client-code">Client Code</h2>
+
+<p>Here is the client code. In order to preserve thread-safety and transactionality, Data access objects are EJBs (<code class="highlighter-rouge">@Stateless</code>, <code class="highlighter-rouge">@Stateful</code>, <code class="highlighter-rouge">@Singleton</code>). The presented solution uses an entity manager that is wrapped and then injected using <code class="highlighter-rouge">@Inject</code> or <code class="highlighter-rouge">@EJB</code>.  Thread-safety, transactionnality and performances are guaranted by the <code class="highlighter-rouge">EJB 3.1</code> and <code class="highlighter-rouge">JPA 2.0</code> specification as explained in the section <code class="highlighter-rouge">Thread-safety and Transactionality</code>. As shown below, the <code class="highlighter-rouge">MultiTenancyWrapper</code> delegates to a real entity manager and implements the <code class="highlighter-rouge">EntityManager</code> interface. Therefore, its use is very similar to a normal <code class="highlighter-rouge">EntityManager</code> injected via <code class="highlighter-rouge">@PersistenceContext</code>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Stateless</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyEJB</span> <span class="kd">implements</span> <span class="n">MyEJBLocal</span> <span class="o">{</span>
+
+   <span class="nd">@Inject</span>
+   <span class="kd">private</span> <span class="n">MultiTenancyWrapper</span> <span class="n">emWrapper</span><span class="o">;</span>
+
+   <span class="nd">@TransactionAttribute</span><span class="o">(</span><span class="n">TransactionAttributeType</span><span class="o">.</span><span class="na">REQUIRED</span><span class="o">)</span>
+   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSomething</span><span class="o">()</span> <span class="o">{</span>
+      <span class="n">emWrapper</span><span class="o">.</span><span class="na">findAll</span><span class="o">(...);</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="the-multi-tenant-entitymanager-ejb">The Multi-Tenant EntityManager EJB</h2>
+
+<p>The <code class="highlighter-rouge">MultiTenanEntityManagertWrapper</code> simply wraps the entity manager that corresponds to the current user context. The trick is to configure it as an EJB in order to get the xml configuration feature via <code class="highlighter-rouge">ejb-jar.xml</code>. Another alternative would be to use the <code class="highlighter-rouge">@PersistenceContexts</code> and <code class="highlighter-rouge">@PersistenceContext</code> annotations. The main drawback being that, for each new tenant, not only the <code class="highlighter-rouge">persistence.xml</code> and <code class="highlighter-rouge">ejb-jar.xml</code> must be changed but also the <code class="highlighter-rouge">Java</code> code.</p>
+
+<p>The JNDI context that is linked to the current request is injected in the <code class="highlighter-rouge">MultiTenantEntityManager</code> using the <code class="highlighter-rouge">@Resource</code>annotation.
+As there is no creation of a new <code class="highlighter-rouge">InitialContext</code> the overhead is not significant. Actually, the <code class="highlighter-rouge">@PersistentContext</code> annotation does the exact same thing except that it is not specific to the user context. The <code class="highlighter-rouge">MultiTenanEntityManagertWrapper</code> implements the delegate pattern. This allows to use it (almost) transparently in client code.
+The main difference being the use of <code class="highlighter-rouge">@Inject</code> or <code class="highlighter-rouge">@EJB</code> over <code class="highlighter-rouge">@PersistenceContext</code> in the client code.</p>
+
+<p>Using the session context that is specific to the caller bean (and thus the caller request/session) enables transparent support for thread-safety, security and transactionality.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ejb</span><span class="o">;</span>
+
+<span class="kn">import</span> <span class="nn">javax.persistence.EntityManager</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">MultiTenanEntityManagertWrapper</span> <span class="kd">extends</span> <span class="n">EntityManager</span> <span class="o">{</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>The method <code class="highlighter-rouge">getMultiTenantEntityManager</code> of the <code class="highlighter-rouge">MultiTenanEntityManagertWrapperImpl</code> extracts the <code class="highlighter-rouge">EntityManager</code> that corresponds to the current request from JNDI (we will see later how it has been put there). To that end, the method <code class="highlighter-rouge">getMultiTenantEntityManager</code>first extracts the prinipal from the current EJB context (<code class="highlighter-rouge">SessionContext</code>). After what, the tenant that corresponds to the current user is used to obtain the JNDI name of the corresponding entity manager. <code class="highlighter-rouge">MultiTenanEntityManagertWrapperImpl</code> simple delegates every call to the this Request specific <code class="highlighter-rouge">EntityManager</code>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nd">@Stateless</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MultiTenanEntityManagertWrapperImpl</span> <span class="kd">implements</span> <span class="n">MultiTenanEntityManagertWrapper</span> <span class="o">{</span>
+   
+   <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">JNDI_ENV</span> <span class="o">=</span> <span class="s">"java:comp/env/persistence/"</span><span class="o">;</span>
+
+   <span class="nd">@Resource</span>
+   <span class="n">SessionContext</span> <span class="n">context</span><span class="o">;</span>
+
+   
+   <span class="kd">private</span> <span class="n">EntityManager</span> <span class="nf">getMultiTenantEntityManager</span><span class="o">()</span> <span class="o">{</span>
+      <span class="c1">//Extract the name of the current user.</span>
+      <span class="n">Principal</span> <span class="n">p</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getCallerPrincipal</span><span class="o">();</span>
+
+      <span class="c1">//Lookup the tenant name for the current user</span>
+      <span class="c1">//This is application specific</span>
+      <span class="n">Users</span> <span class="n">u</span> <span class="o">=</span> <span class="n">Users</span><span class="o">.</span><span class="na">getUser</span><span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+
+      <span class="c1">//Produces either TENANT1 or TENANT2      </span>
+      <span class="n">String</span> <span class="n">tenantName</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="na">getSite</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
+
+      <span class="n">String</span> <span class="n">jndiName</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuffer</span><span class="o">(</span><span class="n">JNDI_ENV</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">tenantName</span><span class="o">).</span><span class="na">toString</span><span class="o">();</span>
+      <span class="c1">//Lookup the entity manager</span>
+      <span class="n">EntityManager</span> <span class="n">manager</span> <span class="o">=</span> <span class="o">(</span><span class="n">EntityManager</span><span class="o">)</span> <span class="n">context</span><span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="n">jndiName</span><span class="o">);</span>
+      
+      <span class="k">if</span> <span class="o">(</span><span class="n">manager</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+         <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="s">"Tenant unknown"</span><span class="o">);</span>
+      <span class="o">}</span>
+      <span class="k">return</span> <span class="n">manager</span><span class="o">;</span>
+   <span class="o">}</span>
+
+
+   <span class="c1">//The delegates</span>
+   <span class="nd">@Override</span>
+   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">persist</span><span class="o">(</span><span class="n">Object</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">getMultiTenantEntityManager</span><span class="o">().</span><span class="na">persist</span><span class="o">(</span><span class="n">entity</span><span class="o">);</span>
+   <span class="o">}</span>
+
+
+   <span class="nd">@Override</span>
+   <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">merge</span><span class="o">(</span><span class="n">T</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
+      <span class="k">return</span> <span class="nf">getMultiTenantEntityManager</span><span class="o">().</span><span class="na">merge</span><span class="o">(</span><span class="n">entity</span><span class="o">);</span>
+   <span class="o">}</span>
+
+
+   <span class="nd">@Override</span>
+   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">remove</span><span class="o">(</span><span class="n">Object</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
+      <span class="n">getMultiTenantEntityManager</span><span class="o">().</span><span class="na">remove</span><span class="o">(</span><span class="n">entity</span><span class="o">);</span>
+   <span class="o">}</span>
+
+        <span class="o">...</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Now let us see how to put the entity manager references in JNDI.
+In order to avoid a lot of annotations (one per tenant) and therefore to be able to handle a huge number of tenans, I propose to use the <code class="highlighter-rouge">ejb-jar.xml</code> file to configure the EJB intead of the <code class="highlighter-rouge">PersistenceContext</code> annotation. The <code class="highlighter-rouge">MultiTenantEntityWrapper</code>EJB is configured as a stateless EJB. Ther persistence contexts are simply exposed to JNDI with the following pattern: <code class="highlighter-rouge">java:comp/env/persistence/TENANTX</code>. For more information please look at the EJB 3.1 specification chapter 16.11.1.</p>
+
+<p><code class="highlighter-rouge">&lt;persistence-unit-name&gt;Tenant1&lt;/persistence-unit-name&gt;</code> is the name of the PU as defined in the <code class="highlighter-rouge">persistence.xml</code> file. <code class="highlighter-rouge">  &lt;persistence-context-ref-name&gt;persistence/TENANT1&lt;/persistence-context-ref-name&gt;</code>defines the name of the entity manager that is exposed via JNDI.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;ejb-jar</span> <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="na">xmlns=</span><span class="s">"http://java.sun.com/xml/ns/javaee"</span> <span class="na">xmlns:ejb=</span><span class="s">"http://java.sun.com/xml/ns/javaee/ejb-jar_3_0.xsd"</span> <span class="na">xsi:schemaLocation=</span><span class="s">"http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"</span> <span class="na">version=</span><span class="s">"3.1"</span><span class="nt">&gt;</span>
+
+
+   <span class="nt">&lt;enterprise-beans&gt;</span>
+      <span class="nt">&lt;session&gt;</span>
+         <span class="nt">&lt;ejb-name&gt;</span>MultiTenantEntityWrapper<span class="nt">&lt;/ejb-name&gt;</span>   
+         <span class="nt">&lt;ejb-class&gt;</span>ejb.MultiTenantWrapperImpl<span class="nt">&lt;/ejb-class&gt;</span>
+         <span class="nt">&lt;session-type&gt;</span>Stateless<span class="nt">&lt;/session-type&gt;</span>
+
+         <span class="c">&lt;!-- Persistece contexts --&gt;</span>
+         <span class="nt">&lt;persistence-context-ref&gt;</span>
+            <span class="nt">&lt;description&gt;</span>Tenant 1<span class="nt">&lt;/description&gt;</span>            
+            <span class="nt">&lt;persistence-context-ref-name&gt;</span>persistence/TENANT1<span class="nt">&lt;/persistence-context-ref-name&gt;</span>      
+            <span class="nt">&lt;persistence-unit-name&gt;</span>Tenant1<span class="nt">&lt;/persistence-unit-name&gt;</span>
+            <span class="nt">&lt;persistence-context-type&gt;</span>Transaction<span class="nt">&lt;/persistence-context-type&gt;</span>
+         <span class="nt">&lt;/persistence-context-ref&gt;</span>
+
+         <span class="nt">&lt;persistence-context-ref&gt;</span>
+            <span class="nt">&lt;description&gt;</span>Tenant 2<span class="nt">&lt;/description&gt;</span>            
+            <span class="nt">&lt;persistence-context-ref-name&gt;</span>persistence/TENANT2<span class="nt">&lt;/persistence-context-ref-name&gt;</span>      
+            <span class="nt">&lt;persistence-unit-name&gt;</span>Tenant2<span class="nt">&lt;/persistence-unit-name&gt;</span>
+            <span class="nt">&lt;persistence-context-type&gt;</span>Transaction<span class="nt">&lt;/persistence-context-type&gt;</span>            
+         <span class="nt">&lt;/persistence-context-ref&gt;</span>
+         
+      <span class="nt">&lt;/session&gt;</span>
+   <span class="nt">&lt;/enterprise-beans&gt;</span>
+
+<span class="nt">&lt;/ejb-jar&gt;</span>
+</code></pre></div></div>
+
+<h2 id="thread-safety-and-transactionality">Thread-safety and Transactionality</h2>
+<p>As this is compliant with both the EJB 3.1 and JPA 2.0 specification, thread-safety and transactionnaly are guaranteed by the container. For more details please look at the EJB 3.1 specification
+at chapters 16.10, 16.11 and the JPA 2.0 specification at chapter 7.6. Of course, the wrapper has to be an EJB in order to have access to the current JNDI context without having to create it.
+Furthermore, because the <code class="highlighter-rouge">EntityManager</code>is not <code class="highlighter-rouge">per se</code> thread-safe (JPA 2.0, chapter 7.2), the serialization of the invokations that is provided by the container for EJBs is essential the thread-safety aspect (EJB 3.1, chapter 4.10.13).</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In this post, I showed how to leverage EJB 3.1 and JPA 2.0 standard features to provide multi-tenancy. The presented approach is thead-safe, it preserves transactionaly and does not induce 
+a significant overhead.</p>
+
+  </div><a class="u-url" href="/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Steve Hostettler</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Steve Hostettler</li><li><a class="u-email" href="mailto:steve.hostettler@gmail.com">steve.hostettler@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/hostettler"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">hostettler</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Steve Hostettler&#39;s personal blog about automatic testing, Java, Java EE, and Architecture.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

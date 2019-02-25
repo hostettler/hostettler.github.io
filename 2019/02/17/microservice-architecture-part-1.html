@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Microservice Architecture - Part 1 | Steve Hostettler</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Microservice Architecture - Part 1" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers. All samples and a complete working application can be found here on GitHub" />
+<meta property="og:description" content="Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers. All samples and a complete working application can be found here on GitHub" />
+<link rel="canonical" href="http://hostettler.net/2019/02/17/microservice-architecture-part-1.html" />
+<meta property="og:url" content="http://hostettler.net/2019/02/17/microservice-architecture-part-1.html" />
+<meta property="og:site_name" content="Steve Hostettler" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-02-17T22:51:20+01:00" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Microservice Architecture - Part 1","dateModified":"2019-02-17T22:51:20+01:00","url":"http://hostettler.net/2019/02/17/microservice-architecture-part-1.html","datePublished":"2019-02-17T22:51:20+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/2019/02/17/microservice-architecture-part-1.html"},"description":"Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers. All samples and a complete working application can be found here on GitHub","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about-me/">About me</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Microservice Architecture - Part 1</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2019-02-17T22:51:20+01:00" itemprop="datePublished">Feb 17, 2019
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <h2 id="introduction">Introduction</h2>
+<p>This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. 
+Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software 
+factories and innovative deployment options such as containers. All samples and a complete working application can be found <a href="https://github.com/hostettler/microservices.git">here on GitHub</a></p>
+
+<h1 id="pre-requisites">Pre-requisites</h1>
+
+<div class="alert alert-info" role="alert"><i class="fa fa-info-circle"></i> <b>Note: </b> This series of blog post leverages a lot of different technologies. Please take the time to install everything properly. It will save time later on. </div>
+
+<p>To execute the samples you will need to install and to configure the following tools:</p>
+<ul>
+  <li>a “reasonnably” powerfull computer with Linux (whatever recent distribution) or Windows (min. Windows 10) to support Docker. Mac is ok as well but it requires some additional steps that will not be described here.</li>
+  <li>a working Docker environnment to deploy the services locally.</li>
+  <li>a <a href="https://jdk.java.net/11/">JDK 11</a> to compile and run the services</li>
+  <li>a Git client for collaboration</li>
+  <li><a href="https://nodejs.org/">NodeJS</a> and the <a href="https://angular.io/guide/quickstart">Angular tooling</a></li>
+  <li><a href="https://maven.apache.org/">Apache Maven</a> for the automation.</li>
+  <li>a bash interpreter (on Windows you can rely on Git bash that is usually installed with Git)</li>
+</ul>
+
+<div class="alert alert-warning" role="alert"><i class="fa fa-warning"></i> <b>Important: </b> because of a bug in one of the 3rd party software, please use Apache Maven 3.5.x instead of the latest 3.6.x. For more information pleaser refer to the Thorntail issue : https://github.com/thorntail/thorntail/pull/1195 </div>
+
+<p>On top of that you need to have:</p>
+<ul>
+  <li>A intermediate level in Java</li>
+  <li>Some basic understanding of OS (including bash scripting) and networking (DNS, TCP, HTTP)</li>
+  <li>a great deal of patience and coffee</li>
+</ul>
+
+<h2 id="getting-everything-to-run">Getting everything to run</h2>
+<p>First thing first, let’s checkout the code and compile everything
+Let’s clone the code from <a href="https://github.com/hostettler/microservices.git">GitHub</a>.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>git clone https://github.com/hostettler/microservices.git</code></pre></figure>
+
+<figure class="console-output"><pre>
+Cloning into 'microservices'...
+remote: Enumerating objects: 875, done.
+remote: Counting objects: 100% (875/875), done.
+remote: Compressing objects: 100% (596/596), done.
+remote: Total 875 (delta 279), reused 787 (delta 203), pack-reused 0
+Receiving objects: 100% (875/875), 3.68 MiB | 912.00 KiB/s, done.
+Resolving deltas: 100% (279/279), done.
+</pre></figure>
+
+<p>Let’s check that Maven and Java are correctly installed.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>java <span class="nt">-version</span></code></pre></figure>
+
+<figure class="console-output"><pre>
+openjdk version "11.0.1" 2018-10-16
+OpenJDK Runtime Environment 18.9 (build 11.0.1+13)
+OpenJDK 64-Bit Server VM 18.9 (build 11.0.1+13, mixed mode)
+</pre></figure>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>mvn <span class="nt">-v</span></code></pre></figure>
+
+<figure class="console-output"><pre>
+Apache Maven 3.5.4 (1edded0938998edf8bf061f1ceb3cfdeccf443fe; 2018-06-17T20:33:14+02:00)
+Maven home: ...
+Java version: 11.0.1, vendor: Oracle Corporation, runtime: ...
+Default locale: en_US, platform encoding: Cp1252
+OS name: "windows 10", version: "10.0", arch: "amd64", family: "windows"
+</pre></figure>
+
+<p>The next step is to compile the project to get the artifacts (i.e., binaries). To that end, 
+we use Apache Maven that is opiniated build tool. For more information and tutorials please refer to this <a href="https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html">Maven Tutorial</a></p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd </span>microservices/
+<span class="nv">$ </span>mvn clean <span class="nb">install</span></code></pre></figure>
+
+<figure class="console-output"><pre>
+[INFO] Scanning for projects...
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO]
+[INFO] Parent Pom of the Pinfo Micro Services                             [pom]
+[INFO] Counterparty Service                                               [war]
+[INFO] Instrument Service                                                 [war]
+[INFO] Valuation Service                                                  [war]
+[INFO] Regulatory Reporting Service                                       [war]
+[INFO] API Gateway Service                                                [war]
+[INFO]
+[INFO] -------------------&lt; ch.unige:pinfo-micro-services &gt;--------------------
+[INFO] Building Parent Pom of the Pinfo Micro Services 0.2.0-SNAPSHOT     [1/6]
+[INFO] --------------------------------[ pom ]---------------------------------
+....
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO]
+[INFO] Parent Pom of the Pinfo Micro Services 0.2.0-SNAPSHOT SUCCESS [  3.216 s]
+[INFO] Counterparty Service ............................... SUCCESS [ 42.866 s]
+[INFO] Instrument Service ................................. SUCCESS [ 49.720 s]
+[INFO] Valuation Service .................................. SUCCESS [ 32.623 s]
+[INFO] Regulatory Reporting Service ....................... SUCCESS [ 23.048 s]
+[INFO] API Gateway Service 0.2.0-SNAPSHOT ................. SUCCESS [ 22.796 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 02:55 min
+[INFO] Finished at: 2019-02-20T18:09:09+01:00
+[INFO] ------------------------------------------------------------------------
+</pre></figure>
+
+<div class="alert alert-success" role="alert"><i class="fa fa-check-square"></i> <b>Tip: </b> Congratulations, you compiled the microservices. </div>
+
+<p>At this point, you compiled all of the Java code and you created maven artifacts for each micro-service (Java Archives a.k.a. JARs). But as we will see in the next chapters, a micro-service architecture is much more than a bunch of micro-services. We will need a lot of additional 3rd party tools and services.
+These additional services (e.g., logging, security) are usually provided as container images that runs on Docker. Therefore, we will run everything in Docker (more of Docker in this chapter)
+Therefore, we will package our micro-services as docker images. Docker images are merely lightweight Linux systems with additional softwares. For more about <a href="https://www.docker.com/">Docker</a>
+Let’s first check whether docker is properly installed.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>docker <span class="nt">-v</span></code></pre></figure>
+
+<figure class="console-output"><pre>
+Docker version 18.09.2, build 6247962
+</pre></figure>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>docker run hello-world</code></pre></figure>
+
+<figure class="console-output"><pre>
+Unable to find image 'hello-world:latest' locally
+latest: Pulling from library/hello-world
+1b930d010525: Pull complete
+Digest: sha256:2557e3c07ed1e38f26e389462d03ed943586f744621577a99efb77324b0fe535
+Status: Downloaded newer image for hello-world:latest
+
+Hello from Docker!
+This message shows that your installation appears to be working correctly.
+
+...
+</pre></figure>
+
+<p>So the docker daemon is up and running. Let’s create the docker images for the micro-services.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">mvn <span class="nb">install</span> <span class="nt">-Pdocker</span></code></pre></figure>
+
+<figure class="console-output"><pre>
+INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO]
+[INFO] Parent Pom of the Pinfo Micro Services 0.2.0-SNAPSHOT SUCCESS [  6.114 s]
+[INFO] Counterparty Service ............................... SUCCESS [ 59.134 s]
+[INFO] Instrument Service ................................. SUCCESS [ 58.533 s]
+[INFO] Valuation Service .................................. SUCCESS [ 42.806 s]
+[INFO] Regulatory Reporting Service ....................... SUCCESS [ 33.979 s]
+[INFO] API Gateway Service 0.2.0-SNAPSHOT ................. SUCCESS [ 14.134 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 03:35 min
+[INFO] Finished at: 2019-02-20T18:58:34+01:00
+[INFO] ------------------------------------------------------------------------
+</pre></figure>
+
+<p>All the docker images for the micro-services have been created. Let’s double check:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>docker image <span class="nb">ls</span> | <span class="nb">grep </span>unige</code></pre></figure>
+
+<figure class="console-output"><pre>
+unige/regulatory-service                 latest              d19aed8e7179        About a minute ago   761MB
+unige/valuation-service                  latest              38d95425c608        2 minutes ago        795MB
+unige/instrument-service                 latest              cbd3898a097b        2 minutes ago        795MB
+unige/counterparty-service               latest              e58b75e7fc43        3 minutes ago        762MB
+</pre></figure>
+
+<div class="alert alert-success" role="alert"><i class="fa fa-check-square"></i> <b>Tip: </b> You now have Docker images for your microservices </div>
+
+<p>We have a hostsname, no let’s generate the SSL certificates so that we can encrypt the data in transit. This step is optional as you can reuse the dummy certificates in the source directory.</p>
+
+<p>We want the application to be accessible by a the following name <code class="highlighter-rouge">financial-app.com</code>. To that end we need the docker host ip address to be resolved to this hostname and vice-versa.
+First, we must identify the docker host ip address. On windows, run the command <code class="highlighter-rouge">ipconfig</code>. On Linux, run the command <code class="highlighter-rouge">ifconfig</code>. Look for an adapter called DockerNAT (or something similar).</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ipconfig</code></pre></figure>
+
+<figure class="console-output"><pre>
+Windows IP Configuration
+....
+Ethernet adapter vEthernet (DockerNAT) 2:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::9d3f:55b9:4504:323f%19
+   IPv4 Address. . . . . . . . . . . : 192.168.240.1
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . :
+</pre></figure>
+
+<p>So the ip-address is <code class="highlighter-rouge">192.168.240.1</code>, let’s add it to the hosts file. On Windows that file is located at <code class="highlighter-rouge">C:\Windows\System32\drivers\etc</code> and on Linux at <code class="highlighter-rouge">/etc/hosts</code></p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cat </span>C:<span class="se">\W</span>indows<span class="se">\S</span>ystem32<span class="se">\d</span>rivers<span class="se">\e</span>tc</code></pre></figure>
+
+<figure class="console-output"><pre>
+192.168.240.1 host.docker.internal
+192.168.240.1 gateway.docker.internal
+192.168.240.1 financial-app.com
+</pre></figure>
+
+<p>We have a hostsname, no let’s generate the SSL certificates so that we can encrypt the data in transit. This step is optional as you can reuse the dummy certificates in the source directory.</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd </span>web-sso-docker
+<span class="nv">$ </span><span class="nb">cd </span>certs
+<span class="nv">$ </span>openssl req <span class="nt">-new</span> <span class="nt">-newkey</span> rsa:4096 <span class="nt">-days</span> 365 <span class="nt">-nodes</span> <span class="nt">-x509</span> <span class="nt">-subj</span> <span class="s2">"/C=CH/ST=Geneva/L=Geneva/O=Dis/CN=financial-app.com"</span> <span class="nt">-keyout</span> financial-app.com.key <span class="nt">-out</span> financial-app.com.crt</code></pre></figure>
+
+<figure class="console-output"><pre>
+Generating a RSA private key
+.......................................................++++
+......++++
+writing new private key to 'financial-app.com.key'
+-----
+</pre></figure>
+
+<p>No, let’s compile the UI</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd </span>web-ui
+<span class="nv">$ </span>node <span class="nt">--version</span></code></pre></figure>
+
+<figure class="console-output"><pre>
+6.5.0
+</pre></figure>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>npm <span class="nt">--version</span></code></pre></figure>
+
+<figure class="console-output"><pre>
+10.15.0
+</pre></figure>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>npm <span class="nb">install</span></code></pre></figure>
+
+<figure class="console-output"><pre>
+...
+audited 31887 packages in 68.922s
+</pre></figure>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>npm build</code></pre></figure>
+
+<figure class="console-output"><pre>
+ 69% building modules 1280/1296 modules 16 active ...components\footer\footer.component.scssDEPRECATION WARNING on line 1, column 8 of 
+Including .css files with @import is non-standard behaviour which will be removed in future versions of LibSass.
+Use a custom importer to maintain this behaviour. Check your implementations documentation on how to create a custom importer.
+
+Date: 2019-02-21T09:13:40.912Z
+Hash: e3a111b6560428e93784
+Time: 76066ms
+chunk {app-pages-pages-module} app-pages-pages-module.js, app-pages-pages-module.js.map (app-pages-pages-module) 3.16 MB  [rendered]
+chunk {main} main.js, main.js.map (main) 1.92 MB [initial] [rendered]
+chunk {polyfills} polyfills.js, polyfills.js.map (polyfills) 492 kB [initial] [rendered]
+chunk {runtime} runtime.js, runtime.js.map (runtime) 8.84 kB [entry] [rendered]
+chunk {scripts} scripts.js, scripts.js.map (scripts) 1.32 MB  [rendered]
+chunk {styles} styles.js, styles.js.map (styles) 3.99 MB [initial] [rendered]
+chunk {vendor} vendor.js, vendor.js.map (vendor) 7.17 MB [initial] [rendered]
+</pre></figure>
+<div class="alert alert-success" role="alert"><i class="fa fa-check-square"></i> <b>Tip: </b> You just compiled the UI based on Angular 7.0 </div>
+
+<h1 id="bibliography">Bibliography</h1>
+
+  </div><a class="u-url" href="/2019/02/17/microservice-architecture-part-1.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Steve Hostettler</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Steve Hostettler</li><li><a class="u-email" href="mailto:steve.hostettler@gmail.com">steve.hostettler@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/hostettler"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">hostettler</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Steve Hostettler&#39;s personal blog about automatic testing, Java, Java EE, and Architecture.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
