@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Communication between Java Enterprise Applications | Steve Hostettler</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Communication between Java Enterprise Applications" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Recently I came across the following problem : How to propagate information from one enterprise application to another in a transparent manner? Transparent meaning without changing the API, that is without adding transversal information to the services’ parameters. The typical use case is to propagate information such as the language, applicative security roles information (not the JAAS role), or the session-id. Moreover, I would like the information to be “request scoped” and to be automatically cleaned up at the end of the request. This is important to avoid memory leak and to enforce isolation for security reasons. Let me add that I currently work with JEE6 on WebSphere 8.5.5." />
+<meta property="og:description" content="Recently I came across the following problem : How to propagate information from one enterprise application to another in a transparent manner? Transparent meaning without changing the API, that is without adding transversal information to the services’ parameters. The typical use case is to propagate information such as the language, applicative security roles information (not the JAAS role), or the session-id. Moreover, I would like the information to be “request scoped” and to be automatically cleaned up at the end of the request. This is important to avoid memory leak and to enforce isolation for security reasons. Let me add that I currently work with JEE6 on WebSphere 8.5.5." />
+<link rel="canonical" href="http://hostettler.net/ears/jee/rmi/2014/12/26/communication-between-java-enterprise-applications.html" />
+<meta property="og:url" content="http://hostettler.net/ears/jee/rmi/2014/12/26/communication-between-java-enterprise-applications.html" />
+<meta property="og:site_name" content="Steve Hostettler" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2014-12-26T22:51:48+01:00" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Communication between Java Enterprise Applications","dateModified":"2014-12-26T22:51:48+01:00","url":"http://hostettler.net/ears/jee/rmi/2014/12/26/communication-between-java-enterprise-applications.html","datePublished":"2014-12-26T22:51:48+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/ears/jee/rmi/2014/12/26/communication-between-java-enterprise-applications.html"},"description":"Recently I came across the following problem : How to propagate information from one enterprise application to another in a transparent manner? Transparent meaning without changing the API, that is without adding transversal information to the services’ parameters. The typical use case is to propagate information such as the language, applicative security roles information (not the JAAS role), or the session-id. Moreover, I would like the information to be “request scoped” and to be automatically cleaned up at the end of the request. This is important to avoid memory leak and to enforce isolation for security reasons. Let me add that I currently work with JEE6 on WebSphere 8.5.5.","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about-me/">About me</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Communication between Java Enterprise Applications</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2014-12-26T22:51:48+01:00" itemprop="datePublished">Dec 26, 2014
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>Recently I came across the following problem : How to propagate information from one enterprise application to another in a transparent manner? Transparent meaning without changing the API, that is without adding transversal information to the services’ parameters. The typical use case is to propagate information such as the language, applicative security roles information (not the JAAS role), or the session-id. Moreover, I would like the information to be “request scoped” and to be automatically cleaned up at the end of the request. This is important to avoid memory leak and to enforce isolation for security reasons. Let me add that I currently work with JEE6 on WebSphere 8.5.5.</p>
+
+<p>I did some research among blogs and forums and I found the following solutions:</p>
+
+<ol>
+  <li>
+    <p>Passing information in thread-local. This consists in putting information in a <code class="highlighter-rouge">Map</code> stored in <code class="highlighter-rouge">ThreadLocal</code>. Although this solution is very simple to implement, information is only transmitted inside the current thread. This means that <code class="highlighter-rouge">@Asynchronous</code> calls will not get access to the information. Similarly, it is not transmitted through RMI calls that spread on several VMs, as it is usually the case on distributed applications.</p>
+  </li>
+  <li>
+    <p>Using the JNDI. This solution does not suffer of the above limitations as it is distributed by nature but scoping must be implemented on top of the existing JNDI implementation. I think that it may be possible to implement something like a custom CDI scope but it seems rather complex.</p>
+  </li>
+  <li>
+    <p>TransactionSynchronizationRegistry (TSR). This alternative is well documented <a href="http://www.adam-bien.com/roller/abien/entry/how_to_pass_context_in">here</a>. This solution works on a JEE application servers. It looks great at the first sight but it does not support any use case in which there is different transactions (or no transaction) involved. This invalidates any information sharing before a transaction as started, when a transaction has been suspended, or when a new transaction is started. Again, I can imagine that it would possible to propagate the content using interceptors but it is too much plumber code to me.</p>
+  </li>
+  <li>
+    <p>Work Area Service (WAS). This is basically the IBM implementation of solution 2 with scoping. Documentation is clear and it seems easy to implement. Of course, the main drawback is that it is vendor-specific. IBM started a <a href="https://jcp.org/en/jsr/detail?id=149">JSR</a> long time ago but it was dropped.</p>
+  </li>
+</ol>
+
+<p>Let us now enumerate several criteria to make a decision about which way to go:</p>
+
+<ol>
+  <li>
+    <p>Supports of asynchronous calls : during a request it may be necessary to dispatch the processing among several threads and I would like the shared information to be accessible by any threads involved in this request.</p>
+  </li>
+  <li>
+    <p>Is (automatically) “request scoped” : if the shared information is not automatically collected at the end the request we may end up with memory leaks. Manual collection is never a good option.</p>
+  </li>
+  <li>
+    <p>Supports Remote Calls : for a given request, we may end up calling several services (EJBs) on others servers and I would like to have an automatic propagation of the information among the clusters nodes.</p>
+  </li>
+  <li>
+    <p>Performance : to be useful, the information sharing must be ubiquitous and therefore it must cheap in terms of resources.</p>
+  </li>
+  <li>
+    <p>Vendor Independence : as far as possible an application must rely on known and portable APIs such as JEE. Locking the application to a specific vendor is, in my opinions, is essentially a problem for maintenance. Migrating from one application server to another only happens rarely.</p>
+  </li>
+</ol>
+
+<table>
+<tr> 
+<th>Solution</th> <th>Async</th> <th>Scope</th> <th>RMI</th> <th>Vendor Indep.</th> </tr>
+<tr> <td>Thread-Local</td> <td>X</td> <td>OK</td> <td>X</td> <td>OK</td> </tr>
+<tr> <td>JNDI</td> <td>OK</td> <td>X</td> <td>OK</td> <td>OK</td> </tr>
+<tr> <td>TSR</td> <td>X</td> <td>OK</td> <td>OK</td> <td>OK</td> </tr>
+<tr> <td>WAS</td> <td>OK</td> <td>OK</td> <td>OK</td> <td>X</td> </tr>
+</table>
+
+<p><br /></p>
+
+<p>As you can see there is no silver bullet here. I went for the vendor specific solution. It can be nicely encapsulated to isolate the dependency to vendor specific code. Furthermore, several servers have similar mechanism and it can be therefore adapted. Here is why it was not possible in my setup to use the other alternatives:</p>
+
+<ul>
+  <li>The Thread-local solution is not acceptable because it does not support Remote Method Invocation on several virtual machines.</li>
+  <li>The JNDI solution requires to implement the scoping mechanism. This can be tricky and it is definitely not my area of expertise.</li>
+  <li>The TransactionSynchronizationRegistry is JEE compliant but it requires huge machinery to support asynchronous calls as well as transaction suspension and re-creation (<code class="highlighter-rouge">REQUIRES_NEW</code>, <code class="highlighter-rouge">NOT_SUPPORTED</code>, <code class="highlighter-rouge">NEVER</code>). Basically, it does not work if there is not one and only one transaction throughout the request.</li>
+</ul>
+
+<h2 id="bibliography">Bibliography</h2>
+<p>[1] Adam Bien. HOW TO PASS CONTEXT IN STANDARD WAY - WITHOUT THREADLOCAL. http://www.adam-bien.com/roller/abien/entry/how_to_pass_context_in</p>
+
+<p>[2] Adam Bien. HOW TO PASS CONTEXT BETWEEN LAYERS WITH THREADLOCAL AND EJB 3.(1). http://www.adam-bien.com/roller/abien/entry/how_to_pass_context_with</p>
+
+<p>[3] IBM. Work area partition service. http://www-01.ibm.com/support/knowledgecenter/SSEQTJ_8.0.0/com.ibm.websphere.nd.multiplatform.doc/info/ae/workarea/concepts/cwa_partition.html</p>
+
+  </div><a class="u-url" href="/ears/jee/rmi/2014/12/26/communication-between-java-enterprise-applications.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Steve Hostettler</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Steve Hostettler</li><li><a class="u-email" href="mailto:steve.hostettler@gmail.com">steve.hostettler@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/hostettler"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">hostettler</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Steve Hostettler&#39;s personal blog about automatic testing, Java, Java EE, and Architecture.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

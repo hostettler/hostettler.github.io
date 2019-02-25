@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>On JEE 6 webapps startup time | Steve Hostettler</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="On JEE 6 webapps startup time" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="In this article, I present how to reduce the startup time of JEE6 web applications by doing minor changes in the configuration files." />
+<meta property="og:description" content="In this article, I present how to reduce the startup time of JEE6 web applications by doing minor changes in the configuration files." />
+<link rel="canonical" href="http://hostettler.net/jsf/java%20ee6/jee6/performances/tomcat%207/weld/junit/2012/03/25/improve-jsf-applications-startup-time.html" />
+<meta property="og:url" content="http://hostettler.net/jsf/java%20ee6/jee6/performances/tomcat%207/weld/junit/2012/03/25/improve-jsf-applications-startup-time.html" />
+<meta property="og:site_name" content="Steve Hostettler" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2012-03-25T23:20:00+02:00" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"On JEE 6 webapps startup time","dateModified":"2012-03-25T23:20:00+02:00","url":"http://hostettler.net/jsf/java%20ee6/jee6/performances/tomcat%207/weld/junit/2012/03/25/improve-jsf-applications-startup-time.html","datePublished":"2012-03-25T23:20:00+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/jsf/java%20ee6/jee6/performances/tomcat%207/weld/junit/2012/03/25/improve-jsf-applications-startup-time.html"},"description":"In this article, I present how to reduce the startup time of JEE6 web applications by doing minor changes in the configuration files.","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about-me/">About me</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">On JEE 6 webapps startup time</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2012-03-25T23:20:00+02:00" itemprop="datePublished">Mar 25, 2012
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>While working on Tomcat 7 embedded to automate my integration tests, I realized that my integration tests wasted much of the time in starting/stopping the server. Even if I do not start the integration tests as often as the unit tests, it becomes rapidly irritating. Furthermore, during development I tend to restart the server a couple of times per hour, especially at the beginning of the project. Sure hot deployment helps, but it is not always enough.</p>
+
+<p>On my Mac Book Pro, a cold start took around 10s. Interestingly enough,  an empty Tomcat startups in less than a second. The problem comes from the fact that Tomcat 7 scans the classpath to find out annotations that declare Servlets using the <code class="highlighter-rouge">@WebServlet</code>. This, even if you do not use that feature. Don’t get me wrong, not having to configure XML is cool but I am not ready to pay such a high price for it. Especially as the only servlet I use, is the JSF one.</p>
+
+<h2 id="where-do-we-start-from">Where do we start from?</h2>
+<p>For these tests, I use a JEE6 application with JSF, Weld and JPA (no EJBs) that runs under Tomcat. <br />
+This is a demo application called <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> that I use to teach JEE6.
+A mentioned previously, a cold start (without tuning anything) requires around 10s on my Mac Book Pro Intel Core i7 with 8Gb RAM : <code class="highlighter-rouge">INFO: Server startup in 9992 ms</code></p>
+
+<h2 id="step-1-avoid-looking-for-webserlet-and-co">Step 1: Avoid looking for <code class="highlighter-rouge">@WebSerlet</code> and co.</h2>
+<p>By default, Tomcat 7 (along with the Servlet 3.0 specification) scans the classpath to look for classes that are annotated <code class="highlighter-rouge">@WebServlet</code>,<code class="highlighter-rouge">@WebServletContextListener</code>, <code class="highlighter-rouge">@ServletFilter</code>, or <code class="highlighter-rouge">@InitParamJSF</code>.  It is a nice feature as you do not have to specify the faces servlet anymore.
+However, it comes at a price: depending of the classpath this can be very long.
+To solve this issues, simple add the <code class="highlighter-rouge">metadata-complete="true"</code> to the <code class="highlighter-rouge">web-app</code> element of our <code class="highlighter-rouge">WEB-INF/web-xml</code> attribute to avoid scanning the classpath.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;web-app</span> <span class="na">metadata-complete=</span><span class="s">"true"</span>
+	<span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span> <span class="na">xmlns=</span><span class="s">"http://java.sun.com/xml/ns/javaee"</span>
+	<span class="na">xmlns:web=</span><span class="s">"http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"</span>
+	<span class="na">xsi:schemaLocation=</span><span class="s">"http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"</span>
+	<span class="na">id=</span><span class="s">"MyWebApp"</span> <span class="na">version=</span><span class="s">"3.0"</span><span class="nt">&gt;</span>
+</code></pre></div></div>
+
+<p>Obviously, as it is no more automatically discovered, we have  to manually add the faces servlet to the context:</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="nt">&lt;servlet&gt;</span>
+		<span class="nt">&lt;servlet-name&gt;</span>Faces Servlet<span class="nt">&lt;/servlet-name&gt;</span>
+		<span class="nt">&lt;servlet-class&gt;</span>javax.faces.webapp.FacesServlet<span class="nt">&lt;/servlet-class&gt;</span>
+		<span class="nt">&lt;load-on-startup&gt;</span>1<span class="nt">&lt;/load-on-startup&gt;</span>
+	<span class="nt">&lt;/servlet&gt;</span>
+
+	<span class="nt">&lt;servlet-mapping&gt;</span>
+		<span class="nt">&lt;servlet-name&gt;</span>Faces Servlet<span class="nt">&lt;/servlet-name&gt;</span>
+		<span class="nt">&lt;url-pattern&gt;</span>/faces/*<span class="nt">&lt;/url-pattern&gt;</span>
+	<span class="nt">&lt;/servlet-mapping&gt;</span>
+</code></pre></div></div>
+
+<p>Using these modifications in <code class="highlighter-rouge">web.xml</code>, the startup time came down to around 4.5 seconds:
+<code class="highlighter-rouge">INFO: Server startup in 4404 ms</code></p>
+
+<h2 id="step-2-avoid-looking-for-managedbean-and-co">Step 2: Avoid looking for <code class="highlighter-rouge">@ManagedBean</code> and co.</h2>
+<p>Similarly, the is a similar feature in JSF 2.0. By default, the JSF implementation looks for classes annotated with
+As I use Weld and its <code class="highlighter-rouge">@Named</code>, <code class="highlighter-rouge">@SessionScoped</code>, and so on, I can disable this feature in JSF.</p>
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;faces-config</span> <span class="na">xmlns=</span><span class="s">"http://java.sun.com/xml/ns/javaee"</span>
+   <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span>
+   <span class="na">xsi:schemaLocation=</span><span class="s">"http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"</span>
+   <span class="na">version=</span><span class="s">"2.0"</span>  <span class="na">metadata-complete=</span><span class="s">"true"</span><span class="nt">&gt;</span>
+</code></pre></div></div>
+
+<p>Using this modification in <code class="highlighter-rouge">faces-config.xml</code>, the startup time came down to around 3.7 seconds:
+<code class="highlighter-rouge">INFO: Server startup in 3730 ms</code></p>
+
+<h2 id="step-3-limiting-welds-scanning">Step 3: Limiting Weld’s scanning</h2>
+<p>Finally, I would like to keep Weld scanning to discover the <code class="highlighter-rouge">@Named</code>, <code class="highlighter-rouge">@Inject</code>, and other Weld annotations but I would like to limit it to my a subset of the classes of the jar. To that end simply add <code class="highlighter-rouge">weld:scan</code> directive and include a pattern with packages to scan.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;beans</span> <span class="na">xmlns=</span><span class="s">"http://java.sun.com/xml/ns/javaee"</span> 
+        <span class="na">xmlns:xsi=</span><span class="s">"http://www.w3.org/2001/XMLSchema-instance"</span> 
+        <span class="na">xmlns:weld=</span><span class="s">"http://jboss.org/schema/weld/beans"</span> 
+        <span class="na">xsi:schemaLocation=</span><span class="s">"
+           http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd
+           http://jboss.org/schema/weld/beans http://jboss.org/schema/weld/beans_1_1.xsd"</span><span class="nt">&gt;</span>
+  
+<span class="nt">&lt;weld:scan&gt;</span>
+    <span class="nt">&lt;weld:include</span> <span class="na">pattern=</span><span class="s">"ch.demo.*"</span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/weld:scan&gt;</span>
+</code></pre></div></div>
+
+<p>Using this modification in <code class="highlighter-rouge">beans.xml</code>, the startup time came down to around 3.3 seconds:
+<code class="highlighter-rouge">INFO: Server startup in 3312 ms</code></p>
+
+<p>To conclude, using these minor modifications I divided the startup time by three. This is very useful during development and integration tests when the server is started and stopped many times.</p>
+
+  </div><a class="u-url" href="/jsf/java%20ee6/jee6/performances/tomcat%207/weld/junit/2012/03/25/improve-jsf-applications-startup-time.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Steve Hostettler</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Steve Hostettler</li><li><a class="u-email" href="mailto:steve.hostettler@gmail.com">steve.hostettler@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/hostettler"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">hostettler</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Steve Hostettler&#39;s personal blog about automatic testing, Java, Java EE, and Architecture.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
