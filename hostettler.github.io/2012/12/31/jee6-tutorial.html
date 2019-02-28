@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>JEE6 Tutorial | Steve Hostettler</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="JEE6 Tutorial" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="I hereby start a series of tutorial on the major (IMHO) JEE 6 features. As a lecturer, I teach the JEE stack at the University of Geneva. This tutorial represents most of the topics that I cover during the EJB, CDI, and JPA lessons." />
+<meta property="og:description" content="I hereby start a series of tutorial on the major (IMHO) JEE 6 features. As a lecturer, I teach the JEE stack at the University of Geneva. This tutorial represents most of the topics that I cover during the EJB, CDI, and JPA lessons." />
+<link rel="canonical" href="http://hostettler.net/2012/12/31/jee6-tutorial.html" />
+<meta property="og:url" content="http://hostettler.net/2012/12/31/jee6-tutorial.html" />
+<meta property="og:site_name" content="Steve Hostettler" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2012-12-31T09:43:00+01:00" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"JEE6 Tutorial","dateModified":"2012-12-31T09:43:00+01:00","url":"http://hostettler.net/2012/12/31/jee6-tutorial.html","datePublished":"2012-12-31T09:43:00+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/2012/12/31/jee6-tutorial.html"},"description":"I hereby start a series of tutorial on the major (IMHO) JEE 6 features. As a lecturer, I teach the JEE stack at the University of Geneva. This tutorial represents most of the topics that I cover during the EJB, CDI, and JPA lessons.","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about-me/">About me</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">JEE6 Tutorial</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2012-12-31T09:43:00+01:00" itemprop="datePublished">Dec 31, 2012
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>I hereby start a series of tutorial on the major (IMHO) JEE 6 features. As a lecturer, I teach the JEE stack at the University of Geneva. This tutorial represents most of the topics that I cover during the EJB, CDI, and JPA lessons.</p>
+
+<p>There already exists a bunch of very complete tutorials and books on the subject. Let me cite the excellent <a href="http://docs.oracle.com/javaee/6/tutorial/doc/" title="Oracle's official JEE6 tutorial">Oracle JEE tutorial</a> and 
+Antonio Goncalvez’s books that are available both in <a href="http://www.amazon.com/Beginning-GlassFish-Experts-Voice-Technology/dp/143022889X/ref=sr_1_1?ie=UTF8&amp;qid=1356945347&amp;sr=8-1&amp;keywords=JEE6+antonio+goncalves" title="Antonio's Book in English">English</a> and in <a href="http://www.amazon.com/Java-EE6-GlassFish-Antonio-Goncalves/dp/2744024236/ref=sr_1_fkmr2_1?s=books&amp;ie=UTF8&amp;qid=1356945440&amp;sr=1-1-fkmr2&amp;keywords=JEE6+et+glassfish" title="Antonio's Book in French">French</a>. For advanced JEE developers, Adam Bien’s <a href="http://press.adam-bien.com/real-world-java-ee-night-hacks-dissecting-the-business-tier.htm" title="Real World Java EE Night Hacks--Dissecting the Business Tier">Real World Java EE Night Hacks</a> is a must read.</p>
+
+<p>As the <a href="http://jcp.org/aboutJava/communityprocess/final/jsr318/index.html" title="EJB 3.1 specification">EJB 3.1 specification</a> is rather well written, I encourage people to read it or at least to look at specifics when needed.</p>
+
+<p>To support this tutorial you can find a JEE6-Demo on GitHub. It contains a simple enterprise application that demonstrates many of the
+aspects I discuss hereafter. The first step of this tutorial is to prepare the environment:</p>
+
+<p>1) Install GlassFish and integrate it to your favorite development environment (eclipse in my case). You can get GlassFish from <a href="http://glassfish.java.net/downloads/3.1.2.2-final.html" title="Glassfish Download Page">here</a>. Grab the zip version and install it by unzipping the archive.</p>
+
+<p>2) Run GlassFish and check that it works. Locate the script named <code class="highlighter-rouge">asadmin</code> in the <code class="highlighter-rouge">bin</code> directory, start it and at the prompt, execute the command <code class="highlighter-rouge">start-domain</code>. This starts the GlassFish instance.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>localhost:bin ~$ ./asadmin
+Use "exit" to exit and "help" for online help.
+asadmin&gt; start-domain
+Waiting for domain1 to start ...
+Successfully started the domain : domain1
+domain  Location: ~/Applications/glassfish3/glassfish/domains/domain1
+Log File: ~/Applications/glassfish3/glassfish/domains/domain1/logs/server.log
+Admin Port: 4848
+Command start-domain executed successfully.
+asadmin&gt; 
+</code></pre></div></div>
+<p>Now the server is started and it listens to the ports 8080 and 4848. The first being the application port while the second is the administrative console.</p>
+
+<p>Start a browser and navigate to <a href="http://localhost:4848/common/index.jsf"><code class="highlighter-rouge">http://localhost:4848/common/index.jsf</code></a>. Depending of the server configuration, you may have to log in.</p>
+
+<p>3) Do a Git checkout of the jee6-demo project that is available <a href="https://github.com/hostettler/JEE6-Demo">here</a>.</p>
+
+<p>4) Perform a <code class="highlighter-rouge">mvn clean install</code> at the project root</p>
+
+<p>This compiles the project and builds the artifacts. It should end up in something like:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] jee6-demo ......................................... SUCCESS [0.480s]
+[INFO] Service Layer ..................................... SUCCESS [3.650s]
+[INFO] Presentation Layer ................................ SUCCESS [1.725s]
+[INFO] Application ....................................... SUCCESS [0.663s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 6.923s
+[INFO] Finished at: Sun Jan 06 16:41:29 CET 2013
+[INFO] Final Memory: 19M/81M
+[INFO] --------------------------------------------------------------------
+</code></pre></div></div>
+
+<p>5) In the GlassFish installation directory, there is a <code class="highlighter-rouge">javadb</code> directory that contains, Derby, a Java-based database. Starts the network server:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt;$ pwd
+/~/Applications/glassfish3/javadb/bin
+localhost:bin ~$ ./startNetworkServer
+Mon Jan 07 06:02:54 CET 2013 : Security manager installed using the Basic server security policy.
+Mon Jan 07 06:02:54 CET 2013 : Apache Derby Network Server - 10.8.1.2 - (1095077) started and ready to accept connections on port 1527
+</code></pre></div></div>
+<p>The database server listens to the port <code class="highlighter-rouge">1527</code>.</p>
+
+<p>Now that the database is started. It is time to populate the database with the database creation scripts as well as some data.
+In the project, under the ejb components, there is a sql file that initializes the database structure as well as some data.</p>
+
+<p>Derby provides a command line tool called <code class="highlighter-rouge">ij</code> to connect to the database and to execute sql scripts:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>localhost:bin ~$ pwd
+~/Applications/glassfish3/javadb/bin
+localhost:bin ~$./ij ~/git/jee6demo/jee6-ejb/src/main/resources/sql/createStudentsDB_DERBY.sql
+...
+ij&gt; QUIT;
+</code></pre></div></div>
+
+<p>Now the database is ready to use.</p>
+
+<p>6) Create a datasource in GlassFish that points to the  database server that has been started previously:</p>
+
+<p>First, let us create a connection pool:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>asadmin&gt; create-jdbc-connection-pool  --datasourceclassname=org.apache.derby.jdbc.ClientDataSource40 --restype=javax.sql.DataSource --property user=DEV:DatabaseName=StudentsDB:Password=DEV:ServerName=localhost:PortNumber=1527:create=true StudentsDB
+Authentication failed with password from login store: ~/.asadminpass
+Enter admin password for user "admin"&gt; 
+222JDBC connection pool StudentsDB created successfully.
+Command create-jdbc-connection-pool executed successfully.
+</code></pre></div></div>
+
+<p>The connection pool provides a … pool of connection that is managed by the application server. A major benefit being that the developer does not have to open and close connections.
+The server opens n connections and allocate them on demand. It ensures that there will not be 1000 open connections to the database thus improving the performances.
+Then, we create a datasource that uses the previous connection pool:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>asadmin&gt; create-jdbc-resource --connectionpoolid StudentsDB --enabled jdbc/StudentsDS
+Authentication failed with password from login store: ~/.asadminpass
+Enter admin password for user "admin"&gt; 
+JDBC resource jdbc/StudentsDS created successfully.
+Command create-jdbc-resource executed successfully.
+</code></pre></div></div>
+
+<p>7) Configure the messaging resources.</p>
+
+<p>The tutorial uses JMS (Java Messaging Service) to implement the publish/subscribe pattern. The following script builds a connection factory for JMS queues.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>asadmin&gt; create-jms-resource --restype javax.jms.QueueConnectionFactory --enabled  MyConnectionFactory
+Authentication failed with password from login store: ~/.asadminpass
+Enter admin password for user "admin"&gt; 
+Connector resource MyConnectionFactory created.
+Command create-jms-resource executed successfully.
+</code></pre></div></div>
+
+<p>The following snippet declares the JMS queue. That is the message endpoint.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>asadmin&gt; create-jms-resource --restype javax.jms.Queue MyQueue
+Authentication failed with password from login store: ~/.asadminpass
+Enter admin password for user "admin"&gt; 
+Administered object MyQueue created.
+Command create-jms-resource executed successfully.
+</code></pre></div></div>
+
+<p>8) Configure the security</p>
+
+<p>Authentication and authorization is another major feature that is provided by the application server.
+First let us create the realm with two groups user and manager.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>asadmin&gt; create-auth-realm --classname com.sun.enterprise.security.auth.realm.file.FileRealm  --property assign-groups=manager,user:file=jee6-tutorial-file-realm:jaas-context=fileRealm jee6-tutorial-file-realm
+Authentication failed with password from login store: ~/.asadminpass
+Enter admin password for user "admin"&gt; 
+Command create-auth-realm executed successfully.
+</code></pre></div></div>
+
+<p>Then, we add a user that belongs two groups: user and manager.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>asadmin&gt; create-file-user --authrealmname jee6-tutorial-file-realm --groups user:manager user1
+Authentication failed with password from login store: ~/.asadminpass
+Enter admin password for user "admin"&gt; 
+Enter the user password&gt; 
+Enter the user password again&gt; 
+Command create-file-user executed successfully.
+</code></pre></div></div>
+
+<p>The second user only belongs to the group user.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>asadmin&gt; create-file-user --authrealmname jee6-tutorial-file-realm --groups user user2
+Authentication failed with password from login store: ~/.asadminpass
+Enter admin password for user "admin"&gt; 
+Enter the user password&gt; 
+Enter the user password again&gt; 
+Command create-file-user executed successfully.
+</code></pre></div></div>
+
+<p>9) Deploy the application</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>asadmin&gt; deploy ~/git/jee6demo/jee6-ear/target/jee6-demo-ear-1.0.0-SNAPSHOT.ear
+Authentication failed with password from login store: ~/.asadminpass
+Enter admin password for user "admin"&gt; 
+Application deployed with name jee6-demo-ear-1.0.0-SNAPSHOT.
+Command deploy executed successfully.
+</code></pre></div></div>
+
+<p>10) Test the application</p>
+
+<p>Once deployed, serve to <a href="http://localhost:8080/jee6-demo-web/facade/studentService/all"><code class="highlighter-rouge">http://localhost:8080/jee6-demo-web/facade/studentService/all</code></a> and you should get:
+You must log yourself with one of the use that you created at step 8).</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;studentsDto</span> <span class="na">xmlns:ns2=</span><span class="s">"http://ch.demo.app"</span><span class="nt">&gt;</span>
+	<span class="nt">&lt;students&gt;</span>
+		<span class="nt">&lt;id&gt;</span>0<span class="nt">&lt;/id&gt;</span>
+		<span class="nt">&lt;last_name&gt;</span>Doe<span class="nt">&lt;/last_name&gt;</span>
+		<span class="nt">&lt;firstName&gt;</span>John<span class="nt">&lt;/firstName&gt;</span>
+		<span class="nt">&lt;birthDate&gt;</span>1965-12-10T00:00:00+01:00<span class="nt">&lt;/birthDate&gt;</span>
+		<span class="nt">&lt;phoneNumber&gt;</span>
+		<span class="nt">&lt;areaCode&gt;</span>0<span class="nt">&lt;/areaCode&gt;</span>
+		<span class="nt">&lt;countryCode&gt;</span>0<span class="nt">&lt;/countryCode&gt;</span>
+		<span class="nt">&lt;number&gt;</span>0<span class="nt">&lt;/number&gt;</span>
+		<span class="nt">&lt;/phoneNumber&gt;</span>
+		<span class="nt">&lt;address&gt;</span>
+			<span class="nt">&lt;number&gt;</span>22<span class="nt">&lt;/number&gt;</span>
+			<span class="nt">&lt;street&gt;</span>wisteria street<span class="nt">&lt;/street&gt;</span>
+			<span class="nt">&lt;city&gt;</span>Downtown<span class="nt">&lt;/city&gt;</span>
+			<span class="nt">&lt;postalCode&gt;</span>34343<span class="nt">&lt;/postalCode&gt;</span>
+		<span class="nt">&lt;/address&gt;</span>
+	<span class="nt">&lt;/students&gt;</span>
+	<span class="nt">&lt;students&gt;</span>
+		<span class="nt">&lt;id&gt;</span>1<span class="nt">&lt;/id&gt;</span>
+		<span class="nt">&lt;last_name&gt;</span>Doe<span class="nt">&lt;/last_name&gt;</span>
+		<span class="nt">&lt;firstName&gt;</span>Jane<span class="nt">&lt;/firstName&gt;</span>
+		<span class="nt">&lt;birthDate&gt;</span>1985-12-10T00:00:00+01:00<span class="nt">&lt;/birthDate&gt;</span>
+		<span class="nt">&lt;phoneNumber&gt;</span>
+		<span class="nt">&lt;areaCode&gt;</span>0<span class="nt">&lt;/areaCode&gt;</span>
+		<span class="nt">&lt;countryCode&gt;</span>0<span class="nt">&lt;/countryCode&gt;</span>
+		<span class="nt">&lt;number&gt;</span>0<span class="nt">&lt;/number&gt;</span>
+		<span class="nt">&lt;/phoneNumber&gt;</span>
+		<span class="nt">&lt;address&gt;</span>
+			<span class="nt">&lt;number&gt;</span>22<span class="nt">&lt;/number&gt;</span>
+			<span class="nt">&lt;street&gt;</span>wisteria street<span class="nt">&lt;/street&gt;</span>
+			<span class="nt">&lt;city&gt;</span>Downtown<span class="nt">&lt;/city&gt;</span>
+			<span class="nt">&lt;postalCode&gt;</span>34343<span class="nt">&lt;/postalCode&gt;</span>
+		<span class="nt">&lt;/address&gt;</span>
+	<span class="nt">&lt;/students&gt;</span>
+<span class="nt">&lt;/studentsDto&gt;</span>
+</code></pre></div></div>
+
+<p>Now you are ready to follow me in the EJB world.</p>
+
+<p>The tutorial is organized in three parts. First, in this post, we will look at the EJB stack. In following posts, we will cover both the Context and Dependency Injection and the Java Persistence API.</p>
+
+<h2 id="ejbs"><a id="ejbs"></a>EJBs</h2>
+
+<p>The EJB API provides useful non-functional services to Java Enterprise Applications such as transactionality, security, pooling, and thread-safety.
+Server side components that implement this API and wrap up business logic are called Enterprise Java Beans (EJBs). While the first versions were infamously known for the boilerplate code as well as their low testability,
+EJB 3.x are rather easy to use thanks to a new design paradigms called <a href="http://en.wikipedia.org/wiki/Convention_over_configuration" title="Convention over Configuration on Wikipedia">Convention over Configuration</a>. The idea is to specify unconventional aspects rather than everything. This dramatically reduces the boilerplate code and improves readability.</p>
+
+<p>Furthermore, the massive usage of annotations instead of XML descriptor greatly improves the productivity. In the sequel, I mostly rely on annotations. Nevertheless, every annotation has its counterpart in a configuration descriptor that is called <code class="highlighter-rouge">ejb-jar.xml</code>.</p>
+
+<blockquote>
+  <p>In case there is two different value for the same property, remember that one from the <code class="highlighter-rouge">ejb-jar.xml</code> always overrides the annotation.</p>
+</blockquote>
+
+<p>Enterprise Java Beans are of three kinds:</p>
+
+<ul>
+  <li><strong>Session Beans</strong>: components whose execution is triggered by a client call. The call can be local (within the JVM) or remote (by another JVM).</li>
+  <li><strong>Message Beans</strong>: execution is triggered by a message and the business logic is processed asynchronously. Please note that, since JEE6 there are other (simpler) ways to process logic asynchronously. Nevertheless, Message Beans
+remain very useful to implement bus and/or publish-subscribe patterns and to enforce loose coupling between the client and the server component.</li>
+  <li><strong>Entity Beans</strong>: I will not discuss entity beans as they have been replaced by the <a href="http://jcp.org/aboutJava/communityprocess/final/jsr317/index.html" title="JPA 2.0 specification">JPA 2.0 specification</a>.</li>
+</ul>
+
+<h3 id="session-beans"><a id="sb"></a>Session Beans</h3>
+<p>As mentioned previously, session beans (merely) react on client invocation. Henceforth, the bean can either take the client session into account (thus it shares a state between multiple client invocations) or it can treat each call as unrelated.
+In the first case, the EJB is called <strong>Stateful</strong> while in the latter it is called <strong>Stateless</strong>.</p>
+
+<h3 id="stateless-session-beans"><a id="slsb"></a>Stateless Session Beans</h3>
+<p>Let us start with a <strong>Stateless</strong> bean. The following Java class describes a Stateless EJB.
+The most important part is the annotation <code class="highlighter-rouge">@Stateless</code> at the top of the class.
+This marks the class as an EJB. When the container instantiates this class, it knows that
+it is a so-called <strong>Managed Bean</strong>. By this, it means that the container manages the bean’s lifecycle (e.g., instantiation, passivation). Furthermore, as an EJB, it has access to the container services such as security and transactionality.</p>
+
+<p>The following snippet describes a Stateless Session bean that computes a grade distribution. The method is secured and only authorized to client that have the role <code class="highlighter-rouge">user</code> through the <code class="highlighter-rouge">@RolesAllowed({ "user" })</code> annotation.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Stateless</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceJPAImpl</span> <span class="kd">implements</span> <span class="n">StudentService</span> <span class="o">{</span>
+<span class="o">...</span>
+    <span class="nd">@Override</span>
+    <span class="nd">@RolesAllowed</span><span class="o">({</span> <span class="s">"user"</span> <span class="o">})</span> <span class="c1">// This a role-based security.</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="n">Integer</span><span class="o">[]</span> <span class="nf">getDistribution</span><span class="o">(</span><span class="kd">final</span> <span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+    	<span class="n">numberOfAccess</span><span class="o">++;</span>
+        <span class="n">Integer</span><span class="o">[]</span> <span class="n">grades</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">[</span><span class="n">n</span><span class="o">];</span>
+
+        <span class="k">for</span> <span class="o">(</span><span class="n">Student</span> <span class="n">s</span> <span class="o">:</span> <span class="k">this</span><span class="o">.</span><span class="na">getAll</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">grades</span><span class="o">[(</span><span class="n">s</span><span class="o">.</span><span class="na">getAvgGrade</span><span class="o">().</span><span class="na">intValue</span><span class="o">()</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span> <span class="o">/</span> <span class="o">(</span><span class="n">TOTAL</span> <span class="o">/</span> <span class="n">n</span><span class="o">)]++;</span>
+        <span class="o">}</span>
+        <span class="k">return</span> <span class="n">grades</span><span class="o">;</span>
+    <span class="o">}</span>
+ <span class="o">...</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Please note that the previous EJB implements an interface. An EJB can be local (invokable from within the container),
+remote (invokable from another JVM) or both. In the previous case, it is a local interface and therefore the bean is only
+invokable locally.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Local</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StudentService</span> <span class="kd">extends</span> <span class="n">Serializable</span> <span class="o">{</span>
+	<span class="cm">/**
+	 * @return an array that contains the distribution of the grades. It
+	 *         partitions the grades in "n" parts.
+	 * @param n : number of parts
+	 */</span>
+	<span class="kt">int</span><span class="o">[]</span> <span class="nf">getDistribution</span><span class="o">(</span><span class="kd">final</span> <span class="kt">int</span> <span class="n">n</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Adding a remote invocation to the implementation amounts to add an interface that is annotated <code class="highlighter-rouge">@Remote</code>.
+Of course, the interface may be different and may exposes different services locally and remotely.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Remote</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StudentServiceRemote</span> <span class="kd">extends</span> <span class="n">Serializable</span> <span class="o">{</span>
+
+    <span class="cm">/**
+     * @param lastname
+     *            of the student
+     * @return the student with the given lastname.
+     */</span>
+    <span class="n">Student</span> <span class="nf">getStudentByLastName</span><span class="o">(</span><span class="n">String</span> <span class="n">lastname</span><span class="o">);</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>The implementation must be changed as follow to be remotely invokable:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Stateless</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceJPAImpl</span> <span class="kd">implements</span> <span class="n">StudentService</span><span class="o">,</span> <span class="n">StudentServiceRemote</span> <span class="o">{</span>
+<span class="o">...</span>
+</code></pre></div></div>
+
+<p>To use this EJB, we need a client code. The easiest possible interaction is either via a JAX-RS service or via a servlet.
+In the JEE6-Demo, under the JEE6-WEB project the JAX-RS facade is called <code class="highlighter-rouge">StudentFacade.java</code>. It implements a JAX-RS facade over the <code class="highlighter-rouge">StudentService</code>.</p>
+
+<p>The method <code class="highlighter-rouge">getDistribution()</code> uses the student service that is injected via <code class="highlighter-rouge">@EJB</code> in the 
+facade. <a href="http://en.wikipedia.org/wiki/Dependency_injection" title="Dependency Injection on Wikipedia">Dependency injection</a>  is now a first class citizen in the JEE6 stack.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@ApplicationScoped</span> <span class="c1">// This sets the scope to application level</span>
+<span class="nd">@Path</span><span class="o">(</span><span class="s">"/studentService"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceFacade</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+<span class="o">...</span>
+	<span class="nd">@EJB</span>
+	<span class="n">StudentService</span> <span class="n">studentService</span><span class="o">;</span>
+
+	<span class="nd">@GET</span>
+	<span class="nd">@Produces</span><span class="o">({</span> <span class="s">"application/xml"</span><span class="o">,</span> <span class="s">"application/json"</span> <span class="o">})</span>
+	<span class="nd">@Path</span><span class="o">(</span><span class="s">"distribution"</span><span class="o">)</span>
+	<span class="kd">public</span> <span class="n">Response</span> <span class="nf">getDistribution</span><span class="o">()</span> <span class="o">{</span>
+		<span class="n">Integer</span><span class="o">[]</span> <span class="n">distrib</span> <span class="o">=</span> <span class="n">studentService</span><span class="o">.</span><span class="na">getDistribution</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
+		<span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span><span class="k">new</span> <span class="n">DistributionDto</span><span class="o">(</span><span class="n">distrib</span><span class="o">)).</span><span class="na">build</span><span class="o">();</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>The following snippet illustrates the injection of a Stateless EJB into a Servlet.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@WebServlet("/student")
+public class StudentServlet extends HttpServlet {
+
+	private static final long serialVersionUID = 1L;
+
+	@EJB
+	StudentService studentService;
+
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		response.getOutputStream()
+				.println("There are #" + studentService.getAll().size() + " students in the database");
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest arg0, HttpServletResponse arg1) throws ServletException, IOException {
+		this.doGet(arg0, arg1);
+	}
+
+}
+</code></pre></div></div>
+
+<p>As you can see, implementing EJBs (and invoking them) is rather easy. So far, we did not talk much about transactionality and security so you might wonder why using EJBs for such simple business services. The answer is pooling and thread-safety. As the container manages a pool of EJBs, it handles the invocation queue and you do not have to manager re-entrance and thread-safety.</p>
+
+<blockquote>
+  <p>Remember that there is a <strong>one to many relationship</strong> between a stateless session bean and the clients. In other words, one instance may manage different clients. Hence, there must be not field that represent a client state in a <strong>Stateless</strong> EJB because there is no guarantee that a given client will get the same SLSB accross two invokations. Nevertheless, within a given invokation the client is guaranteed to be the only user.</p>
+</blockquote>
+
+<p>Consider the following exercises.</p>
+
+<blockquote>
+  <p><em>Exercise 1:</em> Add a new method to the StudentService service that computes the standard deviation and use this method in the JAX-RS facade.</p>
+</blockquote>
+
+<blockquote>
+  <p><em>Exercise 2:</em> Add a counter that is incremented each and every time a method is invoked. Print out the thread-id (and if possible the session-id) and explain why the so-called stateless beans must be without state. Add a rest service to interface this method.</p>
+</blockquote>
+
+<h4 id="transactionality"><a id="trx"></a>Transactionality</h4>
+
+<p><a href="http://en.wikipedia.org/wiki/Database_transaction" title="Transactions on wikipedia">Transactions</a> are important concepts when dealing with enterprise applications. It is of vital importance that whenever something goes wrong, the transaction is roll-backed. This preserves the <a href="http://en.wikipedia.org/wiki/ACID" title="ACID in wikipedia">ACID</a> properties. Managing database transactions with JDBC is complex to say the least. Remember that we often have to manage transactions over several databases and even between databases and messaging queues. If the processing of a message leads to a database exception, we might want to put the message back in the queue.</p>
+
+<p>Lucky for us, JEE 6 manages (almost) everything by itself. By default a bean is transactional and each method either reuse a running transaction or creates a new one if necessary.</p>
+
+<blockquote>
+  <p>By default the transaction (or transaction context) is propagated to other business methods that are called from within a transactional method.</p>
+</blockquote>
+
+<p>In JEE, there is two types of transaction management:</p>
+
+<ul>
+  <li>
+    <p><strong>Bean Managed</strong> : In this case the bean is annotated with <code class="highlighter-rouge">@TransactionManagement(TransactionManagementType.BEAN)</code>. In this mode, the developer must manage the transaction himself.</p>
+  </li>
+  <li>
+    <p><strong>Container Managed</strong>: this is the default behavior and it corresponds to marking the bean <code class="highlighter-rouge">@TransactionManagement(TransactionManagementType.CONTAINER)</code>. This mode is called <strong>Container Managed Transaction Demarcation</strong>. This idea is that every public method is transactional and is marked as <code class="highlighter-rouge">@Required</code>.</p>
+  </li>
+</ul>
+
+<p>The following snippet shows how to use bean demarcation:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@MessageDriven</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">"MyQueue"</span><span class="o">)</span>
+<span class="nd">@TransactionManagement</span><span class="o">(</span><span class="n">TransactionManagementType</span><span class="o">.</span><span class="na">BEAN</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+
+	<span class="nd">@PersistenceContext</span>
+	<span class="n">EntityManager</span> <span class="n">em</span><span class="o">;</span>
+
+	<span class="o">...</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
+		<span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+		<span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">begin</span><span class="o">();</span>
+
+		<span class="k">try</span> <span class="o">{</span>
+			<span class="o">...</span>
+			<span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
+			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"MESSAGE BEAN: Message received: "</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+			<span class="o">...</span>
+		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">rollback</span><span class="o">();</span>
+			<span class="o">...</span>
+		<span class="o">}</span>
+		<span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">commit</span><span class="o">();</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>and now the exact same class using container demarcation:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@MessageDriven</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">"MyQueue"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+
+	<span class="nd">@PersistenceContext</span>
+	<span class="n">EntityManager</span> <span class="n">em</span><span class="o">;</span>
+
+	<span class="o">...</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
+		<span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+		<span class="k">try</span> <span class="o">{</span>
+			<span class="o">...</span>
+			<span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
+			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"MESSAGE BEAN: Message received: "</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+			<span class="o">...</span>
+		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">rollback</span><span class="o">();</span>
+			<span class="o">...</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Because the previous snippet relies on the default convention, it is equivalent to:</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@MessageDriven</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">"MyQueue"</span><span class="o">)</span>
+<span class="nd">@TransactionManagement</span><span class="o">(</span><span class="n">TransactionManagementType</span><span class="o">.</span><span class="na">CONTAINER</span><span class="o">)</span>
+<span class="nd">@TransactionAttribute</span><span class="o">(</span><span class="n">TransactionAttributeType</span><span class="o">.</span><span class="na">REQUIRED</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+
+	<span class="nd">@Inject</span> <span class="c1">// Let's ignore this for the moment</span>
+	<span class="kd">private</span> <span class="kd">transient</span> <span class="n">Logger</span> <span class="n">logger</span><span class="o">;</span>
+
+	<span class="nd">@PersistenceContext</span>
+	<span class="n">EntityManager</span> <span class="n">em</span><span class="o">;</span>
+
+	<span class="nd">@Resource</span> <span class="c1">// Let's ignore this for the moment</span>
+	<span class="kd">private</span> <span class="n">MessageDrivenContext</span> <span class="n">mdbContext</span><span class="o">;</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
+		<span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+		<span class="k">try</span> <span class="o">{</span>
+			<span class="o">...</span>
+			<span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
+			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"MESSAGE BEAN: Message received: "</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+			<span class="o">...</span>
+		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">rollback</span><span class="o">();</span>
+			<span class="o">...</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+<p>In other terms, it uses container managed transaction demarcation <code class="highlighter-rouge">@TransactionManagement(TransactionManagementType.CONTAINER)</code>.
+Moreover, each and every public method either reuses an existing transaction or creates a new one if none has been started <code class="highlighter-rouge">@TransactionAttribute(TransactionAttributeType.REQUIRED)</code></p>
+
+<p>The <code class="highlighter-rouge">@TransactionAttribute</code> annotation can also be put directly on the method. Valid options are:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">REQUIRED</code>: if there is an existing transaction then it reuses it, otherwise it creates a new one.</li>
+  <li><code class="highlighter-rouge">REQUIRES_NEW</code>: it always creates a new transaction</li>
+  <li><code class="highlighter-rouge">NEVER</code>: if there is an existing transaction then it fails</li>
+  <li><code class="highlighter-rouge">MANDATORY</code>: if there is an existing transaction then it reuses it, otherwise it fails</li>
+  <li><code class="highlighter-rouge">NOT_SUPPORTED</code>: If there is a transaction then it suspends it and it does not propagate the transaction to other business methods, otherwise it does nothing.</li>
+  <li><code class="highlighter-rouge">SUPPORTS</code>: If a transaction exists then it works as for <code class="highlighter-rouge">REQUIRED</code>, otherwise it works as for <code class="highlighter-rouge">NOT_SUPPORTED</code>.</li>
+</ul>
+
+<p>Consider the following exercises.</p>
+
+<blockquote>
+  <p><em>Exercise 3:</em> Test the different types of transaction attribute and observe their respective behavior.</p>
+</blockquote>
+
+<blockquote>
+  <p><em>Exercise 4:</em> Are the snippets 1 and 2 semantically equivalent?</p>
+</blockquote>
+
+<blockquote>
+  <p><em>Exercise 5:</em> Mix the two types of transaction management.</p>
+</blockquote>
+
+<h4 id="security"><a id="secu"></a>Security</h4>
+
+<p>Another great feature of EJBs is their ability for declarative authorization and the integration in the JAAS framework. JAAS is the Java Authentication and Authorization Service
+It provides unified services to access user directories for user authentication and their authorization. As the client is already authenticated, at the EJB level, only authorization matters.</p>
+
+<p>After authentication, a principal (e.g., user name, role) is set in the context. This principal is used for authorization.</p>
+
+<p>The main annotation is <code class="highlighter-rouge">@RolesAllowed</code> followed by a list of authorized roles. As an example, look at the method <code class="highlighter-rouge">getDistribution</code> of <code class="highlighter-rouge">StudentServiceJPAImpl.java</code>. The method is only allowed for client that belongs to the group/role <code class="highlighter-rouge">user</code>.</p>
+
+<p>Sometimes, a method of an EJB is not executed in the context of an authenticated user or the authenticated user has not enough credentials. If it is still important to run the method, you can use the <code class="highlighter-rouge">@RunAs</code> annotation. This basically overrides the current security context (and the associated principal) similarly to <code class="highlighter-rouge">sudo</code> for UNIX.</p>
+
+<p>In any EJB, it is possible to get the current client session and therefore the principal:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Resource</span> 
+<span class="n">SessionContext</span> <span class="n">ctx</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSomething</span><span class="o">()</span> <span class="o">{</span>
+	<span class="c1">// obtain the principal. </span>
+	<span class="n">Principal</span> <span class="n">principal</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getCallerPrincipal</span><span class="o">();</span>
+	<span class="c1">// obtain the name. </span>
+	<span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">callerPrincipal</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span>
+	<span class="c1">// Is the caller an admin?</span>
+	<span class="n">ctx</span><span class="o">.</span><span class="na">isCallerInRole</span><span class="o">(</span><span class="s">"admin"</span><span class="o">)</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p><em>Exercise 6:</em> Change the method getDistribution to only allow client that belong to the <code class="highlighter-rouge">admin</code> group. Log as a user and as an admin, check the servlet as well as the JAX-RS service. What do you observe?</p>
+</blockquote>
+
+<blockquote>
+  <p><em>Exercise 7:</em> Add a new Role to the application, and use it. Warning, some configurations are vendor specific.</p>
+</blockquote>
+
+<blockquote>
+  <p><em>Exercise 8:</em> Create a service that uses <code class="highlighter-rouge">@RunAs</code> to upgrade the credentials of a standard user in order to call another service that requires the admin level.</p>
+</blockquote>
+
+<h4 id="-callbacks-and-interceptors"><a id="callbacks"></a> Callbacks and Interceptors</h4>
+
+<p>Interceptors are used to enhance the business method invocations and the beans’ lifecycle events. Interceptors implements the AOP paradigm.</p>
+
+<p>Interceptors are of two kinds:</p>
+<ul>
+  <li>Lifecycle event interceptors such as <code class="highlighter-rouge">@PostConstruct</code>, <code class="highlighter-rouge">@PostActivate</code>, and <code class="highlighter-rouge">@PrePassivate</code>, and <code class="highlighter-rouge">@PreDestroy</code> enable to add logic when the bean is created or destroyed.</li>
+  <li>Call-based interceptors that relies on the <code class="highlighter-rouge">@AroundInvoke</code> annotation.</li>
+</ul>
+
+<p>In the first case, adding the annotation before the method declaration is enough. It will then be called when the lifecycle event occurs.
+In the latter case, in addition to the annotation the developer must configure the <code class="highlighter-rouge">ejb-jar.xml</code> file.</p>
+
+<p>Here is a simple interceptor that prints out the time consumed by a method call:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@AroundInvoke</span>
+<span class="kd">public</span> <span class="n">Object</span> <span class="nf">intercept</span><span class="o">(</span><span class="n">InvocationContext</span> <span class="n">ctx</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span>
+<span class="o">{</span>
+   <span class="kt">long</span> <span class="n">start</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
+      
+   <span class="k">try</span> <span class="o">{</span>
+		<span class="n">Object</span> <span class="n">value</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">proceed</span><span class="o">();</span>
+   <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
+   	 	<span class="n">StringBuilder</span> <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuilder</span><span class="o">(</span><span class="s">"******  "</span><span class="o">);</span>
+		<span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="na">getMethod</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+		<span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">" took :"</span><span class="o">);</span>
+		<span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()</span> <span class="o">-</span> <span class="n">start</span><span class="o">);</span>
+		<span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">" ms  ******"</span><span class="o">);</span>
+
+		<span class="n">mLogger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">str</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+   <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>In addition to the interceptor declaration, it must be activated by mean of either an annotation on the target EJB or via the <code class="highlighter-rouge">ejb-jar.xml</code> file. If several interceptors are declared, then the order of declaration is the order of execution: the last is the most nested interceptor.</p>
+
+<p>The following example presents the annotation based declaration.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Stateless</span>
+<span class="nd">@Interceptor</span><span class="o">({</span><span class="n">PerformanceEJBInterceptor</span><span class="o">.</span><span class="na">class</span><span class="o">})</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">StudentServiceJPAImpl</span> <span class="kd">implements</span> <span class="n">StudentService</span><span class="o">,</span> <span class="n">StudentServiceRemote</span> <span class="o">{</span>
+</code></pre></div></div>
+
+<p>In the following snippet, the interceptor is applied to all methods whose name is like <code class="highlighter-rouge">get*</code> and EJB’s name is like <code class="highlighter-rouge">Student*</code>. It is also possible to specify the parameters’ type in case of overloading.</p>
+
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;assembly-descriptor&gt;</span>
+ <span class="c">&lt;!-- Default interceptor that will apply to all methods for all beans in deployment --&gt;</span>
+ <span class="nt">&lt;interceptor-binding&gt;</span>
+      <span class="nt">&lt;ejb-name&gt;</span>Student*<span class="nt">&lt;/ejb-name&gt;</span>
+      <span class="nt">&lt;method&gt;</span>
+           <span class="nt">&lt;method-name&gt;</span>get*<span class="nt">&lt;/method-name&gt;</span>
+      <span class="nt">&lt;/method&gt;</span>
+      <span class="nt">&lt;interceptor-class&gt;</span>ch.demo.business.interceptors.PerformanceEJBInterceptor<span class="nt">&lt;/interceptor-class&gt;</span>      
+   <span class="nt">&lt;/interceptor-binding&gt;</span>
+   ...
+<span class="nt">&lt;/assembly-descriptor&gt;</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p><em>Exercise 9:</em> Add an interceptor that for all public methods of <code class="highlighter-rouge">StudentServiceJPAImpl.java</code> to increments an overall (common to all clients) usage counter using the annotation based approach.</p>
+</blockquote>
+
+<blockquote>
+  <p><em>Exercise 10:</em> Do the same, but using the ``ejb-jar.xml`.</p>
+</blockquote>
+
+<h4 id="-timers"><a id="timers"></a> Timers</h4>
+
+<p>Some services are not directly linked to a client session. This is the case for batch processes that must run every x hours. To that end, EJB 3.1 provides the annotation <code class="highlighter-rouge">@Schedule</code> to specify how often a service method must be called. This is similar to the CRON  feature on UNIX systems.</p>
+
+<p>The following example runs the method <code class="highlighter-rouge">doSomethingUseful</code> every 30 minutes.</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="nd">@Schedule</span><span class="o">(</span><span class="n">minute</span><span class="o">=</span><span class="s">"*/30"</span><span class="o">,</span> <span class="n">hour</span><span class="o">=</span><span class="s">"*"</span><span class="o">)</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSomethingUseful</span><span class="o">()</span> <span class="o">{</span>
+        <span class="o">...</span>
+    <span class="o">}</span>  
+</code></pre></div></div>
+
+<blockquote>
+  <p><em>Exercise 11:</em>  Add a scheduler that runs a method every minutes to print out the number of students in the database.</p>
+</blockquote>
+
+<blockquote>
+  <p><em>Exercise 12:</em>  <code class="highlighter-rouge">@Schedule</code> is often used in conjunction with <code class="highlighter-rouge">@RunAs</code>. Why?</p>
+</blockquote>
+
+<h4 id="-asynchronous-calls"><a id="async"></a> Asynchronous calls</h4>
+
+<p>Asynchronous calling means that the control is returned to the caller before the process has been completed. For instance, a batch job that loads 1000 customers description from one database, processes them and finally save them in another database. From a performances point of view, it is better to split the process in x batches and then to wait until every thing is finished. Firstly, if the asynchronous call is made to another EJB, it is possible to leverage the pool to have parallel treatments without managing multi-threading and race conditions. Secondly, as the different call may use different database connections, it will limit the database bottleneck.</p>
+
+<p>To do this, JEE provides the <code class="highlighter-rouge">@Asynchronous</code> annotation. Any method that returns either nothing (<code class="highlighter-rouge">void</code>) or an instance of type <code class="highlighter-rouge">Future&lt;T&gt;</code> can be run asynchronously.</p>
+
+<p>The <code class="highlighter-rouge">Future</code> interface exposes the method <code class="highlighter-rouge">get</code> that blocks until the job is over.
+The following class, exposes the method <code class="highlighter-rouge">processJob</code> that runs asynchronously.</p>
+
+<p>The methods <code class="highlighter-rouge">processJobs</code> starts 10 times the method processJob and put the resulting <code class="highlighter-rouge">Future&lt;String&gt;</code> in an array. Then it iterates of the pool and wait until all calls have returned.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Stateless</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">BatchProcessor</span> <span class="o">{</span>
+
+<span class="kd">public</span> <span class="kt">void</span> <span class="nf">processJobs</span><span class="o">()</span> <span class="o">{</span>
+	<span class="n">Future</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;[]</span> <span class="n">pool</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Future</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;[</span><span class="mi">10</span><span class="o">];</span>
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+		<span class="n">pool</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">processJob</span><span class="o">(</span><span class="s">"Job #"</span> <span class="o">+</span> <span class="n">i</span><span class="o">);</span>
+	<span class="o">}</span>
+
+	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+		<span class="n">pool</span><span class="o">[</span><span class="n">i</span><span class="o">].</span><span class="na">get</span><span class="o">();</span>
+	<span class="o">}</span>	
+<span class="o">}</span>
+
+
+<span class="nd">@Asynchronous</span>
+<span class="kd">public</span> <span class="n">Future</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="nf">processJob</span><span class="o">(</span><span class="n">String</span> <span class="n">jobName</span><span class="o">)</span> <span class="o">{</span>
+
+    <span class="k">try</span> <span class="o">{</span>
+        <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">10000</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="n">Thread</span><span class="o">.</span><span class="na">interrupted</span><span class="o">();</span>
+        <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+    <span class="o">}</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="n">AsyncResult</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;(</span><span class="n">jobName</span><span class="o">);</span>
+
+<span class="o">}</span>
+
+</code></pre></div></div>
+
+<blockquote>
+  <p><em>Exercise 13:</em> Create an EJB that invoke an asynchronous method that runs 100 times. The asynchronous method should wait a random time between 5 and 10 seconds  before returning a the actual waiting time. Collect all the waiting times and compute the average.</p>
+</blockquote>
+
+<h3 id="singleton-beans">Singleton Beans</h3>
+
+<p>Singleton beans (<code class="highlighter-rouge">@Singleton</code>) are special kind of EJBS that exist only in one instance in the container. This is for instance useful to initialize the application. Thus, <code class="highlighter-rouge">@Singleton</code> can be associated with <code class="highlighter-rouge">@Startup</code> to start the EJB during container’s startup.</p>
+
+<p>As there is only one instance, it means the bean is meant to be shared. Therefore, it is important to specify the locking policy. There are two types of locking:</p>
+<ul>
+  <li>Container managed concurrency management <code class="highlighter-rouge">@ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)</code>. This is the default behavior and it is highly recommended to stick to it. Annotating a method (or the class) with <code class="highlighter-rouge">@Lock(LockType.READ)</code> means that the method can be safely access concurrently. <code class="highlighter-rouge">@Lock(LockType.WRITE)</code> requires the calls to the method to be serialized. The methods are <code class="highlighter-rouge">@Lock(LockType.WRITE)</code> by default.</li>
+  <li>Bean managed concurrency management <code class="highlighter-rouge">@ConcurrencyManagement(ConcurrencyManagementType.BEAN)</code>. This requires the developer to use synchronized and volatile to achieve good concurrency.</li>
+</ul>
+
+<blockquote>
+  <p>By default the class is marked as <code class="highlighter-rouge">@Lock(LockType.WRITE)</code>, thus EVERY CALL is synchronized. This is probably not the expected behavior (at least most of the time) and produces a huge bottleneck. Make sure to set the proper lock policy on the class and to only put <code class="highlighter-rouge">@Lock(LockType.WRITE)</code> where needed.</p>
+</blockquote>
+
+<p>The following bean initialize a shared variable during container startup and lock the access to the modification to only one thread (client) at a time.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Singleton</span>
+<span class="nd">@Startup</span>
+<span class="nd">@Lock</span><span class="o">(</span><span class="n">LockType</span><span class="o">.</span><span class="na">READ</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StatusBean</span> <span class="o">{</span>
+  <span class="kd">private</span> <span class="n">String</span> <span class="n">status</span><span class="o">;</span>
+
+  <span class="nd">@PostConstruct</span>
+  <span class="kt">void</span> <span class="n">init</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">status</span> <span class="o">=</span> <span class="s">"Ready"</span><span class="o">;</span>
+  <span class="o">}</span>
+
+  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getStatus</span><span class="o">()</span> <span class="o">{</span>
+    <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">status</span><span class="o">;</span>
+  <span class="o">}</span>
+  
+  <span class="nd">@Lock</span><span class="o">(</span><span class="n">LockType</span><span class="o">.</span><span class="na">WRITE</span><span class="o">)</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setStatus</span><span class="o">(</span><span class="n">String</span> <span class="k">new</span> <span class="n">Status</span><span class="o">)</span> <span class="o">{</span>
+    <span class="k">this</span><span class="o">.</span><span class="na">status</span> <span class="o">=</span> <span class="n">newStatus</span><span class="o">;</span>
+  <span class="o">}</span>
+
+  <span class="nd">@Lock</span><span class="o">(</span><span class="n">LockType</span><span class="o">.</span><span class="na">WRITE</span><span class="o">)</span>
+  <span class="nd">@AccessTimeout</span><span class="o">(</span><span class="n">value</span><span class="o">=</span><span class="mi">360000</span><span class="o">)</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="n">doTediousOperation</span> <span class="o">{</span>
+    <span class="o">...</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p><em>Exercise 14:</em> Write a singleton that reads the postal code from the database during startup, update them every 30 minutes. Take care of the concurrency aspects.</p>
+</blockquote>
+
+<h3 id="stateful-session-beans"><a id="sfsb"></a>Stateful Session Beans</h3>
+
+<p>Unlike stateless session beans, stateful session beans maintain a state across several client invocation. This is because there is a one to one relationship between a client and a stateful session bean.</p>
+
+<p>The following code snippet describes a stateful session bean that maintains a counter across several invocations.
+A stateful session bean is annotated with <code class="highlighter-rouge">@Stateful</code>. As it is stateful, it maintains a session state and it is therefore important to set a timeout. Otherwise, the number of open session will raise and it will consume the server memory.
+The timeout is defined using the <code class="highlighter-rouge">@StatefulTimeout</code> annotation.</p>
+
+<blockquote>
+  <p>Because there is no instance sharing among several client, Stateful session beans are more resource-demanding than stateless session beans. Therefore, they should be used with great care.</p>
+</blockquote>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Stateful</span>
+<span class="nd">@StatefulTimeout</span><span class="o">(</span><span class="n">unit</span> <span class="o">=</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">MINUTES</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">30</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentStatisticsServiceImpl</span> <span class="kd">implements</span> <span class="n">StudentStatisticsService</span> <span class="o">{</span>
+
+	<span class="kd">private</span> <span class="n">Long</span> <span class="n">numberOfAccess</span> <span class="o">=</span> <span class="mi">0</span><span class="n">l</span><span class="o">;</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="n">String</span> <span class="nf">getStatistics</span><span class="o">()</span> <span class="o">{</span>
+		<span class="k">return</span> <span class="s">"The student service has been invoked #"</span> <span class="o">+</span> <span class="n">numberOfAccess</span>
+				<span class="o">+</span> <span class="s">" in this session"</span><span class="o">;</span>
+	<span class="o">}</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">count</span><span class="o">()</span> <span class="o">{</span>
+		<span class="n">numberOfAccess</span><span class="o">++;</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>As a stateful session bean is not per se linked to an HTTP session, the application client code must ensure to remember which instance of the EJB is dedicated to which client.
+When used in conjunction with a Servlet, Stateful beans are often put in the HTTP session for further reuse.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Override</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+		<span class="n">StudentStatisticsService</span> <span class="n">statistics</span> <span class="o">=</span> <span class="o">(</span><span class="n">StudentStatisticsService</span><span class="o">)</span> <span class="n">request</span><span class="o">.</span><span class="na">getSession</span><span class="o">().</span><span class="na">getAttribute</span><span class="o">(</span>
+				<span class="n">StudentStatisticsService</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+
+		<span class="k">if</span> <span class="o">(</span><span class="n">statistics</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+			<span class="k">try</span> <span class="o">{</span>
+				<span class="n">InitialContext</span> <span class="n">ctx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">InitialContext</span><span class="o">();</span>
+				<span class="n">statistics</span> <span class="o">=</span> <span class="o">(</span><span class="n">StudentStatisticsService</span><span class="o">)</span> <span class="n">ctx</span>
+						<span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="s">"java:global/JEE6-EAR/JEE6-EJB-0.0.1-SNAPSHOT/StudentStatisticsServiceImpl"</span><span class="o">);</span>
+				<span class="n">request</span><span class="o">.</span><span class="na">getSession</span><span class="o">().</span><span class="na">setAttribute</span><span class="o">(</span><span class="n">StudentStatisticsService</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">toString</span><span class="o">(),</span> <span class="n">statistics</span><span class="o">);</span>
+			<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">NamingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+				<span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+			<span class="o">}</span>
+
+		<span class="o">}</span>
+
+		<span class="n">statistics</span><span class="o">.</span><span class="na">count</span><span class="o">();</span>
+
+		<span class="n">response</span><span class="o">.</span><span class="na">getOutputStream</span><span class="o">().</span><span class="na">println</span><span class="o">(</span><span class="s">"There are #"</span> <span class="o">+</span> <span class="n">studentService</span><span class="o">.</span><span class="na">getAll</span><span class="o">().</span><span class="na">size</span><span class="o">()</span> <span class="o">+</span> <span class="s">" students in the database"</span><span class="o">);</span>
+		<span class="n">response</span><span class="o">.</span><span class="na">getOutputStream</span><span class="o">().</span><span class="na">println</span><span class="o">(</span><span class="n">statistics</span><span class="o">.</span><span class="na">getStatistics</span><span class="o">());</span>
+		<span class="n">response</span><span class="o">.</span><span class="na">getOutputStream</span><span class="o">().</span><span class="na">println</span><span class="o">(</span><span class="n">studentService</span><span class="o">.</span><span class="na">getStatistics</span><span class="o">());</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Either the EJB is looked-up with JNDI and then put into the HTTP session or, when using CDI, the link is made based on the caller scope.
+The class <code class="highlighter-rouge">StudentServiceFacade.java</code> describes how the injection automatically links the correct instance of a stateful session bean to a given based on the <code class="highlighter-rouge">@SessionScoped</code> annotation.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@SessionScoped</span>
+<span class="nd">@Path</span><span class="o">(</span><span class="s">"/studentService"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceFacade</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+
+	<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="mi">1318211294294344900L</span><span class="o">;</span>
+
+	<span class="nd">@EJB</span>
+	<span class="n">StudentService</span> <span class="n">studentService</span><span class="o">;</span>
+
+	<span class="nd">@EJB</span>
+	<span class="n">StudentStatisticsService</span> <span class="n">studentServiceStatistics</span><span class="o">;</span>
+
+
+	<span class="nd">@GET</span>
+	<span class="nd">@Produces</span><span class="o">({</span> <span class="s">"application/xml"</span><span class="o">,</span> <span class="s">"application/json"</span> <span class="o">})</span>
+	<span class="nd">@Path</span><span class="o">(</span><span class="s">"session"</span><span class="o">)</span>
+	<span class="kd">public</span> <span class="n">Response</span> <span class="nf">getSessionStatistics</span><span class="o">()</span> <span class="o">{</span>
+		<span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span><span class="n">studentServiceStatistics</span><span class="o">.</span><span class="na">getStatistics</span><span class="o">()).</span><span class="na">build</span><span class="o">();</span>
+	<span class="o">}</span>
+	
+	<span class="o">...</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Consider the following exercise.</p>
+
+<blockquote>
+  <p><em>Exercise 15:</em> Show that two sessions share the same overall count but not the same per session count.</p>
+</blockquote>
+
+<p>As the container does not share the stateful instances, it might run out of memory and therefore it will try to save the state of the bean on disk (or database). This operation is called <strong>Passivation</strong>. Afterwards, when the client comes back and requires its stateful instance, the container loads it from the disk. This operation is called <strong>Activation</strong>.</p>
+
+<p>Some operations such as initializing/cleaning File, a socket connection, or a database connection can be made before activation and/or after activation using the following 
+<code class="highlighter-rouge">@PrePassivate</code> and the <code class="highlighter-rouge">@PostActivate</code> annotations.</p>
+
+<p>Consider the following exercises:</p>
+
+<blockquote>
+  <p><em>Exercise 16:</em> Stop the server and observe that the bean has been passivated.</p>
+</blockquote>
+
+<blockquote>
+  <p><em>Exercise 17:</em> Start the server and observe that the bean has been activated.</p>
+</blockquote>
+
+<p>Whenever the user logs out and thus invalidate the HTTP Session, you might want to clean up the EJB state and release the resources. To achieve this, the client must call a method annotated with <code class="highlighter-rouge">@Remove</code>. As soon as the client call is over the container can garbage the bean. The idea is simply to get ahead of the timeout.</p>
+
+<blockquote>
+  <p><em>Exercise 18:</em> Implements two methods with <code class="highlighter-rouge">@Remove</code> with two different behaviors. Check that both will discard the current instance. Hint: you can use <code class="highlighter-rouge">@PreDestroy</code> to check the bean’s destruction.</p>
+</blockquote>
+
+<h2 id="message-driven-beans">Message Driven Beans</h2>
+
+<p>Message driven beans (MDB) are very useful for asynchronous process and for decoupling the client from the processor. MDB implement a typical publish/subscribe architecture.</p>
+
+<p>There are two kinds of objects, a MDB can listen to:</p>
+
+<ul>
+  <li><strong>Topics</strong>: pure publish/subscribe semantics. A new message will be processed by every listeners.</li>
+  <li><strong>Queue</strong>: more of a load balancer, once the message is consumed by one of the listeners, it
+is removed from the queue.</li>
+</ul>
+
+<p>Although, there is, in JEE6, another mechanism for asynchronous processing, MDBs remain the best alternative if you do not want the client to be aware of the asynchronous logic and processor.</p>
+
+<p>The idea is that there is a queue (or a topic) in between. Therefore, the client as no knowledge whatsoever of the message processor contract or semantics.</p>
+
+<p>The first step is to configure a Queue Connection Factory as well as a Queue in the application server.</p>
+
+<p>The following servlet gets  the connection factory as well as the queue injected. As always with dependency injection, the same result can be achieved using JNDI lookups.
+For each request to the servlet 100 messages are generated and put in the Queue called <code class="highlighter-rouge">MyQueue</code>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@WebServlet</span><span class="o">(</span><span class="s">"/registration"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RegistrationServlet</span> <span class="kd">extends</span> <span class="n">HttpServlet</span> <span class="o">{</span>
+
+	<span class="o">...</span>
+		
+	<span class="nd">@Resource</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">"MyConnectionFactory"</span><span class="o">)</span>
+	<span class="kd">private</span> <span class="n">ConnectionFactory</span> <span class="n">connectionFactory</span><span class="o">;</span>
+
+	<span class="nd">@Resource</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">"MyQueue"</span><span class="o">)</span>
+	<span class="kd">private</span> <span class="n">Queue</span> <span class="n">queue</span><span class="o">;</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">)</span> <span class="kd">throws</span> 	<span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+
+		<span class="k">try</span> <span class="o">{</span>
+			<span class="n">Connection</span> <span class="n">connection</span><span class="o">;</span>
+			<span class="n">connection</span> <span class="o">=</span> <span class="n">connectionFactory</span><span class="o">.</span><span class="na">createConnection</span><span class="o">();</span>
+
+			<span class="n">Session</span> <span class="n">session</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createSession</span><span class="o">(</span><span class="kc">false</span><span class="o">,</span> <span class="n">Session</span><span class="o">.</span><span class="na">AUTO_ACKNOWLEDGE</span><span class="o">);</span>
+			<span class="n">MessageProducer</span> <span class="n">messageProducer</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createProducer</span><span class="o">(</span><span class="n">queue</span><span class="o">);</span>
+
+			<span class="n">TextMessage</span> <span class="n">message</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createTextMessage</span><span class="o">();</span>
+
+			<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
+				<span class="n">message</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="s">"This is message "</span> <span class="o">+</span> <span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">));</span>
+				<span class="n">messageProducer</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">message</span><span class="o">);</span>
+			<span class="o">}</span>
+		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+			<span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>The following MDB listens to <code class="highlighter-rouge">MyQueue</code> (thanks to the annotation <code class="highlighter-rouge">@MessageDriven(mappedName = "MyQueue")</code> and because it implements the <code class="highlighter-rouge">MessageListener</code> interface it takes a message when available.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@MessageDriven</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">"MyQueue"</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+    <span class="o">...</span>
+
+	<span class="nd">@Resource</span>
+	<span class="kd">private</span> <span class="n">MessageDrivenContext</span> <span class="n">mdbContext</span><span class="o">;</span>
+
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
+		<span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+
+		<span class="k">try</span> <span class="o">{</span>
+			<span class="k">if</span> <span class="o">(</span><span class="n">inMessage</span> <span class="k">instanceof</span> <span class="n">TextMessage</span><span class="o">)</span> <span class="o">{</span>
+				<span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
+				<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"MESSAGE BEAN: Message received: "</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
+			<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+				<span class="n">logger</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"Message of wrong type: "</span>
+						<span class="o">+</span> <span class="n">inMessage</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+			<span class="o">}</span>
+		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+			<span class="n">mdbContext</span><span class="o">.</span><span class="na">setRollbackOnly</span><span class="o">();</span>
+			<span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
+		<span class="o">}</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Here is a sample output. As you can see, the messages are processed according to their input order but not necessarily by the same EJB (worker).</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>INFO: Sending message: This is message 1
+INFO: Sending message: This is message 2
+INFO: Sending message: This is message 3
+INFO: MESSAGE BEAN: Message received: This is message 1
+INFO: MESSAGE BEAN: Message received: This is message 2
+INFO: Sending message: This is message 5
+INFO: Sending message: This is message 6
+INFO: MESSAGE BEAN: Message received: This is message 4
+INFO: MESSAGE BEAN: Message received: This is message 5
+...
+INFO: MESSAGE BEAN: Message received: This is message 100
+</code></pre></div></div>
+
+<p>Consider the following exercises:</p>
+
+<blockquote>
+  <p><em>Exercise 19:</em> Compare Message Driven Beans and Session Beans with asynchronous calls.</p>
+</blockquote>
+
+<blockquote>
+  <p><em>Exercise 20:</em> Print out the thread-id. What do you observe?</p>
+</blockquote>
+
+<blockquote>
+  <p><em>Exercise 21:</em> Create another MDB that consumes the same queue. What do you observe?</p>
+</blockquote>
+
+<blockquote>
+  <p><em>Exercise 22:</em> Do the same (2 consumers) but using a <code class="highlighter-rouge">Topic</code> instead of a <code class="highlighter-rouge">Queue</code>.</p>
+</blockquote>
+
+
+  </div><a class="u-url" href="/2012/12/31/jee6-tutorial.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Steve Hostettler</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Steve Hostettler</li><li><a class="u-email" href="mailto:steve.hostettler@gmail.com">steve.hostettler@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/hostettler"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">hostettler</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Steve Hostettler&#39;s personal blog about automatic testing, Java, Java EE, and Architecture.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

@@ -9,15 +9,15 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="In this post, I look at the different kind of objects used for test purposes. By this, I mean objects that are used to make a test running. This article focuses on component testing, a.k.a. unit testing (I do not like the term unit testing because it is too often misunderstood with the technology behind, e.g., JUnit, testNG). Although there already exists a great number of resources on that subject, it was very difficult to me to understand the differences between the different kinds of test objects. This is partly due to the fact that different authors use different terms for the same object and the same term for different objects [1]. To be as didactic as possible, I also chose to add some blocks of code. Please note, that these blocks are only here for the sake of clarity. This is not the way I would recommend to do stubbing, faking, and mocking. Consider Mockito and PowerMockito for that. These are amazing tools to that purpose. They deserve a post on their own to discuss good practices. This post is in no way an exhaustive state of the art, I only tried to select the terms that, in my opinion, are clear and are consensual enough. To that end I used a number of sources that can be found in the bibliography section. Here are the main reasons to use different objects during the test phase and in production:" />
 <meta property="og:description" content="In this post, I look at the different kind of objects used for test purposes. By this, I mean objects that are used to make a test running. This article focuses on component testing, a.k.a. unit testing (I do not like the term unit testing because it is too often misunderstood with the technology behind, e.g., JUnit, testNG). Although there already exists a great number of resources on that subject, it was very difficult to me to understand the differences between the different kinds of test objects. This is partly due to the fact that different authors use different terms for the same object and the same term for different objects [1]. To be as didactic as possible, I also chose to add some blocks of code. Please note, that these blocks are only here for the sake of clarity. This is not the way I would recommend to do stubbing, faking, and mocking. Consider Mockito and PowerMockito for that. These are amazing tools to that purpose. They deserve a post on their own to discuss good practices. This post is in no way an exhaustive state of the art, I only tried to select the terms that, in my opinion, are clear and are consensual enough. To that end I used a number of sources that can be found in the bibliography section. Here are the main reasons to use different objects during the test phase and in production:" />
-<link rel="canonical" href="http://hostettler.net/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html" />
-<meta property="og:url" content="http://hostettler.net/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html" />
+<link rel="canonical" href="http://localhost:4000/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html" />
+<meta property="og:url" content="http://localhost:4000/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html" />
 <meta property="og:site_name" content="Steve Hostettler" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2014-05-18T10:58:00+02:00" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","headline":"Fakes, Stubs, Dummy, Mocks, Doubles and all that…","dateModified":"2014-05-18T10:58:00+02:00","url":"http://hostettler.net/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html","datePublished":"2014-05-18T10:58:00+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html"},"description":"In this post, I look at the different kind of objects used for test purposes. By this, I mean objects that are used to make a test running. This article focuses on component testing, a.k.a. unit testing (I do not like the term unit testing because it is too often misunderstood with the technology behind, e.g., JUnit, testNG). Although there already exists a great number of resources on that subject, it was very difficult to me to understand the differences between the different kinds of test objects. This is partly due to the fact that different authors use different terms for the same object and the same term for different objects [1]. To be as didactic as possible, I also chose to add some blocks of code. Please note, that these blocks are only here for the sake of clarity. This is not the way I would recommend to do stubbing, faking, and mocking. Consider Mockito and PowerMockito for that. These are amazing tools to that purpose. They deserve a post on their own to discuss good practices. This post is in no way an exhaustive state of the art, I only tried to select the terms that, in my opinion, are clear and are consensual enough. To that end I used a number of sources that can be found in the bibliography section. Here are the main reasons to use different objects during the test phase and in production:","@context":"http://schema.org"}</script>
+{"@type":"BlogPosting","datePublished":"2014-05-18T10:58:00+02:00","url":"http://localhost:4000/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html"},"description":"In this post, I look at the different kind of objects used for test purposes. By this, I mean objects that are used to make a test running. This article focuses on component testing, a.k.a. unit testing (I do not like the term unit testing because it is too often misunderstood with the technology behind, e.g., JUnit, testNG). Although there already exists a great number of resources on that subject, it was very difficult to me to understand the differences between the different kinds of test objects. This is partly due to the fact that different authors use different terms for the same object and the same term for different objects [1]. To be as didactic as possible, I also chose to add some blocks of code. Please note, that these blocks are only here for the sake of clarity. This is not the way I would recommend to do stubbing, faking, and mocking. Consider Mockito and PowerMockito for that. These are amazing tools to that purpose. They deserve a post on their own to discuss good practices. This post is in no way an exhaustive state of the art, I only tried to select the terms that, in my opinion, are clear and are consensual enough. To that end I used a number of sources that can be found in the bibliography section. Here are the main reasons to use different objects during the test phase and in production:","headline":"Fakes, Stubs, Dummy, Mocks, Doubles and all that…","dateModified":"2014-05-18T10:58:00+02:00","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Steve Hostettler" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
@@ -78,9 +78,10 @@ In rough terms, test doubles look like the actual object they double. They satis
 
 <p>The next figure describes a simple test setup that do not use test doubles. To test the Component Under Test (CUT), the following test setup uses its actual dependencies (another component). This setup phase is trivial as there is nothing to do. The exercise phase calls the CUT with the proper parameters (direct inputs) that in turn calls it dependency (indirect outputs). Another Component returns its result to the CUT (indirect inputs) that uses it to complete the work and then finally returns the overall result (direct outputs). The terms “direct inputs”, “indirect outputs”, and so on come from [2].</p>
 
-<figure class="image">
+<figure class="image"><pre>
   <img src="/figures/TestSetup.png" alt="Overview of a test setup" />
   <figcaption>Overview of a test setup</figcaption>
+</pre>
 </figure>
 
 <p>Now let us say that “AnotherComponent” is either too complex, not already implemented or has a non-deterministic behavior. In those cases, it is easier to use another implementation of “AnotherComponent” that behaves exactly has expected for a specific scenario.</p>
@@ -181,9 +182,10 @@ Some method signatures of the CUT may require objects as parameters. If neither 
 
 <p>The next figure presents a test that relies on a test stub. First, the test case setups a stub object. This object responds to the expected CUT invokation in order to enact a given scenario. This is very useful to check indirect inputs with seldom values.</p>
 
-<figure class="image">
+<figure class="image"><pre>
   <img src="/figures/TestSTUB.png" alt="Test setup that uses a test stub" />
   <figcaption>Test setup that uses a test stub</figcaption>
+</pre>
 </figure>
 
 <p>Back to the example, the following program illustrates how to use a stub to check specific indirect inputs.
@@ -216,9 +218,10 @@ would otherwise raise a <code class="highlighter-rouge">NullPointerException</co
 <h2 id="fake-objects">Fake objects</h2>
 <p>Fake objects have working implementations, but  they may simplify some behaviors. This makes them not suitable for prime time. The idea is that the object actually displays some real behavior but not everything. While a Fake Object is typically built specifically for testing, it is not used as either a control point or an observation point by the test. The most common reasons for using fake objects is that the real component is not available yet, is too slow or cannot be used during tests because of side effects.</p>
 
-<figure class="image">
+<figure class="image"><pre>
   <img src="/figures/TestFAKE.png" alt="Test setup that uses a fake" />
   <figcaption>Test setup that uses a fake</figcaption>
+</pre>
 </figure>
 
 <p>The following fake simulates most of the behaviors except for the limits (MAX_INTEGER, null, etc…)</p>
@@ -254,9 +257,10 @@ In fact mocks are a certain kind of stub or fake. However, the additional featur
 
 <p>Whenever the assertions are made on the fake object and not the CUT, then it is a mock.</p>
 
-<figure class="image">
+<figure class="image"><pre>
   <img src="/figures/TestMOCK.png" alt="Test setup that uses a mock" />
   <figcaption>Test setup that uses a mock</figcaption>
+</pre>
 </figure>
 
 <p>The following example uses <a href="https://code.google.com/p/mockito/">Mockito</a> to provide easy Mocking. Note that the last assertion <code class="highlighter-rouge">Mockito.verify</code> checks whether the mock was called with a given parameters. In other words, we check that the CUT did not filter the input parameter.</p>
@@ -292,9 +296,10 @@ In fact mocks are a certain kind of stub or fake. However, the additional featur
 <h2 id="test-spy">Test Spy</h2>
 <p>According to Meszaros [2], a test spy is basically a recorder that is able to save the interactions between the CUT and the spy for later verifications.</p>
 
-<figure class="image">
+<figure class="image"><pre>
   <img src="/figures/TestSPY.png" alt="Test setup that uses a test spy" />
   <figcaption>Test setup that uses a test spy</figcaption>
+</pre>
 </figure>
 <p>On the other hand, <a href="https://code.google.com/p/mockito/">Mockito</a> considers that a spy is an real implementation in which you change only some specific behaviors. Instead of specifying every behavior one by one, you take an existing object that does most of it and you only change very specific behaviors.</p>
 

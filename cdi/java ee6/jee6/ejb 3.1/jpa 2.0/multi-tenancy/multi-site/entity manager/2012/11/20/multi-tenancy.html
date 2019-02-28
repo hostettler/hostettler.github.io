@@ -9,15 +9,15 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="In this post, we look at how to simulate multi-tenancy with several datasources using JPA 2.0" />
 <meta property="og:description" content="In this post, we look at how to simulate multi-tenancy with several datasources using JPA 2.0" />
-<link rel="canonical" href="http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html" />
-<meta property="og:url" content="http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html" />
+<link rel="canonical" href="http://localhost:4000/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html" />
+<meta property="og:url" content="http://localhost:4000/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html" />
 <meta property="og:site_name" content="Steve Hostettler" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2012-11-20T05:18:00+01:00" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","headline":"Multi-Tenancy with EJB 3.1 and JPA 2.0","dateModified":"2012-11-20T05:18:00+01:00","url":"http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html","datePublished":"2012-11-20T05:18:00+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html"},"description":"In this post, we look at how to simulate multi-tenancy with several datasources using JPA 2.0","@context":"http://schema.org"}</script>
+{"@type":"BlogPosting","datePublished":"2012-11-20T05:18:00+01:00","url":"http://localhost:4000/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html"},"description":"In this post, we look at how to simulate multi-tenancy with several datasources using JPA 2.0","headline":"Multi-Tenancy with EJB 3.1 and JPA 2.0","dateModified":"2012-11-20T05:18:00+01:00","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Steve Hostettler" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
@@ -60,9 +60,10 @@
 
 <p>First, let me start with the overall architecture as described below.</p>
 
-<figure class="image">
+<figure class="image"><pre>
   <img src="/figures/multi-tenancy-architecture.png" alt="Multi-tenancy architecture with serveral datasources " />
   <figcaption>Multi-tenancy architecture with serveral datasources </figcaption>
+</pre>
 </figure>
 
 <p>In the above figure, the database is organized in schemas, with one application server datasource (DS) per schema and one persistence unit (PU) per datasource. 

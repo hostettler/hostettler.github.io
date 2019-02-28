@@ -9,15 +9,15 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="In this post, I describe a way to get closer to a rich object model using the EJB 3.1 specification and more precisely the CDI 1.0 specification." />
 <meta property="og:description" content="In this post, I describe a way to get closer to a rich object model using the EJB 3.1 specification and more precisely the CDI 1.0 specification." />
-<link rel="canonical" href="http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/12/05/servicelocator.html" />
-<meta property="og:url" content="http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/12/05/servicelocator.html" />
+<link rel="canonical" href="http://localhost:4000/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/12/05/servicelocator.html" />
+<meta property="og:url" content="http://localhost:4000/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/12/05/servicelocator.html" />
 <meta property="og:site_name" content="Steve Hostettler" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2012-12-05T06:59:00+01:00" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","headline":"Context Dependency Injection and the Rich Object Model","dateModified":"2012-12-05T06:59:00+01:00","url":"http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/12/05/servicelocator.html","datePublished":"2012-12-05T06:59:00+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/12/05/servicelocator.html"},"description":"In this post, I describe a way to get closer to a rich object model using the EJB 3.1 specification and more precisely the CDI 1.0 specification.","@context":"http://schema.org"}</script>
+{"@type":"BlogPosting","datePublished":"2012-12-05T06:59:00+01:00","url":"http://localhost:4000/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/12/05/servicelocator.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/12/05/servicelocator.html"},"description":"In this post, I describe a way to get closer to a rich object model using the EJB 3.1 specification and more precisely the CDI 1.0 specification.","headline":"Context Dependency Injection and the Rich Object Model","dateModified":"2012-12-05T06:59:00+01:00","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Steve Hostettler" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
@@ -53,9 +53,10 @@ The anemic object model is very popular among JEE partitioners because, in the p
 <p>As example, let us take a portfolio that contains a set of financial position. A financial position can be either a set of stock, or an amount in a given currency. To evaluate the actual portfolio value, we go through the positions and for each of them we ask the current quote for stock to the service <code class="highlighter-rouge">QuoteService</code> or the current value of a given currency to the <code class="highlighter-rouge">CurrencyService</code>.
 The next figure presents the “ideal” design.</p>
 
-<figure class="image">
+<figure class="image"><pre>
   <img src="/figures/portfolio-business.png" alt="An object oriented class diagram of the Portfolio management component." />
   <figcaption>An object oriented class diagram of the Portfolio management component.</figcaption>
+</pre>
 </figure>
 
 <p>To achieve this, one need to access services from within business objects. Since EJB 3.1,  Context and Dependency Injection (CDI) provides such a mechanism via the <code class="highlighter-rouge">@Inject</code> annotation. The only requirement is that the object that requires the service as well as the service to inject are so called “managed beans”. The trick is that not all objects are meant to be managed. Furthermore, having managed lists of object is very tricky to say the least. Fortunately, the EJB 3.1 and more specifically the CDI 1.0 specification provide a way to solve this.

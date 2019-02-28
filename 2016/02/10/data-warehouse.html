@@ -9,15 +9,15 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="In my current assignment, I had the opportunity to discuss with Data Warehouse (DWH) experts about its integration with the rest of the information system. I noticed that not every stakeholders (included Data Warehouse professionals) use the same vocabulary. During the discussions, people raised words such as “Data Warehouse”, “Data Marts”, ODS, “Data Lake” and so on. Some of the words were used interchangeably which does not help to follow the discussion. As I was not familiar with several of them, I decided to do my homework and to come up with a small glossary to provide a common ground for further discussions." />
 <meta property="og:description" content="In my current assignment, I had the opportunity to discuss with Data Warehouse (DWH) experts about its integration with the rest of the information system. I noticed that not every stakeholders (included Data Warehouse professionals) use the same vocabulary. During the discussions, people raised words such as “Data Warehouse”, “Data Marts”, ODS, “Data Lake” and so on. Some of the words were used interchangeably which does not help to follow the discussion. As I was not familiar with several of them, I decided to do my homework and to come up with a small glossary to provide a common ground for further discussions." />
-<link rel="canonical" href="http://hostettler.net/2016/02/10/data-warehouse.html" />
-<meta property="og:url" content="http://hostettler.net/2016/02/10/data-warehouse.html" />
+<link rel="canonical" href="http://localhost:4000/2016/02/10/data-warehouse.html" />
+<meta property="og:url" content="http://localhost:4000/2016/02/10/data-warehouse.html" />
 <meta property="og:site_name" content="Steve Hostettler" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2016-02-10T14:07:42+01:00" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","headline":"A (small) hitchhiker’s guide to Data Warehousing","dateModified":"2016-02-10T14:07:42+01:00","url":"http://hostettler.net/2016/02/10/data-warehouse.html","datePublished":"2016-02-10T14:07:42+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/2016/02/10/data-warehouse.html"},"description":"In my current assignment, I had the opportunity to discuss with Data Warehouse (DWH) experts about its integration with the rest of the information system. I noticed that not every stakeholders (included Data Warehouse professionals) use the same vocabulary. During the discussions, people raised words such as “Data Warehouse”, “Data Marts”, ODS, “Data Lake” and so on. Some of the words were used interchangeably which does not help to follow the discussion. As I was not familiar with several of them, I decided to do my homework and to come up with a small glossary to provide a common ground for further discussions.","@context":"http://schema.org"}</script>
+{"@type":"BlogPosting","datePublished":"2016-02-10T14:07:42+01:00","url":"http://localhost:4000/2016/02/10/data-warehouse.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2016/02/10/data-warehouse.html"},"description":"In my current assignment, I had the opportunity to discuss with Data Warehouse (DWH) experts about its integration with the rest of the information system. I noticed that not every stakeholders (included Data Warehouse professionals) use the same vocabulary. During the discussions, people raised words such as “Data Warehouse”, “Data Marts”, ODS, “Data Lake” and so on. Some of the words were used interchangeably which does not help to follow the discussion. As I was not familiar with several of them, I decided to do my homework and to come up with a small glossary to provide a common ground for further discussions.","headline":"A (small) hitchhiker’s guide to Data Warehousing","dateModified":"2016-02-10T14:07:42+01:00","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Steve Hostettler" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
@@ -63,9 +63,10 @@ During the discussions, people raised words such as <a href="#dwh">“Data Wareh
 <p>Business Intelligence Systems usually (but not always) rely on a Data Warehouse to provide information out of raw operational data.
 The following diagram shows the relationships between the different levels involved in making a  decision.
 Information emerge from consolidated data thus helping the user to improve her knowledge on a given subject. Using this knowledge, she then can make a informed decision.</p>
-<figure class="image">
+<figure class="image"><pre>
   <img src="/figures/B.I.png" alt="How B.I. helps Decision making" />
   <figcaption>How B.I. helps Decision making</figcaption>
+</pre>
 </figure>
 
 <p>Business Intelligence Systems have the following properties:</p>
@@ -96,9 +97,10 @@ Information emerge from consolidated data thus helping the user to improve her k
 <p>Inmon’s model follows a top-down approach. First, a complete (enterprise wide) Data Warehouse (DW) is created in <a href="https://en.wikipedia.org/wiki/Third_normal_form">third normal form</a> (3NF : avoiding duplication and having referential integrity) and then, if required, <a href="#dmt">datamarts</a> (DMT) are provisioned out of the DW. Datamarts in Inmon’s model are in 3NF from which the <a href="https://en.wikipedia.org/wiki/Online_transaction_processing">OLAP</a> cubes are built.
 For Inmon, data quality and coherency is paramount and thus the 3NF in the DW and the DMs.</p>
 
-<figure class="image">
+<figure class="image"><pre>
   <img src="/figures/Imnon.png" alt="The Imnon Top-Down model" />
   <figcaption>The Imnon Top-Down model</figcaption>
+</pre>
 </figure>
 
 <h3 id="ralph-kimballs-approach">Ralph Kimball’s approach</h3>
@@ -107,9 +109,10 @@ For Inmon, data quality and coherency is paramount and thus the 3NF in the DW an
 <p>Kimball’s model follows a bottom-up approach. First, some (Datamarts)(#dmt) (DM) emerge directly sourced from <a href="https://en.wikipedia.org/wiki/Online_transaction_processing">OLTP</a> (Online Transaction Processing Systems) systems usually follow the company processes and organization.<br />
 The <a href="#dmt">Datamarts</a> are either in 3NF (<a href="#cube">OLAP cubes</a> are built on top of them) or de-normalized star schemas.</p>
 
-<figure class="image">
+<figure class="image"><pre>
   <img src="/figures/Kimball.png" alt="The Kimball Bottum-Up model" />
   <figcaption>The Kimball Bottum-Up model</figcaption>
+</pre>
 </figure>
 
 <h3 id="the-hybrid-model---a-typical-architecture">The Hybrid model - A typical architecture</h3>
@@ -127,9 +130,10 @@ On the other hand, Inmon’s approach is structured and easier to maintain at th
   <li><a href="#dmt">datamarts</a> that rely either on 3NF or on the star schema for better performances</li>
 </ul>
 
-<figure class="image">
+<figure class="image"><pre>
   <img src="/figures/DWHArchitecture.png" alt="A typical Hybrid Architecture" />
   <figcaption>A typical Hybrid Architecture</figcaption>
+</pre>
 </figure>
 
 <h3 id="data-mart-dmt-">Data Mart (DMT) <a id="dmt"></a></h3>

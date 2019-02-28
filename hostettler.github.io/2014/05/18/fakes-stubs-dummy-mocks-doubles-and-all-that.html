@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Fakes, Stubs, Dummy, Mocks, Doubles and all that… | Steve Hostettler</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Fakes, Stubs, Dummy, Mocks, Doubles and all that…" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="In this post, I look at the different kind of objects used for test purposes. By this, I mean objects that are used to make a test running. This article focuses on component testing, a.k.a. unit testing (I do not like the term unit testing because it is too often misunderstood with the technology behind, e.g., JUnit, testNG). Although there already exists a great number of resources on that subject, it was very difficult to me to understand the differences between the different kinds of test objects. This is partly due to the fact that different authors use different terms for the same object and the same term for different objects [1]. To be as didactic as possible, I also chose to add some blocks of code. Please note, that these blocks are only here for the sake of clarity. This is not the way I would recommend to do stubbing, faking, and mocking. Consider Mockito and PowerMockito for that. These are amazing tools to that purpose. They deserve a post on their own to discuss good practices. This post is in no way an exhaustive state of the art, I only tried to select the terms that, in my opinion, are clear and are consensual enough. To that end I used a number of sources that can be found in the bibliography section. Here are the main reasons to use different objects during the test phase and in production:" />
+<meta property="og:description" content="In this post, I look at the different kind of objects used for test purposes. By this, I mean objects that are used to make a test running. This article focuses on component testing, a.k.a. unit testing (I do not like the term unit testing because it is too often misunderstood with the technology behind, e.g., JUnit, testNG). Although there already exists a great number of resources on that subject, it was very difficult to me to understand the differences between the different kinds of test objects. This is partly due to the fact that different authors use different terms for the same object and the same term for different objects [1]. To be as didactic as possible, I also chose to add some blocks of code. Please note, that these blocks are only here for the sake of clarity. This is not the way I would recommend to do stubbing, faking, and mocking. Consider Mockito and PowerMockito for that. These are amazing tools to that purpose. They deserve a post on their own to discuss good practices. This post is in no way an exhaustive state of the art, I only tried to select the terms that, in my opinion, are clear and are consensual enough. To that end I used a number of sources that can be found in the bibliography section. Here are the main reasons to use different objects during the test phase and in production:" />
+<link rel="canonical" href="http://hostettler.net/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html" />
+<meta property="og:url" content="http://hostettler.net/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html" />
+<meta property="og:site_name" content="Steve Hostettler" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2014-05-18T10:58:00+02:00" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Fakes, Stubs, Dummy, Mocks, Doubles and all that…","dateModified":"2014-05-18T10:58:00+02:00","url":"http://hostettler.net/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html","datePublished":"2014-05-18T10:58:00+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html"},"description":"In this post, I look at the different kind of objects used for test purposes. By this, I mean objects that are used to make a test running. This article focuses on component testing, a.k.a. unit testing (I do not like the term unit testing because it is too often misunderstood with the technology behind, e.g., JUnit, testNG). Although there already exists a great number of resources on that subject, it was very difficult to me to understand the differences between the different kinds of test objects. This is partly due to the fact that different authors use different terms for the same object and the same term for different objects [1]. To be as didactic as possible, I also chose to add some blocks of code. Please note, that these blocks are only here for the sake of clarity. This is not the way I would recommend to do stubbing, faking, and mocking. Consider Mockito and PowerMockito for that. These are amazing tools to that purpose. They deserve a post on their own to discuss good practices. This post is in no way an exhaustive state of the art, I only tried to select the terms that, in my opinion, are clear and are consensual enough. To that end I used a number of sources that can be found in the bibliography section. Here are the main reasons to use different objects during the test phase and in production:","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about-me/">About me</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Fakes, Stubs, Dummy, Mocks, Doubles and all that...</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2014-05-18T10:58:00+02:00" itemprop="datePublished">May 18, 2014
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>In this post, I  look at the different kind of objects used for test purposes. By this, I mean objects that are used to make a test running. This article focuses on component testing, a.k.a. unit testing (I do not like the term unit testing because it is too often misunderstood with the technology behind, e.g., JUnit, testNG).
+Although there already exists a great number of resources on that subject, it was very difficult to me to understand the differences between the different kinds of test objects. This is partly due to the fact that different authors use different terms for the same object and the same term for different objects [1]. To be as didactic as possible, I also chose to add some blocks of code. Please note, that these blocks are only here for the sake of clarity. This is not the way I would recommend to do stubbing, faking, and mocking. Consider  <a href="https://code.google.com/p/mockito/">Mockito</a> and PowerMockito for that. These are amazing tools to that purpose. They deserve a post on their own to discuss good practices.
+This post is in no way an exhaustive state of the art, I only tried to select the terms that, in my opinion, are clear and are consensual enough. To that end I used a number of sources that can be found in the bibliography section.</p>
+
+<p>Here are the main reasons to use different objects during the test phase and in production:</p>
+
+<ul>
+  <li>
+    <p>Performances: the actual object contains slow algorithms and heavy calculation that may impair the test performances. A test should always be fast to not discourage regular run and therefore to identify problems as soon as possible. The worst case being the one in which the developer must deploy and run the entire application to test a single use case.</p>
+  </li>
+  <li>
+    <p>States: sometimes the constellation under test happens rarely. This is for instances that occur with a low probability  such as race conditions, network failure, etc..</p>
+  </li>
+  <li>
+    <p>Non-deterministic: this is the case of components that have interactions with the real-world such as sensors.</p>
+  </li>
+  <li>
+    <p>The actual object does not exist: for instance, another team is working on it and is not yet ready.</p>
+  </li>
+  <li>
+    <p>To instrument the actual dependency: for instance to spy the calls of the CUT to one of its dependencies.</p>
+  </li>
+</ul>
+
+<h2 id="doubles-objects">Doubles objects</h2>
+<p>Test double is the generic term that groups all the categories of objects that are used to fulfill one or several of the previous requirements.
+The term comes has been coined by Gerard Meszaros in [2]
+In rough terms, test doubles look like the actual object they double. They satisfy, to different extends the original interface and propose a sub-set of the behaviors that is expected by the specification. This helps to isolate the problem and reduce the double implementation to the strict minimum.</p>
+
+<p>There exists different kind of test doubles for different purposes. The have in common that they can be use instead of the actual component without breaking the contract syntactically.</p>
+
+<p>The next figure describes a simple test setup that do not use test doubles. To test the Component Under Test (CUT), the following test setup uses its actual dependencies (another component). This setup phase is trivial as there is nothing to do. The exercise phase calls the CUT with the proper parameters (direct inputs) that in turn calls it dependency (indirect outputs). Another Component returns its result to the CUT (indirect inputs) that uses it to complete the work and then finally returns the overall result (direct outputs). The terms “direct inputs”, “indirect outputs”, and so on come from [2].</p>
+
+<figure class="image">
+  <img src="/figures/TestSetup.png" alt="Overview of a test setup" />
+  <figcaption>Overview of a test setup</figcaption>
+</figure>
+
+<p>Now let us say that “AnotherComponent” is either too complex, not already implemented or has a non-deterministic behavior. In those cases, it is easier to use another implementation of “AnotherComponent” that behaves exactly has expected for a specific scenario.</p>
+
+<p>Hereafter, a simple example to illustrate the rest of the post. The class <code class="highlighter-rouge">CUTImpl</code> that realizes the contract <code class="highlighter-rouge">CUT</code> implements  the component under test. The CUT uses a component that realizes the interface <code class="highlighter-rouge">AnotherComponent</code>. 
+For the sake of clarity, the following example injects the dependencies through the constructor.
+To improve loose coupling, it is possible to rely on dependency injection.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CUTImpl</span> <span class="kd">implements</span> <span class="n">CUT</span> <span class="o">{</span>
+	
+	<span class="n">AnotherComponent</span> <span class="n">component</span><span class="o">;</span>
+
+    <span class="kd">public</span> <span class="nf">CUTImpl</span><span class="o">(</span><span class="n">AnotherComponent</span> <span class="n">c</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">this</span><span class="o">.</span><span class="na">component</span> <span class="o">=</span> <span class="n">c</span><span class="o">;</span>
+    <span class="o">}</span>
+
+	<span class="nd">@Override</span>
+	<span class="kd">public</span> <span class="n">String</span> <span class="nf">doBusiness</span><span class="o">(</span><span class="n">String</span> <span class="n">param</span><span class="o">,</span> <span class="n">Integer</span> <span class="n">delta</span><span class="o">)</span> <span class="o">{</span>
+		<span class="k">return</span> <span class="n">component</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">param</span><span class="o">)).</span><span class="na">toString</span><span class="o">();</span>
+	<span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">CUT</span> <span class="o">{</span>
+	<span class="kd">public</span> <span class="n">String</span> <span class="nf">doBusiness</span><span class="o">(</span><span class="n">String</span> <span class="n">string</span><span class="o">,</span> <span class="n">Integer</span> <span class="n">delta</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">AnotherComponent</span> <span class="o">{</span>
+	<span class="n">Integer</span> <span class="nf">inc</span><span class="o">(</span><span class="n">Integer</span> <span class="n">param</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AnotherComponentImpl</span> <span class="kd">implements</span> <span class="n">AnotherComponent</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="n">Integer</span> <span class="nf">inc</span><span class="o">(</span><span class="n">Integer</span> <span class="n">param</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">if</span> <span class="o">(</span><span class="n">param</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalArgumentException</span><span class="o">(</span><span class="s">"Param must be not null!"</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="k">if</span> <span class="o">(</span><span class="n">param</span> <span class="o">==</span> <span class="n">Integer</span><span class="o">.</span><span class="na">MAX_INTEGER</span><span class="o">)</span> <span class="o">{</span>
+            <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="s">"Incrementing MAX_INTEGER will result in overflow!"</span><span class="o">);</span>
+        <span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+            <span class="k">return</span> <span class="n">param</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
+        <span class="o">}</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>The following test uses real implementations of the the different components.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CUTTest</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testInc</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">"inc(3) != 4"</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="k">new</span> <span class="n">CUTImpl</span><span class="o">(</span><span class="k">new</span> <span class="n">AnotherComponentImpl</span><span class="o">()).</span><span class="na">inc</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>The question is what if:</p>
+
+<ol>
+  <li><code class="highlighter-rouge">AnotherComponentImpl</code> is not ready yet</li>
+  <li><code class="highlighter-rouge">AnotherComponentImpl</code> depends itself on external services or specific hardware resources</li>
+  <li><code class="highlighter-rouge">AnotherComponentImpl</code> has non-deterministic behaviors.</li>
+</ol>
+
+<h2 id="dummy-objects">Dummy objects</h2>
+
+<p>Dummy objects are meant to satisfy compile-time check and runtime execution. Dummies do not take part to the test scenario.
+Some method signatures of the CUT may require objects as parameters. If neither the test nor the CUT care about these objects, we may choose to pass in a Dummy Object. This can be a null reference, an empty object or a constant. Dummy objects are passed around (to dependencies for instance) but never actually used. Usually they are just used to fill parameter lists. They are meant to replace input/output parameters of the components that the CUT interacts with.</p>
+
+<p>In the current example, the parameter <code class="highlighter-rouge">delta</code> of the <code class="highlighter-rouge">doBusiness</code> method can be set to <code class="highlighter-rouge">null</code> or any <code class="highlighter-rouge">Integer</code> value without interfering with the test. Of course, this might be different for another test.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CUTTest</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testInc</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">"inc(3) != 4"</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="k">new</span> <span class="n">CUTImpl</span><span class="o">(</span><span class="k">new</span> <span class="n">AnotherComponentImpl</span><span class="o">()).</span><span class="na">inc</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="kc">null</span><span class="o">));</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="stub-objects">Stub objects</h2>
+
+<p>Stub objects provide simple answers to the CUT invocations. It does answer to scenarii that are not foreseen by the current test. In other terms it is a simplified fake object. Stub objects may trigger paths in the CUT that would otherwise not been executed.</p>
+
+<p>The next figure presents a test that relies on a test stub. First, the test case setups a stub object. This object responds to the expected CUT invokation in order to enact a given scenario. This is very useful to check indirect inputs with seldom values.</p>
+
+<figure class="image">
+  <img src="/figures/TestSTUB.png" alt="Test setup that uses a test stub" />
+  <figcaption>Test setup that uses a test stub</figcaption>
+</figure>
+
+<p>Back to the example, the following program illustrates how to use a stub to check specific indirect inputs.
+This stub shows that the CUT relies on the fact that <code class="highlighter-rouge">AnotherComponent</code> does not return <code class="highlighter-rouge">null</code>, as it
+would otherwise raise a <code class="highlighter-rouge">NullPointerException</code>.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AnotherComponentStub</span> <span class="kd">implements</span> <span class="n">AnotherComponent</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="n">Integer</span> <span class="nf">inc</span><span class="o">(</span><span class="n">Integer</span> <span class="n">param</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="kc">null</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CUTTest</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testIncWhenAnotherComponentReturnsNull</span><span class="o">()</span> <span class="o">{</span>
+        <span class="c1">//Without any modification of the CUT implement, this would raise an exception</span>
+        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">"inc(3) != 4"</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="k">new</span> <span class="n">CUTImpl</span><span class="o">(</span><span class="k">new</span> <span class="n">AnotherComponentStub</span><span class="o">()).</span><span class="na">inc</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="fake-objects">Fake objects</h2>
+<p>Fake objects have working implementations, but  they may simplify some behaviors. This makes them not suitable for prime time. The idea is that the object actually displays some real behavior but not everything. While a Fake Object is typically built specifically for testing, it is not used as either a control point or an observation point by the test. The most common reasons for using fake objects is that the real component is not available yet, is too slow or cannot be used during tests because of side effects.</p>
+
+<figure class="image">
+  <img src="/figures/TestFAKE.png" alt="Test setup that uses a fake" />
+  <figcaption>Test setup that uses a fake</figcaption>
+</figure>
+
+<p>The following fake simulates most of the behaviors except for the limits (MAX_INTEGER, null, etc…)</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">AnotherComponentFake</span> <span class="kd">implements</span> <span class="n">AnotherComponent</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="n">Integer</span> <span class="nf">inc</span><span class="o">(</span><span class="n">Integer</span> <span class="n">param</span><span class="o">)</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">param</span> <span class="o">+</span> <span class="mi">1</span><span class="o">;</span>
+    <span class="o">}</span>
+
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>As the fake covers many scenarios, it can be used to test the general behavior of the CUT.</p>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CUTTest</span> <span class="o">{</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testIncWhenAnotherComponentIsFake</span><span class="o">()</span> <span class="o">{</span>
+        <span class="n">CUT</span> <span class="n">cut</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CUTImpl</span><span class="o">(</span><span class="k">new</span> <span class="n">AnotherComponentFake</span><span class="o">());</span>
+        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">"inc(3) != 4"</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="n">cut</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
+        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">"inc(123) != 124"</span><span class="o">,</span> <span class="mi">124</span><span class="o">,</span> <span class="n">cut</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="mi">123</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h1 id="mock-objects">Mock objects</h1>
+<p>Partially implements the interface and provides a way to verify that the calls to the mock objects validate the specification.
+Mock objects are pre-programmed with expectations that form a specification of the calls they are expected to receive.
+In fact mocks are a certain kind of stub or fake. However, the additional feature mock objects offer on top of acting as simple stubs or fakes is that they provide a flexible way to specify more directly how your function under test should actually operate. In this sense they also act as a kind of recording device: They keep track of which of the mock object’s methods are called, with what kind of parameters, and how many times.</p>
+
+<p>Whenever the assertions are made on the fake object and not the CUT, then it is a mock.</p>
+
+<figure class="image">
+  <img src="/figures/TestMOCK.png" alt="Test setup that uses a mock" />
+  <figcaption>Test setup that uses a mock</figcaption>
+</figure>
+
+<p>The following example uses <a href="https://code.google.com/p/mockito/">Mockito</a> to provide easy Mocking. Note that the last assertion <code class="highlighter-rouge">Mockito.verify</code> checks whether the mock was called with a given parameters. In other words, we check that the CUT did not filter the input parameter.</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ch</span><span class="o">.</span><span class="na">demo</span><span class="o">.</span><span class="na">business</span><span class="o">.</span><span class="na">service</span><span class="o">;</span>
+
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">CUTTest</span> <span class="o">{</span>
+
+	<span class="nd">@Mock</span>
+	<span class="n">AnotherComponent</span> <span class="n">ac</span><span class="o">;</span>
+	
+	<span class="nd">@InjectMocks</span>
+	<span class="n">CUT</span> <span class="n">cut</span> <span class="o">=</span> <span class="k">new</span> <span class="n">CUTImpl</span><span class="o">();</span>
+
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">testIncWhenAnotherComponentReturnsNull</span><span class="o">()</span> <span class="o">{</span>
+		<span class="n">Mockito</span><span class="o">.</span><span class="na">when</span><span class="o">(</span><span class="n">ac</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">MAX_INTEGER</span><span class="o">)).</span><span class="na">thenReturn</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">MAX_INTEGER</span> <span class="o">+</span> <span class="mi">1</span><span class="o">);</span>
+		<span class="n">Mockito</span><span class="o">.</span><span class="na">when</span><span class="o">(</span><span class="n">ac</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="mi">3</span><span class="o">)).</span><span class="na">thenReturn</span><span class="o">(</span><span class="mi">3</span><span class="o">);</span>
+		<span class="n">Mockito</span><span class="o">.</span><span class="na">when</span><span class="o">(</span><span class="n">ac</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="mi">123</span><span class="o">)).</span><span class="na">thenReturn</span><span class="o">(</span><span class="mi">124</span><span class="o">);</span>
+		
+        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">"inc(Integer.MIN_INTEGER) != Integer.MIN_INTEGER + 1"</span><span class="o">,</span> 
+                <span class="n">Integer</span><span class="o">.</span><span class="na">MIN_INTEGER</span> <span class="o">+</span> <span class="mi">1</span><span class="o">,</span> <span class="n">cut</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">MIN_INTEGER</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
+        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">"inc(3) != 4"</span><span class="o">,</span> <span class="mi">4</span><span class="o">,</span> <span class="n">cut</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="mi">3</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
+        <span class="n">Assert</span><span class="o">.</span><span class="na">assertEquals</span><span class="o">(</span><span class="s">"inc(123) != 124"</span><span class="o">,</span> <span class="mi">124</span><span class="o">,</span> <span class="n">cut</span><span class="o">.</span><span class="na">inc</span><span class="o">(</span><span class="mi">123</span><span class="o">,</span> <span class="mi">1</span><span class="o">));</span>
+        
+        <span class="c1">//Verifies that the method inc of AnotherComponent was called with parameter Integer.MAX_INTEGER</span>
+        <span class="n">Mockito</span><span class="o">.</span><span class="na">verify</span><span class="o">(</span><span class="n">ac</span><span class="o">).</span><span class="na">inc</span><span class="o">(</span><span class="n">Matchers</span><span class="o">.</span><span class="na">eq</span><span class="o">(</span><span class="n">Integer</span><span class="o">.</span><span class="na">MAX_INTEGER</span><span class="o">));</span>
+        <span class="c1">//Verifies that the inc method has been called three times.</span>
+        <span class="n">Mockito</span><span class="o">.</span><span class="na">verify</span><span class="o">(</span><span class="n">ac</span><span class="o">,</span> <span class="n">Mockito</span><span class="o">.</span><span class="na">times</span><span class="o">(</span><span class="mi">3</span><span class="o">)).</span><span class="na">inc</span><span class="o">(</span><span class="n">anyInt</span><span class="o">());</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<h2 id="test-spy">Test Spy</h2>
+<p>According to Meszaros [2], a test spy is basically a recorder that is able to save the interactions between the CUT and the spy for later verifications.</p>
+
+<figure class="image">
+  <img src="/figures/TestSPY.png" alt="Test setup that uses a test spy" />
+  <figcaption>Test setup that uses a test spy</figcaption>
+</figure>
+<p>On the other hand, <a href="https://code.google.com/p/mockito/">Mockito</a> considers that a spy is an real implementation in which you change only some specific behaviors. Instead of specifying every behavior one by one, you take an existing object that does most of it and you only change very specific behaviors.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>To sum up:</p>
+
+<ul>
+  <li>A dummy is just there to enable compilation and is not supposed to be part of the test.</li>
+  <li>A fake is a partial implementation that can be used either in a component test or in a deployed setting.</li>
+  <li>A mock is a partial implementation that enables asserting on the component interactions.</li>
+  <li>A spy is either a recorder for later use or a proxy on a real implementation that is used to override some specific behaviors.</li>
+</ul>
+
+<h2 id="bibliography">Bibliography</h2>
+
+<ul>
+  <li>[1] Martin Fowler <a href="http://martinfowler.com/articles/mocksArentStubs.html">Mock aren’t stubs</a></li>
+  <li>[2] Meszaros, Gerard (2007). xUnit Test Patterns: Refactoring Test Code. Addison-Wesley. ISBN 978-0-13-149505-0.</li>
+  <li>[3] <a href="https://storage.googleapis.com/gtb/TotT-2008-06-12.pdf">Friends you can depend on</a></li>
+  <li>[4] <a href="http://en.wikipedia.org/wiki/Mock_object">Wikipedia Mock Object</a></li>
+  <li>[5] <a href="http://en.wikipedia.org/wiki/Test_double">Wikipedia Test Doubles</a></li>
+  <li>[6] <a href="http://en.wikipedia.org/wiki/Fake_object">Wikipedia Fakes</a></li>
+  <li>[7] <a href="http://en.wikipedia.org/wiki/Test_stubs">Wikipedia Stubs</a></li>
+</ul>
+
+  </div><a class="u-url" href="/2014/05/18/fakes-stubs-dummy-mocks-doubles-and-all-that.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Steve Hostettler</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Steve Hostettler</li><li><a class="u-email" href="mailto:steve.hostettler@gmail.com">steve.hostettler@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/hostettler"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">hostettler</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Steve Hostettler&#39;s personal blog about automatic testing, Java, Java EE, and Architecture.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

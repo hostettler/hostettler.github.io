@@ -9188,3 +9188,6 @@ td.visible-print {
 .console-output {
   margin-top: -12px;
   margin-bottom: 17px; }
+
+.image {
+  text-align: center; }
