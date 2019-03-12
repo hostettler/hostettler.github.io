@@ -3,9 +3,9 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
-<title>Microservice Architecture - Part 1 | Steve Hostettler</title>
+<title>Microservice Architecture - Part 1 (A running microservice architecture) | Steve Hostettler</title>
 <meta name="generator" content="Jekyll v3.8.5" />
-<meta property="og:title" content="Microservice Architecture - Part 1" />
+<meta property="og:title" content="Microservice Architecture - Part 1 (A running microservice architecture)" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers. All samples and a complete working application can be found here on GitHub" />
 <meta property="og:description" content="Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers. All samples and a complete working application can be found here on GitHub" />
@@ -15,7 +15,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2019-02-17T22:51:20+01:00" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","datePublished":"2019-02-17T22:51:20+01:00","url":"http://hostettler.net/2019/02/17/microservice-architecture-part-1.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/2019/02/17/microservice-architecture-part-1.html"},"description":"Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers. All samples and a complete working application can be found here on GitHub","headline":"Microservice Architecture - Part 1","dateModified":"2019-02-17T22:51:20+01:00","@context":"http://schema.org"}</script>
+{"@type":"BlogPosting","headline":"Microservice Architecture - Part 1 (A running microservice architecture)","dateModified":"2019-02-17T22:51:20+01:00","url":"http://hostettler.net/2019/02/17/microservice-architecture-part-1.html","datePublished":"2019-02-17T22:51:20+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/2019/02/17/microservice-architecture-part-1.html"},"description":"Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers. All samples and a complete working application can be found here on GitHub","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
 <body><header class="site-header" role="banner">
@@ -38,7 +38,7 @@
         <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Microservice Architecture - Part 1</h1>
+    <h1 class="post-title p-name" itemprop="name headline">Microservice Architecture - Part 1 (A running microservice architecture)</h1>
     <p class="post-meta">
       <time class="dt-published" datetime="2019-02-17T22:51:20+01:00" itemprop="datePublished">Feb 17, 2019
       </time></p>
@@ -65,13 +65,20 @@ You do not need a deep financial knowledge, sufficient is to say that:</p>
 </figure>
 <p>Besides, these “business” services, the architecture delivers a set of non-functional services such as:</p>
 <ul>
-  <li>A (reverse) proxy that shields the user from knowing the ugly details of the network topology. It also protects the backend by establishing a clear front vs back network separation. Furthermore, it exposes the static resources and finally, it provides TLS termination.</li>
-  <li>An API-Gateway that is providing load-balancing and SSO to the micro-services</li>
-  <li>A Central logging mechanism to deal with the distributed nature of the architecture</li>
-  <li>A Message broker but to increase service decoupling and scalability</li>
+  <li>A Central logging mechanism to deal with the distributed nature of the architecture. We will use a <a href="https://github.com/gliderlabs/logspout">Logspout</a> companion container that will send the logs from all the containers to a concentrator called <a href="https://www.elastic.co">Logstash</a> that will in turn 
+send to database optimized for search called <a href="https://www.elastic.co">ElasticSearch</a>. Finally, <a href="https://www.elastic.co">Kibana</a> is used to vizualize and analyze the logs.</li>
+  <li>A Message broker but to increase service decoupling and scalability. <a href="https://kafka.apache.org/">Kafka</a> in this case.</li>
+  <li>An API-Gateway that is providing routing, load-balancing and SSO to the micro-services by integrating an indentity manager called <a href="https://www.keycloak.org/">Keycloack</a>. We will use <a href="https://konghq.com/kong/">Kong</a> as an API-Gateway.
+The API-Gateway also shields the user from knowing the ugly details of the network topology. It also protects the backend by establishing a clear front vs back network separation. Furthermore, it exposes the static resources and finally, it provides TLS termination.</li>
 </ul>
 
-<p>From a technology perspective, we will implement Java microservice using JEE8 and its microprofile. More specifically we will use Thorntail. Then we will package it as Docker container using Maven as build tool.</p>
+<p>From a technology perspective, we will implement Java microservice using JEE8 and its microprofile. More specifically we will use <a href="https://thorntail.io/">Thorntail</a>. Then we will package it as <a href="https://www.docker.com/">Docker</a> container using <a href="https://maven.apache.org/">Maven</a> as build tool.</p>
+
+<p>This chapter describes step by step how to compile and deploy the microservices. 
+<a href="http://www.hostettler.net/2019/02/17/microservice-architecture-part-2.html">Part 2</a> describes how to setup non-functional services such as SSO (Single Sign On) and API concentration and logging.
+Part 3 dives a bit deeper in what a microservice architecture actually is and its benefits and some drawbacks.
+Part 5 focuses on the software factory, putting everything together and testing the result. 
+Then Part 6 does the autopsy of a microservice with the associated design patterns.</p>
 
 <h1 id="pre-requisites">Pre-requisites</h1>
 
@@ -88,14 +95,14 @@ You do not need a deep financial knowledge, sufficient is to say that:</p>
   <li>a bash interpreter (on Windows you can rely on Git bash that is usually installed with Git)</li>
 </ul>
 
-<div class="alert alert-warning" role="alert"><i class="fa fa-warning"></i> <b>Important: </b> because of a bug in one of the 3rd party software, please use Apache Maven 3.5.x instead of the latest 3.6.x. For more information pleaser refer to the Thorntail issue : https://github.com/thorntail/thorntail/pull/1195 </div>
-
 <p>On top of that you need to have:</p>
 <ul>
   <li>A intermediate level in Java</li>
   <li>Some basic understanding of OS (including bash scripting) and networking (DNS, TCP, HTTP)</li>
   <li>a great deal of patience and coffee</li>
 </ul>
+
+<div class="alert alert-info" role="alert"><i class="fa fa-info-circle"></i> <b>Note: </b> We will start a lot of containers, please grant at 6GB RAM and 6GB swap to your docker-machine </div>
 
 <h2 id="getting-the-backend-components-to-run">Getting the backend components to run</h2>
 <p>First thing first, let’s checkout the code and compile everything. Before you start complaining, yes this section is tedious but we have the environment set up before diving into the wonderful world of microservices.

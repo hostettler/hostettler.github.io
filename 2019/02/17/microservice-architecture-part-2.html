@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+<title>Microservice Architecture - Part 2 (SSO, Logging, and all that) | Steve Hostettler</title>
+<meta name="generator" content="Jekyll v3.8.5" />
+<meta property="og:title" content="Microservice Architecture - Part 2 (SSO, Logging, and all that)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="In part 1, we discussed how to compile and deploy the microservices. Remember that the microservices themselves are only a part of the microservice architecture. By its very nature, microservice architecture are distributed and that comes with a lot of benefits and some constraints. One of these constraint is that all the non-functional features such as security, logging, testability and so on, have to take distribution into account." />
+<meta property="og:description" content="In part 1, we discussed how to compile and deploy the microservices. Remember that the microservices themselves are only a part of the microservice architecture. By its very nature, microservice architecture are distributed and that comes with a lot of benefits and some constraints. One of these constraint is that all the non-functional features such as security, logging, testability and so on, have to take distribution into account." />
+<link rel="canonical" href="http://hostettler.net/2019/02/17/microservice-architecture-part-2.html" />
+<meta property="og:url" content="http://hostettler.net/2019/02/17/microservice-architecture-part-2.html" />
+<meta property="og:site_name" content="Steve Hostettler" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2019-02-17T22:51:20+01:00" />
+<script type="application/ld+json">
+{"@type":"BlogPosting","headline":"Microservice Architecture - Part 2 (SSO, Logging, and all that)","dateModified":"2019-02-17T22:51:20+01:00","url":"http://hostettler.net/2019/02/17/microservice-architecture-part-2.html","datePublished":"2019-02-17T22:51:20+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/2019/02/17/microservice-architecture-part-2.html"},"description":"In part 1, we discussed how to compile and deploy the microservices. Remember that the microservices themselves are only a part of the microservice architecture. By its very nature, microservice architecture are distributed and that comes with a lot of benefits and some constraints. One of these constraint is that all the non-functional features such as security, logging, testability and so on, have to take distribution into account.","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<body><header class="site-header" role="banner">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/about-me/">About me</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Microservice Architecture - Part 2 (SSO, Logging, and all that)</h1>
+    <p class="post-meta">
+      <time class="dt-published" datetime="2019-02-17T22:51:20+01:00" itemprop="datePublished">Feb 17, 2019
+      </time></p>
+  </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <p>In <a href="http://www.hostettler.net/2019/02/17/microservice-architecture-part-1.html">part 1</a>, we discussed how to compile and deploy the microservices. Remember that the microservices themselves are only a part of the microservice architecture. 
+By its very nature, microservice architecture are distributed and that comes with a lot of benefits and some constraints.
+One of these constraint is that all the non-functional features such as security, logging, testability and so on, have to take distribution into account.</p>
+
+<h2 id="getting-the-backend-components-to-run">Getting the backend components to run</h2>
+
+<p>We want the application to be accessible by a the following name <code class="highlighter-rouge">financial-app.com</code>. To that end we need the docker host ip address to be resolved to this hostname 
+and vice-versa. First, we must identify the docker host ip address. On windows, run the command <code class="highlighter-rouge">ipconfig</code>. On Linux, run the command <code class="highlighter-rouge">ifconfig</code>. 
+Look for an adapter called DockerNAT (or something similar).</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ipconfig</code></pre></figure>
+
+<figure class="console-output"><pre>
+Windows IP Configuration
+....
+Ethernet adapter vEthernet (DockerNAT) 2:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::9d3f:55b9:4504:323f%19
+   IPv4 Address. . . . . . . . . . . : 192.168.240.1
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . :
+</pre></figure>
+
+<p>So the ip-address is <code class="highlighter-rouge">192.168.240.1</code>, let’s add it to the hosts file. On Windows that file is located at <code class="highlighter-rouge">C:\Windows\System32\drivers\etc</code> and on Linux at <code class="highlighter-rouge">/etc/hosts</code></p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cat </span>C:<span class="se">\W</span>indows<span class="se">\S</span>ystem32<span class="se">\d</span>rivers<span class="se">\e</span>tc</code></pre></figure>
+
+<figure class="console-output"><pre>
+192.168.240.1 host.docker.internal
+192.168.240.1 gateway.docker.internal
+192.168.240.1 financial-app.com
+</pre></figure>
+
+<p>If you wish to generate new certificates, you must regenerate the docker image <code class="highlighter-rouge">unige/web-sso</code> . To do so, run the appropriate maven command:</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>mvn clean <span class="nb">install</span> <span class="nt">-Ppackage-docker-image</span></code></pre></figure>
+
+<figure class="console-output"><pre>
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  07:22 min
+[INFO] Finished at: 2019-03-06T21:18:13+01:00
+[INFO] --------------------------------------------------------------------
+</pre></figure>
+
+<p>Now, let’s compile the UI</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd </span>web-ui
+<span class="nv">$ </span>node <span class="nt">--version</span></code></pre></figure>
+
+<figure class="console-output"><pre>
+6.5.0
+</pre></figure>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>npm <span class="nt">--version</span></code></pre></figure>
+
+<figure class="console-output"><pre>
+10.15.0
+</pre></figure>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>npm <span class="nb">install</span></code></pre></figure>
+
+<figure class="console-output"><pre>
+...
+audited 31887 packages in 68.922s
+</pre></figure>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>npm build</code></pre></figure>
+
+<figure class="console-output"><pre>
+ 69% building modules 1280/1296 modules 16 active ...components\footer\footer.component.scssDEPRECATION WARNING on line 1, column 8 of 
+Including .css files with @import is non-standard behaviour which will be removed in future versions of LibSass.
+Use a custom importer to maintain this behaviour. Check your implementations documentation on how to create a custom importer.
+
+Date: 2019-02-21T09:13:40.912Z
+Hash: e3a111b6560428e93784
+Time: 76066ms
+chunk {app-pages-pages-module} app-pages-pages-module.js, app-pages-pages-module.js.map (app-pages-pages-module) 3.16 MB  [rendered]
+chunk {main} main.js, main.js.map (main) 1.92 MB [initial] [rendered]
+chunk {polyfills} polyfills.js, polyfills.js.map (polyfills) 492 kB [initial] [rendered]
+chunk {runtime} runtime.js, runtime.js.map (runtime) 8.84 kB [entry] [rendered]
+chunk {scripts} scripts.js, scripts.js.map (scripts) 1.32 MB  [rendered]
+chunk {styles} styles.js, styles.js.map (styles) 3.99 MB [initial] [rendered]
+chunk {vendor} vendor.js, vendor.js.map (vendor) 7.17 MB [initial] [rendered]
+</pre></figure>
+<div class="alert alert-success" role="alert"><i class="fa fa-check-square"></i> <b>Tip: </b> You just compiled the UI based on Angular 7.0 </div>
+
+<p>At this point, we have all the necessary components. Let’s put everything together by starting the different docker compositions. The order in which we start the compositions is 
+important as there are dependencies:</p>
+<ul>
+  <li><code class="highlighter-rouge">docker-compose-microservices.yml</code> starts the <a href="https://kafka.apache.org/">Kafka</a> message brocker and the microservices. This is what we start in part 1 to test that all the microservices are available.</li>
+  <li><code class="highlighter-rouge">docker-compose-log.yml</code> starts an <a href="https://www.elastic.co/elk-stack">ElasticSearch, LogStash, and Kibana (ELK) suite</a> alongside a Logspout compagnon container to take care of logs. This will ALL logs from all containers
+and concentrate them into the ElasticSearch using Logstash. Kibana can then be used to analyze the logs and extract intelligence.</li>
+  <li><code class="highlighter-rouge">docker-compose-api-gw.yml</code> starts an api-gateway that will route the calls to the services and handle security by delegating authentication to a indendity manager called <a href="https://www.keycloak.org/">keyloak</a>. It will also serve static content and serve as <a href="https://en.wikipedia.org/wiki/TLS_termination_proxy">TLS termination</a>.</li>
+</ul>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd  </span>docker-compose
+<span class="nv">$ </span>docker-compose <span class="nt">-f</span> docker-compose-microservices.yml up &amp;
+<span class="nv">$ </span>docker-compose <span class="nt">-f</span> docker-compose-log.yml up &amp;
+<span class="nv">$ </span>docker-compose <span class="nt">-f</span> docker-compose-api-gw.yml up &amp;</code></pre></figure>
+
+<figure class="console-output"><pre>
+counterparty-service    | 2019-03-12 20:06:27,203 INFO  [stdout] (default task-1)         counterpar0_.registrationStatus as registr16_0_,
+counterparty-service    | 2019-03-12 20:06:27,203 INFO  [stdout] (default task-1)         counterpar0_.status as status17_0_
+counterparty-service    | 2019-03-12 20:06:27,203 INFO  [stdout] (default task-1)     from
+counterparty-service    | 2019-03-12 20:06:27,205 INFO  [stdout] (default task-1)         Counterparty counterpar0_
+kafka                   | [2019-03-12 20:10:15,744] INFO [GroupMetadataManager brokerId=1] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+kafka                   | [2019-03-12 20:20:15,651] INFO [GroupMetadataManager brokerId=1] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+kafka                   | [2019-03-12 20:30:15,652] INFO [GroupMetadataManager brokerId=1] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+kafka                   | [2019-03-12 20:40:15,652] INFO [GroupMetadataManager brokerId=1] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+kafka                   | [2019-03-12 20:50:15,654] INFO [GroupMetadataManager brokerId=1] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+...
+kibana           | {"type":"response","@timestamp":"2019-03-12T20:53:56Z","tags":[],"pid":1,"method":"get","statusCode":302,"req":{"url":"/","method":"get","headers":{"user-agent":"curl/7.29.0","host":"localhost:5601","accept":"*/*"},"remoteAddress":"127.0.0.1","userAgent":"127.0.0.1"},"res":{"statusCode":302,"responseTime":3,"contentLength":9},"message":"GET / 302 3ms - 9.0B"}
+kibana           | {"type":"response","@timestamp":"2019-03-12T20:54:01Z","tags":[],"pid":1,"method":"get","statusCode":302,"req":{"url":"/","method":"get","headers":{"user-agent":"curl/7.29.0","host":"localhost:5601","accept":"*/*"},"remoteAddress":"127.0.0.1","userAgent":"127.0.0.1"},"res":{"statusCode":302,"responseTime":8,"contentLength":9},"message":"GET / 302 8ms - 9.0B"}
+....
+api-gateway         | 192.168.128.15 - - [12/Mar/2019:20:02:36 +0000] "POST /plugins HTTP/1.1" 409 213 "-" "curl/7.29.0"                                                                        
+api-gateway         | 2019/03/12 20:02:36 [notice] 41#0: *139 [lua] init.lua:393: insert(): ERROR: duplicate key value violates unique constraint "plugins_cache_key_key"                       " 
+api-gateway         | Key (cache_key)=(plugins:oidc::::) already exists., client: 192.168.128.15, server: kong_admin, request: "POST /plugins HTTP/1.1", host: "api-gateway:8001"               
+</pre></figure>
+
+<p>If everything goes according to plan, you know have a working application ecosystem at <code class="highlighter-rouge">https://financial-app.com</code> 
+Point your browser to <code class="highlighter-rouge">https://financial-app.com</code> and you’ll get an nice UI.</p>
+<figure class="image"><pre>
+  <img src="/figures/ui.png" alt="Angular 7.0 UI to the financial-app" />
+  <figcaption>Angular 7.0 UI to the financial-app</figcaption>
+</pre>
+</figure>
+
+<p>Point it to the counterparty microservice at <code class="highlighter-rouge">https://financial-app.com/api/v1/counterparty</code>, the API-gateway will detect that you are not authenticated and will redirect you
+to the SSO platform to be asked for credentials. Enter <code class="highlighter-rouge">user1/user1</code></p>
+<figure class="image"><pre>
+  <img src="/figures/login.png" alt="Keycloack SSO login form" />
+  <figcaption>Keycloack SSO login form</figcaption>
+</pre>
+</figure>
+<p>Once authenticated you get redirected to the orginal URL you requested (<code class="highlighter-rouge">https://financial-app.com/api/v1/counterparty</code>)</p>
+<figure class="image"><pre>
+  <img src="/figures/counterparty-service.png" alt="JSON result of the counterparty  microservice that returns all counterparties." />
+  <figcaption>JSON result of the counterparty  microservice that returns all counterparties.</figcaption>
+</pre>
+</figure>
+
+<div class="alert alert-success" role="alert"><i class="fa fa-check-square"></i> <b>Tip: </b> Kudos, you just completed the installation of a complete microservice ecosystem locally on your machine. </div>
+
+  </div><a class="u-url" href="/2019/02/17/microservice-architecture-part-2.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Steve Hostettler</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Steve Hostettler</li><li><a class="u-email" href="mailto:steve.hostettler@gmail.com">steve.hostettler@gmail.com</a></li></ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/hostettler"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">hostettler</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3">
+        <p>Steve Hostettler&#39;s personal blog about automatic testing, Java, Java EE, and Architecture.</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

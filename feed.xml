@@ -1,4 +1,48 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://hostettler.net/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hostettler.net/" rel="alternate" type="text/html" /><updated>2019-02-28T10:03:23+01:00</updated><id>http://hostettler.net/feed.xml</id><title type="html">Steve Hostettler</title><subtitle>Steve Hostettler's personal blog about automatic testing, Java, Java EE, and Architecture.</subtitle><entry><title type="html">Microservice Architecture - Part 1</title><link href="http://hostettler.net/2019/02/17/microservice-architecture-part-1.html" rel="alternate" type="text/html" title="Microservice Architecture - Part 1" /><published>2019-02-17T22:51:20+01:00</published><updated>2019-02-17T22:51:20+01:00</updated><id>http://hostettler.net/2019/02/17/microservice-architecture-part-1</id><content type="html" xml:base="http://hostettler.net/2019/02/17/microservice-architecture-part-1.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://hostettler.net/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hostettler.net/" rel="alternate" type="text/html" /><updated>2019-03-12T22:09:04+01:00</updated><id>http://hostettler.net/feed.xml</id><title type="html">Steve Hostettler</title><subtitle>Steve Hostettler's personal blog about automatic testing, Java, Java EE, and Architecture.</subtitle><entry><title type="html">Microservice Architecture - Part 3 (Diving in microservices)</title><link href="http://hostettler.net/2019/03/04/microservice-architecture-part-3.html" rel="alternate" type="text/html" title="Microservice Architecture - Part 3 (Diving in microservices)" /><published>2019-03-04T22:51:20+01:00</published><updated>2019-03-04T22:51:20+01:00</updated><id>http://hostettler.net/2019/03/04/microservice-architecture-part-3</id><content type="html" xml:base="http://hostettler.net/2019/03/04/microservice-architecture-part-3.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+&lt;p&gt;In this chapter, we will dive into the concept of microservices. First, we will discuss why the community came with yet another architecture paradigm. Secondly, we will 
+look at some definitions and the main properties of such an architecture. Then, we will detail some of the technologies microservice architecture leverage to deliver maximum value. 
+After that, we will analyse the pros and cons of this architecture.
+Finally, we will discuss some of the architecture patterns related to microservices.&lt;/p&gt;
+
+&lt;h2 id=&quot;why-yet-another-architecture-paradigm&quot;&gt;Why (yet) another architecture paradigm&lt;/h2&gt;
+&lt;p&gt;The microservice architecture can be seen as a reaction to the monolith architecture. In particular, the fact that the bigger the application, the slower the pace of change. 
+Modifying a monolith requires to
+rebuilt it completly and to ship it in one block. Furthermore, by its very nature, a monolith tend to favor API leaks and to decrease modularity. 
+Finally, having one block means that scalability happens at
+that granularity which might lead to a waste of resources as all the modules of the monolith will be scaled at the same time whereas not all the modules might 
+need the same type of scalability or no scalability at all,&lt;/p&gt;
+
+&lt;h2 id=&quot;definitions&quot;&gt;Definition(s)&lt;/h2&gt;
+&lt;p&gt;At this core, microservice is an architecture (MSA) that is an evolution of the service oriented architecture (SOA). It inhnerits from SOA several key concepts. The most important one being
+that business added value is delivered by combining a collection loosely coupled services.&lt;/p&gt;
+
+&lt;p&gt;Reusing the definition of services from SOA, a service has the &lt;a href=&quot;https://en.wikipedia.org/wiki/Service-oriented_architecture&quot;&gt;following properties&lt;/a&gt;:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;It logically represents a business activity with a specified outcome.&lt;/li&gt;
+  &lt;li&gt;It is self-contained.&lt;/li&gt;
+  &lt;li&gt;It is a black box for its consumers (and the communication between consumer and provider is formalized by a contract).&lt;/li&gt;
+  &lt;li&gt;It may consist of other underlying services.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;These properties apply to microservices as well. The main differentce between SOA and MSA is in the granularity of the services and some opinionated implementation choices&lt;/p&gt;
+
+&lt;h2 id=&quot;technologies&quot;&gt;Technologies&lt;/h2&gt;
+&lt;p&gt;Microservices also leverage new technologies to foster its core benefits.&lt;/p&gt;
+
+&lt;h2 id=&quot;pros-and-cons&quot;&gt;Pros and Cons&lt;/h2&gt;
+
+&lt;h2 id=&quot;architecture-patterns&quot;&gt;architecture patterns&lt;/h2&gt;
+
+&lt;h4 id=&quot;cqrs&quot;&gt;CQRS&lt;/h4&gt;
+&lt;h4 id=&quot;api-gateway&quot;&gt;API Gateway&lt;/h4&gt;
+
+&lt;h2 id=&quot;bibliography&quot;&gt;Bibliography&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;[1] N. Poulton, (2017) Docker Deep Dive&lt;/li&gt;
+  &lt;li&gt;[2] Turnbull, J. (2014). The Docker Book: Containerization is the new virtualization.&lt;/li&gt;
+  &lt;li&gt;[3] Mauro Vocale, Luigi Fugaro (2018). Hands-On Cloud-Native Microservices with Jakarta EE&lt;/li&gt;
+  &lt;li&gt;[4] Raghuram Bharathan, (2015). Apache Maven Cookbook&lt;/li&gt;
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">Introduction In this chapter, we will dive into the concept of microservices. First, we will discuss why the community came with yet another architecture paradigm. Secondly, we will look at some definitions and the main properties of such an architecture. Then, we will detail some of the technologies microservice architecture leverage to deliver maximum value. After that, we will analyse the pros and cons of this architecture. Finally, we will discuss some of the architecture patterns related to microservices.</summary></entry><entry><title type="html">Microservice Architecture - Part 1 (A running microservice architecture)</title><link href="http://hostettler.net/2019/02/17/microservice-architecture-part-1.html" rel="alternate" type="text/html" title="Microservice Architecture - Part 1 (A running microservice architecture)" /><published>2019-02-17T22:51:20+01:00</published><updated>2019-02-17T22:51:20+01:00</updated><id>http://hostettler.net/2019/02/17/microservice-architecture-part-1</id><content type="html" xml:base="http://hostettler.net/2019/02/17/microservice-architecture-part-1.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. 
 Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software 
 factories and innovative deployment options such as containers. All samples and a complete working application can be found &lt;a href=&quot;https://github.com/hostettler/microservices.git&quot;&gt;here on GitHub&lt;/a&gt;&lt;/p&gt;
@@ -18,13 +62,20 @@ You do not need a deep financial knowledge, sufficient is to say that:&lt;/p&gt;
 &lt;/figure&gt;
 &lt;p&gt;Besides, these “business” services, the architecture delivers a set of non-functional services such as:&lt;/p&gt;
 &lt;ul&gt;
-  &lt;li&gt;A (reverse) proxy that shields the user from knowing the ugly details of the network topology. It also protects the backend by establishing a clear front vs back network separation. Furthermore, it exposes the static resources and finally, it provides TLS termination.&lt;/li&gt;
-  &lt;li&gt;An API-Gateway that is providing load-balancing and SSO to the micro-services&lt;/li&gt;
-  &lt;li&gt;A Central logging mechanism to deal with the distributed nature of the architecture&lt;/li&gt;
-  &lt;li&gt;A Message broker but to increase service decoupling and scalability&lt;/li&gt;
+  &lt;li&gt;A Central logging mechanism to deal with the distributed nature of the architecture. We will use a &lt;a href=&quot;https://github.com/gliderlabs/logspout&quot;&gt;Logspout&lt;/a&gt; companion container that will send the logs from all the containers to a concentrator called &lt;a href=&quot;https://www.elastic.co&quot;&gt;Logstash&lt;/a&gt; that will in turn 
+send to database optimized for search called &lt;a href=&quot;https://www.elastic.co&quot;&gt;ElasticSearch&lt;/a&gt;. Finally, &lt;a href=&quot;https://www.elastic.co&quot;&gt;Kibana&lt;/a&gt; is used to vizualize and analyze the logs.&lt;/li&gt;
+  &lt;li&gt;A Message broker but to increase service decoupling and scalability. &lt;a href=&quot;https://kafka.apache.org/&quot;&gt;Kafka&lt;/a&gt; in this case.&lt;/li&gt;
+  &lt;li&gt;An API-Gateway that is providing routing, load-balancing and SSO to the micro-services by integrating an indentity manager called &lt;a href=&quot;https://www.keycloak.org/&quot;&gt;Keycloack&lt;/a&gt;. We will use &lt;a href=&quot;https://konghq.com/kong/&quot;&gt;Kong&lt;/a&gt; as an API-Gateway.
+The API-Gateway also shields the user from knowing the ugly details of the network topology. It also protects the backend by establishing a clear front vs back network separation. Furthermore, it exposes the static resources and finally, it provides TLS termination.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;From a technology perspective, we will implement Java microservice using JEE8 and its microprofile. More specifically we will use Thorntail. Then we will package it as Docker container using Maven as build tool.&lt;/p&gt;
+&lt;p&gt;From a technology perspective, we will implement Java microservice using JEE8 and its microprofile. More specifically we will use &lt;a href=&quot;https://thorntail.io/&quot;&gt;Thorntail&lt;/a&gt;. Then we will package it as &lt;a href=&quot;https://www.docker.com/&quot;&gt;Docker&lt;/a&gt; container using &lt;a href=&quot;https://maven.apache.org/&quot;&gt;Maven&lt;/a&gt; as build tool.&lt;/p&gt;
+
+&lt;p&gt;This chapter describes step by step how to compile and deploy the microservices. 
+&lt;a href=&quot;http://www.hostettler.net/2019/02/17/microservice-architecture-part-2.html&quot;&gt;Part 2&lt;/a&gt; describes how to setup non-functional services such as SSO (Single Sign On) and API concentration and logging.
+Part 3 dives a bit deeper in what a microservice architecture actually is and its benefits and some drawbacks.
+Part 5 focuses on the software factory, putting everything together and testing the result. 
+Then Part 6 does the autopsy of a microservice with the associated design patterns.&lt;/p&gt;
 
 &lt;h1 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h1&gt;
 
@@ -41,14 +92,14 @@ You do not need a deep financial knowledge, sufficient is to say that:&lt;/p&gt;
   &lt;li&gt;a bash interpreter (on Windows you can rely on Git bash that is usually installed with Git)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;div class=&quot;alert alert-warning&quot; role=&quot;alert&quot;&gt;&lt;i class=&quot;fa fa-warning&quot;&gt;&lt;/i&gt; &lt;b&gt;Important: &lt;/b&gt; because of a bug in one of the 3rd party software, please use Apache Maven 3.5.x instead of the latest 3.6.x. For more information pleaser refer to the Thorntail issue : https://github.com/thorntail/thorntail/pull/1195 &lt;/div&gt;
-
 &lt;p&gt;On top of that you need to have:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;A intermediate level in Java&lt;/li&gt;
   &lt;li&gt;Some basic understanding of OS (including bash scripting) and networking (DNS, TCP, HTTP)&lt;/li&gt;
   &lt;li&gt;a great deal of patience and coffee&lt;/li&gt;
 &lt;/ul&gt;
+
+&lt;div class=&quot;alert alert-info&quot; role=&quot;alert&quot;&gt;&lt;i class=&quot;fa fa-info-circle&quot;&gt;&lt;/i&gt; &lt;b&gt;Note: &lt;/b&gt; We will start a lot of containers, please grant at 6GB RAM and 6GB swap to your docker-machine &lt;/div&gt;
 
 &lt;h2 id=&quot;getting-the-backend-components-to-run&quot;&gt;Getting the backend components to run&lt;/h2&gt;
 &lt;p&gt;First thing first, let’s checkout the code and compile everything. Before you start complaining, yes this section is tedious but we have the environment set up before diving into the wonderful world of microservices.
@@ -295,7 +346,152 @@ f197de9c79fe        zookeeper:3.4.9                   &quot;/docker-entrypoint.�
   &lt;li&gt;[2] Turnbull, J. (2014). The Docker Book: Containerization is the new virtualization.&lt;/li&gt;
   &lt;li&gt;[3] Mauro Vocale, Luigi Fugaro (2018). Hands-On Cloud-Native Microservices with Jakarta EE&lt;/li&gt;
   &lt;li&gt;[4] Raghuram Bharathan, (2015). Apache Maven Cookbook&lt;/li&gt;
-&lt;/ul&gt;</content><author><name></name></author><summary type="html">Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers. All samples and a complete working application can be found here on GitHub</summary></entry><entry><title type="html">My two cents on SVN vs GIT</title><link href="http://hostettler.net/2016/02/27/my-two-cents-on-svn-vs-git.html" rel="alternate" type="text/html" title="My two cents on SVN vs GIT" /><published>2016-02-27T11:13:50+01:00</published><updated>2016-02-27T11:13:50+01:00</updated><id>http://hostettler.net/2016/02/27/my-two-cents-on-svn-vs-git</id><content type="html" xml:base="http://hostettler.net/2016/02/27/my-two-cents-on-svn-vs-git.html">&lt;div class=&quot;alert alert-warning&quot; role=&quot;alert&quot;&gt;&lt;i class=&quot;fa fa-warning&quot;&gt;&lt;/i&gt; &lt;b&gt;Important: &lt;/b&gt; This post is 3 years old and a lot has changed in the mean time. I would now recommend to upgrade to Git. 
+&lt;/ul&gt;</content><author><name></name></author><summary type="html">Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers. All samples and a complete working application can be found here on GitHub</summary></entry><entry><title type="html">Microservice Architecture - Part 2 (SSO, Logging, and all that)</title><link href="http://hostettler.net/2019/02/17/microservice-architecture-part-2.html" rel="alternate" type="text/html" title="Microservice Architecture - Part 2 (SSO, Logging, and all that)" /><published>2019-02-17T22:51:20+01:00</published><updated>2019-02-17T22:51:20+01:00</updated><id>http://hostettler.net/2019/02/17/microservice-architecture-part-2</id><content type="html" xml:base="http://hostettler.net/2019/02/17/microservice-architecture-part-2.html">&lt;p&gt;In &lt;a href=&quot;http://www.hostettler.net/2019/02/17/microservice-architecture-part-1.html&quot;&gt;part 1&lt;/a&gt;, we discussed how to compile and deploy the microservices. Remember that the microservices themselves are only a part of the microservice architecture. 
+By its very nature, microservice architecture are distributed and that comes with a lot of benefits and some constraints.
+One of these constraint is that all the non-functional features such as security, logging, testability and so on, have to take distribution into account.&lt;/p&gt;
+
+&lt;h2 id=&quot;getting-the-backend-components-to-run&quot;&gt;Getting the backend components to run&lt;/h2&gt;
+
+&lt;p&gt;We want the application to be accessible by a the following name &lt;code class=&quot;highlighter-rouge&quot;&gt;financial-app.com&lt;/code&gt;. To that end we need the docker host ip address to be resolved to this hostname 
+and vice-versa. First, we must identify the docker host ip address. On windows, run the command &lt;code class=&quot;highlighter-rouge&quot;&gt;ipconfig&lt;/code&gt;. On Linux, run the command &lt;code class=&quot;highlighter-rouge&quot;&gt;ifconfig&lt;/code&gt;. 
+Look for an adapter called DockerNAT (or something similar).&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ipconfig&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;console-output&quot;&gt;&lt;pre&gt;
+Windows IP Configuration
+....
+Ethernet adapter vEthernet (DockerNAT) 2:
+
+   Connection-specific DNS Suffix  . :
+   Link-local IPv6 Address . . . . . : fe80::9d3f:55b9:4504:323f%19
+   IPv4 Address. . . . . . . . . . . : 192.168.240.1
+   Subnet Mask . . . . . . . . . . . : 255.255.255.0
+   Default Gateway . . . . . . . . . :
+&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;So the ip-address is &lt;code class=&quot;highlighter-rouge&quot;&gt;192.168.240.1&lt;/code&gt;, let’s add it to the hosts file. On Windows that file is located at &lt;code class=&quot;highlighter-rouge&quot;&gt;C:\Windows\System32\drivers\etc&lt;/code&gt; and on Linux at &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/hosts&lt;/code&gt;&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat &lt;/span&gt;C:&lt;span class=&quot;se&quot;&gt;\W&lt;/span&gt;indows&lt;span class=&quot;se&quot;&gt;\S&lt;/span&gt;ystem32&lt;span class=&quot;se&quot;&gt;\d&lt;/span&gt;rivers&lt;span class=&quot;se&quot;&gt;\e&lt;/span&gt;tc&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;console-output&quot;&gt;&lt;pre&gt;
+192.168.240.1 host.docker.internal
+192.168.240.1 gateway.docker.internal
+192.168.240.1 financial-app.com
+&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If you wish to generate new certificates, you must regenerate the docker image &lt;code class=&quot;highlighter-rouge&quot;&gt;unige/web-sso&lt;/code&gt; . To do so, run the appropriate maven command:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;mvn clean &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-Ppackage-docker-image&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;console-output&quot;&gt;&lt;pre&gt;
+...
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  07:22 min
+[INFO] Finished at: 2019-03-06T21:18:13+01:00
+[INFO] --------------------------------------------------------------------
+&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Now, let’s compile the UI&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;web-ui
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;node &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;console-output&quot;&gt;&lt;pre&gt;
+6.5.0
+&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;npm &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;console-output&quot;&gt;&lt;pre&gt;
+10.15.0
+&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;npm &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;console-output&quot;&gt;&lt;pre&gt;
+...
+audited 31887 packages in 68.922s
+&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;npm build&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;console-output&quot;&gt;&lt;pre&gt;
+ 69% building modules 1280/1296 modules 16 active ...components\footer\footer.component.scssDEPRECATION WARNING on line 1, column 8 of 
+Including .css files with @import is non-standard behaviour which will be removed in future versions of LibSass.
+Use a custom importer to maintain this behaviour. Check your implementations documentation on how to create a custom importer.
+
+Date: 2019-02-21T09:13:40.912Z
+Hash: e3a111b6560428e93784
+Time: 76066ms
+chunk {app-pages-pages-module} app-pages-pages-module.js, app-pages-pages-module.js.map (app-pages-pages-module) 3.16 MB  [rendered]
+chunk {main} main.js, main.js.map (main) 1.92 MB [initial] [rendered]
+chunk {polyfills} polyfills.js, polyfills.js.map (polyfills) 492 kB [initial] [rendered]
+chunk {runtime} runtime.js, runtime.js.map (runtime) 8.84 kB [entry] [rendered]
+chunk {scripts} scripts.js, scripts.js.map (scripts) 1.32 MB  [rendered]
+chunk {styles} styles.js, styles.js.map (styles) 3.99 MB [initial] [rendered]
+chunk {vendor} vendor.js, vendor.js.map (vendor) 7.17 MB [initial] [rendered]
+&lt;/pre&gt;&lt;/figure&gt;
+&lt;div class=&quot;alert alert-success&quot; role=&quot;alert&quot;&gt;&lt;i class=&quot;fa fa-check-square&quot;&gt;&lt;/i&gt; &lt;b&gt;Tip: &lt;/b&gt; You just compiled the UI based on Angular 7.0 &lt;/div&gt;
+
+&lt;p&gt;At this point, we have all the necessary components. Let’s put everything together by starting the different docker compositions. The order in which we start the compositions is 
+important as there are dependencies:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;docker-compose-microservices.yml&lt;/code&gt; starts the &lt;a href=&quot;https://kafka.apache.org/&quot;&gt;Kafka&lt;/a&gt; message brocker and the microservices. This is what we start in part 1 to test that all the microservices are available.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;docker-compose-log.yml&lt;/code&gt; starts an &lt;a href=&quot;https://www.elastic.co/elk-stack&quot;&gt;ElasticSearch, LogStash, and Kibana (ELK) suite&lt;/a&gt; alongside a Logspout compagnon container to take care of logs. This will ALL logs from all containers
+and concentrate them into the ElasticSearch using Logstash. Kibana can then be used to analyze the logs and extract intelligence.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;docker-compose-api-gw.yml&lt;/code&gt; starts an api-gateway that will route the calls to the services and handle security by delegating authentication to a indendity manager called &lt;a href=&quot;https://www.keycloak.org/&quot;&gt;keyloak&lt;/a&gt;. It will also serve static content and serve as &lt;a href=&quot;https://en.wikipedia.org/wiki/TLS_termination_proxy&quot;&gt;TLS termination&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd  &lt;/span&gt;docker-compose
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker-compose &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; docker-compose-microservices.yml up &amp;amp;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker-compose &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; docker-compose-log.yml up &amp;amp;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker-compose &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; docker-compose-api-gw.yml up &amp;amp;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;figure class=&quot;console-output&quot;&gt;&lt;pre&gt;
+counterparty-service    | 2019-03-12 20:06:27,203 INFO  [stdout] (default task-1)         counterpar0_.registrationStatus as registr16_0_,
+counterparty-service    | 2019-03-12 20:06:27,203 INFO  [stdout] (default task-1)         counterpar0_.status as status17_0_
+counterparty-service    | 2019-03-12 20:06:27,203 INFO  [stdout] (default task-1)     from
+counterparty-service    | 2019-03-12 20:06:27,205 INFO  [stdout] (default task-1)         Counterparty counterpar0_
+kafka                   | [2019-03-12 20:10:15,744] INFO [GroupMetadataManager brokerId=1] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+kafka                   | [2019-03-12 20:20:15,651] INFO [GroupMetadataManager brokerId=1] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+kafka                   | [2019-03-12 20:30:15,652] INFO [GroupMetadataManager brokerId=1] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+kafka                   | [2019-03-12 20:40:15,652] INFO [GroupMetadataManager brokerId=1] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+kafka                   | [2019-03-12 20:50:15,654] INFO [GroupMetadataManager brokerId=1] Removed 0 expired offsets in 0 milliseconds. (kafka.coordinator.group.GroupMetadataManager)
+...
+kibana           | {&quot;type&quot;:&quot;response&quot;,&quot;@timestamp&quot;:&quot;2019-03-12T20:53:56Z&quot;,&quot;tags&quot;:[],&quot;pid&quot;:1,&quot;method&quot;:&quot;get&quot;,&quot;statusCode&quot;:302,&quot;req&quot;:{&quot;url&quot;:&quot;/&quot;,&quot;method&quot;:&quot;get&quot;,&quot;headers&quot;:{&quot;user-agent&quot;:&quot;curl/7.29.0&quot;,&quot;host&quot;:&quot;localhost:5601&quot;,&quot;accept&quot;:&quot;*/*&quot;},&quot;remoteAddress&quot;:&quot;127.0.0.1&quot;,&quot;userAgent&quot;:&quot;127.0.0.1&quot;},&quot;res&quot;:{&quot;statusCode&quot;:302,&quot;responseTime&quot;:3,&quot;contentLength&quot;:9},&quot;message&quot;:&quot;GET / 302 3ms - 9.0B&quot;}
+kibana           | {&quot;type&quot;:&quot;response&quot;,&quot;@timestamp&quot;:&quot;2019-03-12T20:54:01Z&quot;,&quot;tags&quot;:[],&quot;pid&quot;:1,&quot;method&quot;:&quot;get&quot;,&quot;statusCode&quot;:302,&quot;req&quot;:{&quot;url&quot;:&quot;/&quot;,&quot;method&quot;:&quot;get&quot;,&quot;headers&quot;:{&quot;user-agent&quot;:&quot;curl/7.29.0&quot;,&quot;host&quot;:&quot;localhost:5601&quot;,&quot;accept&quot;:&quot;*/*&quot;},&quot;remoteAddress&quot;:&quot;127.0.0.1&quot;,&quot;userAgent&quot;:&quot;127.0.0.1&quot;},&quot;res&quot;:{&quot;statusCode&quot;:302,&quot;responseTime&quot;:8,&quot;contentLength&quot;:9},&quot;message&quot;:&quot;GET / 302 8ms - 9.0B&quot;}
+....
+api-gateway         | 192.168.128.15 - - [12/Mar/2019:20:02:36 +0000] &quot;POST /plugins HTTP/1.1&quot; 409 213 &quot;-&quot; &quot;curl/7.29.0&quot;                                                                        
+api-gateway         | 2019/03/12 20:02:36 [notice] 41#0: *139 [lua] init.lua:393: insert(): ERROR: duplicate key value violates unique constraint &quot;plugins_cache_key_key&quot;                       &quot; 
+api-gateway         | Key (cache_key)=(plugins:oidc::::) already exists., client: 192.168.128.15, server: kong_admin, request: &quot;POST /plugins HTTP/1.1&quot;, host: &quot;api-gateway:8001&quot;               
+&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If everything goes according to plan, you know have a working application ecosystem at &lt;code class=&quot;highlighter-rouge&quot;&gt;https://financial-app.com&lt;/code&gt; 
+Point your browser to &lt;code class=&quot;highlighter-rouge&quot;&gt;https://financial-app.com&lt;/code&gt; and you’ll get an nice UI.&lt;/p&gt;
+&lt;figure class=&quot;image&quot;&gt;&lt;pre&gt;
+  &lt;img src=&quot;/figures/ui.png&quot; alt=&quot;Angular 7.0 UI to the financial-app&quot; /&gt;
+  &lt;figcaption&gt;Angular 7.0 UI to the financial-app&lt;/figcaption&gt;
+&lt;/pre&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Point it to the counterparty microservice at &lt;code class=&quot;highlighter-rouge&quot;&gt;https://financial-app.com/api/v1/counterparty&lt;/code&gt;, the API-gateway will detect that you are not authenticated and will redirect you
+to the SSO platform to be asked for credentials. Enter &lt;code class=&quot;highlighter-rouge&quot;&gt;user1/user1&lt;/code&gt;&lt;/p&gt;
+&lt;figure class=&quot;image&quot;&gt;&lt;pre&gt;
+  &lt;img src=&quot;/figures/login.png&quot; alt=&quot;Keycloack SSO login form&quot; /&gt;
+  &lt;figcaption&gt;Keycloack SSO login form&lt;/figcaption&gt;
+&lt;/pre&gt;
+&lt;/figure&gt;
+&lt;p&gt;Once authenticated you get redirected to the orginal URL you requested (&lt;code class=&quot;highlighter-rouge&quot;&gt;https://financial-app.com/api/v1/counterparty&lt;/code&gt;)&lt;/p&gt;
+&lt;figure class=&quot;image&quot;&gt;&lt;pre&gt;
+  &lt;img src=&quot;/figures/counterparty-service.png&quot; alt=&quot;JSON result of the counterparty  microservice that returns all counterparties.&quot; /&gt;
+  &lt;figcaption&gt;JSON result of the counterparty  microservice that returns all counterparties.&lt;/figcaption&gt;
+&lt;/pre&gt;
+&lt;/figure&gt;
+
+&lt;div class=&quot;alert alert-success&quot; role=&quot;alert&quot;&gt;&lt;i class=&quot;fa fa-check-square&quot;&gt;&lt;/i&gt; &lt;b&gt;Tip: &lt;/b&gt; Kudos, you just completed the installation of a complete microservice ecosystem locally on your machine. &lt;/div&gt;</content><author><name></name></author><summary type="html">In part 1, we discussed how to compile and deploy the microservices. Remember that the microservices themselves are only a part of the microservice architecture. By its very nature, microservice architecture are distributed and that comes with a lot of benefits and some constraints. One of these constraint is that all the non-functional features such as security, logging, testability and so on, have to take distribution into account.</summary></entry><entry><title type="html">My two cents on SVN vs GIT</title><link href="http://hostettler.net/2016/02/27/my-two-cents-on-svn-vs-git.html" rel="alternate" type="text/html" title="My two cents on SVN vs GIT" /><published>2016-02-27T11:13:50+01:00</published><updated>2016-02-27T11:13:50+01:00</updated><id>http://hostettler.net/2016/02/27/my-two-cents-on-svn-vs-git</id><content type="html" xml:base="http://hostettler.net/2016/02/27/my-two-cents-on-svn-vs-git.html">&lt;div class=&quot;alert alert-warning&quot; role=&quot;alert&quot;&gt;&lt;i class=&quot;fa fa-warning&quot;&gt;&lt;/i&gt; &lt;b&gt;Important: &lt;/b&gt; This post is 3 years old and a lot has changed in the mean time. I would now recommend to upgrade to Git. 
 Especially because the Cloud ecosystem is extremely dynamic. That being said, do it in a managed way starting by a low profile project. &lt;/div&gt;
 
 &lt;hr /&gt;
@@ -1110,1019 +1306,4 @@ Models, volume 1491 of Lecture Notes in Computer Science, pages 429D528. Springe
 &lt;p&gt;[3] Martin Fowler. TestPyramid. http://martinfowler.com/bliki/TestPyramid.html&lt;/p&gt;
 
 &lt;p&gt;[4] Alister Scott. Yet another software testing pyramid. http://watirmelon.com/2011/06/10/yet-another-software-testing-pyramid/
-[5] Alister Scott. Introducing the software testing ice-cream cone (anti-pattern). http://watirmelon.com/2012/01/31/introducing-the-software-testing-ice-cream-cone/&lt;/p&gt;</content><author><name></name></author><summary type="html">Introduction</summary></entry><entry><title type="html">JEE6 Tutorial</title><link href="http://hostettler.net/2012/12/31/jee6-tutorial.html" rel="alternate" type="text/html" title="JEE6 Tutorial" /><published>2012-12-31T09:43:00+01:00</published><updated>2012-12-31T09:43:00+01:00</updated><id>http://hostettler.net/2012/12/31/jee6-tutorial</id><content type="html" xml:base="http://hostettler.net/2012/12/31/jee6-tutorial.html">&lt;p&gt;I hereby start a series of tutorial on the major (IMHO) JEE 6 features. As a lecturer, I teach the JEE stack at the University of Geneva. This tutorial represents most of the topics that I cover during the EJB, CDI, and JPA lessons.&lt;/p&gt;
-
-&lt;p&gt;There already exists a bunch of very complete tutorials and books on the subject. Let me cite the excellent &lt;a href=&quot;http://docs.oracle.com/javaee/6/tutorial/doc/&quot; title=&quot;Oracle's official JEE6 tutorial&quot;&gt;Oracle JEE tutorial&lt;/a&gt; and 
-Antonio Goncalvez’s books that are available both in &lt;a href=&quot;http://www.amazon.com/Beginning-GlassFish-Experts-Voice-Technology/dp/143022889X/ref=sr_1_1?ie=UTF8&amp;amp;qid=1356945347&amp;amp;sr=8-1&amp;amp;keywords=JEE6+antonio+goncalves&quot; title=&quot;Antonio's Book in English&quot;&gt;English&lt;/a&gt; and in &lt;a href=&quot;http://www.amazon.com/Java-EE6-GlassFish-Antonio-Goncalves/dp/2744024236/ref=sr_1_fkmr2_1?s=books&amp;amp;ie=UTF8&amp;amp;qid=1356945440&amp;amp;sr=1-1-fkmr2&amp;amp;keywords=JEE6+et+glassfish&quot; title=&quot;Antonio's Book in French&quot;&gt;French&lt;/a&gt;. For advanced JEE developers, Adam Bien’s &lt;a href=&quot;http://press.adam-bien.com/real-world-java-ee-night-hacks-dissecting-the-business-tier.htm&quot; title=&quot;Real World Java EE Night Hacks--Dissecting the Business Tier&quot;&gt;Real World Java EE Night Hacks&lt;/a&gt; is a must read.&lt;/p&gt;
-
-&lt;p&gt;As the &lt;a href=&quot;http://jcp.org/aboutJava/communityprocess/final/jsr318/index.html&quot; title=&quot;EJB 3.1 specification&quot;&gt;EJB 3.1 specification&lt;/a&gt; is rather well written, I encourage people to read it or at least to look at specifics when needed.&lt;/p&gt;
-
-&lt;p&gt;To support this tutorial you can find a JEE6-Demo on GitHub. It contains a simple enterprise application that demonstrates many of the
-aspects I discuss hereafter. The first step of this tutorial is to prepare the environment:&lt;/p&gt;
-
-&lt;p&gt;1) Install GlassFish and integrate it to your favorite development environment (eclipse in my case). You can get GlassFish from &lt;a href=&quot;http://glassfish.java.net/downloads/3.1.2.2-final.html&quot; title=&quot;Glassfish Download Page&quot;&gt;here&lt;/a&gt;. Grab the zip version and install it by unzipping the archive.&lt;/p&gt;
-
-&lt;p&gt;2) Run GlassFish and check that it works. Locate the script named &lt;code class=&quot;highlighter-rouge&quot;&gt;asadmin&lt;/code&gt; in the &lt;code class=&quot;highlighter-rouge&quot;&gt;bin&lt;/code&gt; directory, start it and at the prompt, execute the command &lt;code class=&quot;highlighter-rouge&quot;&gt;start-domain&lt;/code&gt;. This starts the GlassFish instance.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;localhost:bin ~$ ./asadmin
-Use &quot;exit&quot; to exit and &quot;help&quot; for online help.
-asadmin&amp;gt; start-domain
-Waiting for domain1 to start ...
-Successfully started the domain : domain1
-domain  Location: ~/Applications/glassfish3/glassfish/domains/domain1
-Log File: ~/Applications/glassfish3/glassfish/domains/domain1/logs/server.log
-Admin Port: 4848
-Command start-domain executed successfully.
-asadmin&amp;gt; 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Now the server is started and it listens to the ports 8080 and 4848. The first being the application port while the second is the administrative console.&lt;/p&gt;
-
-&lt;p&gt;Start a browser and navigate to &lt;a href=&quot;http://localhost:4848/common/index.jsf&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;http://localhost:4848/common/index.jsf&lt;/code&gt;&lt;/a&gt;. Depending of the server configuration, you may have to log in.&lt;/p&gt;
-
-&lt;p&gt;3) Do a Git checkout of the jee6-demo project that is available &lt;a href=&quot;https://github.com/hostettler/JEE6-Demo&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;4) Perform a &lt;code class=&quot;highlighter-rouge&quot;&gt;mvn clean install&lt;/code&gt; at the project root&lt;/p&gt;
-
-&lt;p&gt;This compiles the project and builds the artifacts. It should end up in something like:&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary:
-[INFO] 
-[INFO] jee6-demo ......................................... SUCCESS [0.480s]
-[INFO] Service Layer ..................................... SUCCESS [3.650s]
-[INFO] Presentation Layer ................................ SUCCESS [1.725s]
-[INFO] Application ....................................... SUCCESS [0.663s]
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time: 6.923s
-[INFO] Finished at: Sun Jan 06 16:41:29 CET 2013
-[INFO] Final Memory: 19M/81M
-[INFO] --------------------------------------------------------------------
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;5) In the GlassFish installation directory, there is a &lt;code class=&quot;highlighter-rouge&quot;&gt;javadb&lt;/code&gt; directory that contains, Derby, a Java-based database. Starts the network server:&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;$ pwd
-/~/Applications/glassfish3/javadb/bin
-localhost:bin ~$ ./startNetworkServer
-Mon Jan 07 06:02:54 CET 2013 : Security manager installed using the Basic server security policy.
-Mon Jan 07 06:02:54 CET 2013 : Apache Derby Network Server - 10.8.1.2 - (1095077) started and ready to accept connections on port 1527
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;The database server listens to the port &lt;code class=&quot;highlighter-rouge&quot;&gt;1527&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Now that the database is started. It is time to populate the database with the database creation scripts as well as some data.
-In the project, under the ejb components, there is a sql file that initializes the database structure as well as some data.&lt;/p&gt;
-
-&lt;p&gt;Derby provides a command line tool called &lt;code class=&quot;highlighter-rouge&quot;&gt;ij&lt;/code&gt; to connect to the database and to execute sql scripts:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;localhost:bin ~$ pwd
-~/Applications/glassfish3/javadb/bin
-localhost:bin ~$./ij ~/git/jee6demo/jee6-ejb/src/main/resources/sql/createStudentsDB_DERBY.sql
-...
-ij&amp;gt; QUIT;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Now the database is ready to use.&lt;/p&gt;
-
-&lt;p&gt;6) Create a datasource in GlassFish that points to the  database server that has been started previously:&lt;/p&gt;
-
-&lt;p&gt;First, let us create a connection pool:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;asadmin&amp;gt; create-jdbc-connection-pool  --datasourceclassname=org.apache.derby.jdbc.ClientDataSource40 --restype=javax.sql.DataSource --property user=DEV:DatabaseName=StudentsDB:Password=DEV:ServerName=localhost:PortNumber=1527:create=true StudentsDB
-Authentication failed with password from login store: ~/.asadminpass
-Enter admin password for user &quot;admin&quot;&amp;gt; 
-222JDBC connection pool StudentsDB created successfully.
-Command create-jdbc-connection-pool executed successfully.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The connection pool provides a … pool of connection that is managed by the application server. A major benefit being that the developer does not have to open and close connections.
-The server opens n connections and allocate them on demand. It ensures that there will not be 1000 open connections to the database thus improving the performances.
-Then, we create a datasource that uses the previous connection pool:&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;asadmin&amp;gt; create-jdbc-resource --connectionpoolid StudentsDB --enabled jdbc/StudentsDS
-Authentication failed with password from login store: ~/.asadminpass
-Enter admin password for user &quot;admin&quot;&amp;gt; 
-JDBC resource jdbc/StudentsDS created successfully.
-Command create-jdbc-resource executed successfully.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;7) Configure the messaging resources.&lt;/p&gt;
-
-&lt;p&gt;The tutorial uses JMS (Java Messaging Service) to implement the publish/subscribe pattern. The following script builds a connection factory for JMS queues.&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;asadmin&amp;gt; create-jms-resource --restype javax.jms.QueueConnectionFactory --enabled  MyConnectionFactory
-Authentication failed with password from login store: ~/.asadminpass
-Enter admin password for user &quot;admin&quot;&amp;gt; 
-Connector resource MyConnectionFactory created.
-Command create-jms-resource executed successfully.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The following snippet declares the JMS queue. That is the message endpoint.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;asadmin&amp;gt; create-jms-resource --restype javax.jms.Queue MyQueue
-Authentication failed with password from login store: ~/.asadminpass
-Enter admin password for user &quot;admin&quot;&amp;gt; 
-Administered object MyQueue created.
-Command create-jms-resource executed successfully.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;8) Configure the security&lt;/p&gt;
-
-&lt;p&gt;Authentication and authorization is another major feature that is provided by the application server.
-First let us create the realm with two groups user and manager.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;asadmin&amp;gt; create-auth-realm --classname com.sun.enterprise.security.auth.realm.file.FileRealm  --property assign-groups=manager,user:file=jee6-tutorial-file-realm:jaas-context=fileRealm jee6-tutorial-file-realm
-Authentication failed with password from login store: ~/.asadminpass
-Enter admin password for user &quot;admin&quot;&amp;gt; 
-Command create-auth-realm executed successfully.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Then, we add a user that belongs two groups: user and manager.&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;asadmin&amp;gt; create-file-user --authrealmname jee6-tutorial-file-realm --groups user:manager user1
-Authentication failed with password from login store: ~/.asadminpass
-Enter admin password for user &quot;admin&quot;&amp;gt; 
-Enter the user password&amp;gt; 
-Enter the user password again&amp;gt; 
-Command create-file-user executed successfully.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The second user only belongs to the group user.&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;asadmin&amp;gt; create-file-user --authrealmname jee6-tutorial-file-realm --groups user user2
-Authentication failed with password from login store: ~/.asadminpass
-Enter admin password for user &quot;admin&quot;&amp;gt; 
-Enter the user password&amp;gt; 
-Enter the user password again&amp;gt; 
-Command create-file-user executed successfully.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;9) Deploy the application&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;asadmin&amp;gt; deploy ~/git/jee6demo/jee6-ear/target/jee6-demo-ear-1.0.0-SNAPSHOT.ear
-Authentication failed with password from login store: ~/.asadminpass
-Enter admin password for user &quot;admin&quot;&amp;gt; 
-Application deployed with name jee6-demo-ear-1.0.0-SNAPSHOT.
-Command deploy executed successfully.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;10) Test the application&lt;/p&gt;
-
-&lt;p&gt;Once deployed, serve to &lt;a href=&quot;http://localhost:8080/jee6-demo-web/facade/studentService/all&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;http://localhost:8080/jee6-demo-web/facade/studentService/all&lt;/code&gt;&lt;/a&gt; and you should get:
-You must log yourself with one of the use that you created at step 8).&lt;/p&gt;
-
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;studentsDto&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;xmlns:ns2=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://ch.demo.app&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-	&lt;span class=&quot;nt&quot;&gt;&amp;lt;students&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;0&lt;span class=&quot;nt&quot;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;last_name&amp;gt;&lt;/span&gt;Doe&lt;span class=&quot;nt&quot;&gt;&amp;lt;/last_name&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;firstName&amp;gt;&lt;/span&gt;John&lt;span class=&quot;nt&quot;&gt;&amp;lt;/firstName&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;birthDate&amp;gt;&lt;/span&gt;1965-12-10T00:00:00+01:00&lt;span class=&quot;nt&quot;&gt;&amp;lt;/birthDate&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;phoneNumber&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;areaCode&amp;gt;&lt;/span&gt;0&lt;span class=&quot;nt&quot;&gt;&amp;lt;/areaCode&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;countryCode&amp;gt;&lt;/span&gt;0&lt;span class=&quot;nt&quot;&gt;&amp;lt;/countryCode&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;number&amp;gt;&lt;/span&gt;0&lt;span class=&quot;nt&quot;&gt;&amp;lt;/number&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;/phoneNumber&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;address&amp;gt;&lt;/span&gt;
-			&lt;span class=&quot;nt&quot;&gt;&amp;lt;number&amp;gt;&lt;/span&gt;22&lt;span class=&quot;nt&quot;&gt;&amp;lt;/number&amp;gt;&lt;/span&gt;
-			&lt;span class=&quot;nt&quot;&gt;&amp;lt;street&amp;gt;&lt;/span&gt;wisteria street&lt;span class=&quot;nt&quot;&gt;&amp;lt;/street&amp;gt;&lt;/span&gt;
-			&lt;span class=&quot;nt&quot;&gt;&amp;lt;city&amp;gt;&lt;/span&gt;Downtown&lt;span class=&quot;nt&quot;&gt;&amp;lt;/city&amp;gt;&lt;/span&gt;
-			&lt;span class=&quot;nt&quot;&gt;&amp;lt;postalCode&amp;gt;&lt;/span&gt;34343&lt;span class=&quot;nt&quot;&gt;&amp;lt;/postalCode&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;/address&amp;gt;&lt;/span&gt;
-	&lt;span class=&quot;nt&quot;&gt;&amp;lt;/students&amp;gt;&lt;/span&gt;
-	&lt;span class=&quot;nt&quot;&gt;&amp;lt;students&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;id&amp;gt;&lt;/span&gt;1&lt;span class=&quot;nt&quot;&gt;&amp;lt;/id&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;last_name&amp;gt;&lt;/span&gt;Doe&lt;span class=&quot;nt&quot;&gt;&amp;lt;/last_name&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;firstName&amp;gt;&lt;/span&gt;Jane&lt;span class=&quot;nt&quot;&gt;&amp;lt;/firstName&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;birthDate&amp;gt;&lt;/span&gt;1985-12-10T00:00:00+01:00&lt;span class=&quot;nt&quot;&gt;&amp;lt;/birthDate&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;phoneNumber&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;areaCode&amp;gt;&lt;/span&gt;0&lt;span class=&quot;nt&quot;&gt;&amp;lt;/areaCode&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;countryCode&amp;gt;&lt;/span&gt;0&lt;span class=&quot;nt&quot;&gt;&amp;lt;/countryCode&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;number&amp;gt;&lt;/span&gt;0&lt;span class=&quot;nt&quot;&gt;&amp;lt;/number&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;/phoneNumber&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;address&amp;gt;&lt;/span&gt;
-			&lt;span class=&quot;nt&quot;&gt;&amp;lt;number&amp;gt;&lt;/span&gt;22&lt;span class=&quot;nt&quot;&gt;&amp;lt;/number&amp;gt;&lt;/span&gt;
-			&lt;span class=&quot;nt&quot;&gt;&amp;lt;street&amp;gt;&lt;/span&gt;wisteria street&lt;span class=&quot;nt&quot;&gt;&amp;lt;/street&amp;gt;&lt;/span&gt;
-			&lt;span class=&quot;nt&quot;&gt;&amp;lt;city&amp;gt;&lt;/span&gt;Downtown&lt;span class=&quot;nt&quot;&gt;&amp;lt;/city&amp;gt;&lt;/span&gt;
-			&lt;span class=&quot;nt&quot;&gt;&amp;lt;postalCode&amp;gt;&lt;/span&gt;34343&lt;span class=&quot;nt&quot;&gt;&amp;lt;/postalCode&amp;gt;&lt;/span&gt;
-		&lt;span class=&quot;nt&quot;&gt;&amp;lt;/address&amp;gt;&lt;/span&gt;
-	&lt;span class=&quot;nt&quot;&gt;&amp;lt;/students&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/studentsDto&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Now you are ready to follow me in the EJB world.&lt;/p&gt;
-
-&lt;p&gt;The tutorial is organized in three parts. First, in this post, we will look at the EJB stack. In following posts, we will cover both the Context and Dependency Injection and the Java Persistence API.&lt;/p&gt;
-
-&lt;h2 id=&quot;ejbs&quot;&gt;&lt;a id=&quot;ejbs&quot;&gt;&lt;/a&gt;EJBs&lt;/h2&gt;
-
-&lt;p&gt;The EJB API provides useful non-functional services to Java Enterprise Applications such as transactionality, security, pooling, and thread-safety.
-Server side components that implement this API and wrap up business logic are called Enterprise Java Beans (EJBs). While the first versions were infamously known for the boilerplate code as well as their low testability,
-EJB 3.x are rather easy to use thanks to a new design paradigms called &lt;a href=&quot;http://en.wikipedia.org/wiki/Convention_over_configuration&quot; title=&quot;Convention over Configuration on Wikipedia&quot;&gt;Convention over Configuration&lt;/a&gt;. The idea is to specify unconventional aspects rather than everything. This dramatically reduces the boilerplate code and improves readability.&lt;/p&gt;
-
-&lt;p&gt;Furthermore, the massive usage of annotations instead of XML descriptor greatly improves the productivity. In the sequel, I mostly rely on annotations. Nevertheless, every annotation has its counterpart in a configuration descriptor that is called &lt;code class=&quot;highlighter-rouge&quot;&gt;ejb-jar.xml&lt;/code&gt;.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;In case there is two different value for the same property, remember that one from the &lt;code class=&quot;highlighter-rouge&quot;&gt;ejb-jar.xml&lt;/code&gt; always overrides the annotation.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;Enterprise Java Beans are of three kinds:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Session Beans&lt;/strong&gt;: components whose execution is triggered by a client call. The call can be local (within the JVM) or remote (by another JVM).&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Message Beans&lt;/strong&gt;: execution is triggered by a message and the business logic is processed asynchronously. Please note that, since JEE6 there are other (simpler) ways to process logic asynchronously. Nevertheless, Message Beans
-remain very useful to implement bus and/or publish-subscribe patterns and to enforce loose coupling between the client and the server component.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Entity Beans&lt;/strong&gt;: I will not discuss entity beans as they have been replaced by the &lt;a href=&quot;http://jcp.org/aboutJava/communityprocess/final/jsr317/index.html&quot; title=&quot;JPA 2.0 specification&quot;&gt;JPA 2.0 specification&lt;/a&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;session-beans&quot;&gt;&lt;a id=&quot;sb&quot;&gt;&lt;/a&gt;Session Beans&lt;/h3&gt;
-&lt;p&gt;As mentioned previously, session beans (merely) react on client invocation. Henceforth, the bean can either take the client session into account (thus it shares a state between multiple client invocations) or it can treat each call as unrelated.
-In the first case, the EJB is called &lt;strong&gt;Stateful&lt;/strong&gt; while in the latter it is called &lt;strong&gt;Stateless&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;h3 id=&quot;stateless-session-beans&quot;&gt;&lt;a id=&quot;slsb&quot;&gt;&lt;/a&gt;Stateless Session Beans&lt;/h3&gt;
-&lt;p&gt;Let us start with a &lt;strong&gt;Stateless&lt;/strong&gt; bean. The following Java class describes a Stateless EJB.
-The most important part is the annotation &lt;code class=&quot;highlighter-rouge&quot;&gt;@Stateless&lt;/code&gt; at the top of the class.
-This marks the class as an EJB. When the container instantiates this class, it knows that
-it is a so-called &lt;strong&gt;Managed Bean&lt;/strong&gt;. By this, it means that the container manages the bean’s lifecycle (e.g., instantiation, passivation). Furthermore, as an EJB, it has access to the container services such as security and transactionality.&lt;/p&gt;
-
-&lt;p&gt;The following snippet describes a Stateless Session bean that computes a grade distribution. The method is secured and only authorized to client that have the role &lt;code class=&quot;highlighter-rouge&quot;&gt;user&lt;/code&gt; through the &lt;code class=&quot;highlighter-rouge&quot;&gt;@RolesAllowed({ &quot;user&quot; })&lt;/code&gt; annotation.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@Stateless&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StudentServiceJPAImpl&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;StudentService&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-    &lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
-    &lt;span class=&quot;nd&quot;&gt;@RolesAllowed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;({&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;user&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;})&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// This a role-based security.&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Integer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getDistribution&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    	&lt;span class=&quot;n&quot;&gt;numberOfAccess&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;Integer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grades&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Integer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;];&lt;/span&gt;
-
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Student&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getAll&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;())&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;grades&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getAvgGrade&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;intValue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TOTAL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)]++;&lt;/span&gt;
-        &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;grades&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
- &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Please note that the previous EJB implements an interface. An EJB can be local (invokable from within the container),
-remote (invokable from another JVM) or both. In the previous case, it is a local interface and therefore the bean is only
-invokable locally.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@Local&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;interface&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StudentService&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Serializable&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-	&lt;span class=&quot;cm&quot;&gt;/**
-	 * @return an array that contains the distribution of the grades. It
-	 *         partitions the grades in &quot;n&quot; parts.
-	 * @param n : number of parts
-	 */&lt;/span&gt;
-	&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getDistribution&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Adding a remote invocation to the implementation amounts to add an interface that is annotated &lt;code class=&quot;highlighter-rouge&quot;&gt;@Remote&lt;/code&gt;.
-Of course, the interface may be different and may exposes different services locally and remotely.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@Remote&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;interface&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StudentServiceRemote&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Serializable&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-    &lt;span class=&quot;cm&quot;&gt;/**
-     * @param lastname
-     *            of the student
-     * @return the student with the given lastname.
-     */&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;Student&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getStudentByLastName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lastname&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The implementation must be changed as follow to be remotely invokable:&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@Stateless&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StudentServiceJPAImpl&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;StudentService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;StudentServiceRemote&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;To use this EJB, we need a client code. The easiest possible interaction is either via a JAX-RS service or via a servlet.
-In the JEE6-Demo, under the JEE6-WEB project the JAX-RS facade is called &lt;code class=&quot;highlighter-rouge&quot;&gt;StudentFacade.java&lt;/code&gt;. It implements a JAX-RS facade over the &lt;code class=&quot;highlighter-rouge&quot;&gt;StudentService&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;The method &lt;code class=&quot;highlighter-rouge&quot;&gt;getDistribution()&lt;/code&gt; uses the student service that is injected via &lt;code class=&quot;highlighter-rouge&quot;&gt;@EJB&lt;/code&gt; in the 
-facade. &lt;a href=&quot;http://en.wikipedia.org/wiki/Dependency_injection&quot; title=&quot;Dependency Injection on Wikipedia&quot;&gt;Dependency injection&lt;/a&gt;  is now a first class citizen in the JEE6 stack.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@ApplicationScoped&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// This sets the scope to application level&lt;/span&gt;
-&lt;span class=&quot;nd&quot;&gt;@Path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/studentService&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StudentServiceFacade&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Serializable&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-	&lt;span class=&quot;nd&quot;&gt;@EJB&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;StudentService&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;studentService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-	&lt;span class=&quot;nd&quot;&gt;@GET&lt;/span&gt;
-	&lt;span class=&quot;nd&quot;&gt;@Produces&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;({&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;application/xml&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;application/json&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;})&lt;/span&gt;
-	&lt;span class=&quot;nd&quot;&gt;@Path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;distribution&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-	&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Response&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getDistribution&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;Integer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;distrib&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;studentService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getDistribution&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;ok&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;DistributionDto&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;distrib&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;build&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The following snippet illustrates the injection of a Stateless EJB into a Servlet.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;@WebServlet(&quot;/student&quot;)
-public class StudentServlet extends HttpServlet {
-
-	private static final long serialVersionUID = 1L;
-
-	@EJB
-	StudentService studentService;
-
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		response.getOutputStream()
-				.println(&quot;There are #&quot; + studentService.getAll().size() + &quot; students in the database&quot;);
-	}
-
-	@Override
-	protected void doPost(HttpServletRequest arg0, HttpServletResponse arg1) throws ServletException, IOException {
-		this.doGet(arg0, arg1);
-	}
-
-}
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;As you can see, implementing EJBs (and invoking them) is rather easy. So far, we did not talk much about transactionality and security so you might wonder why using EJBs for such simple business services. The answer is pooling and thread-safety. As the container manages a pool of EJBs, it handles the invocation queue and you do not have to manager re-entrance and thread-safety.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;Remember that there is a &lt;strong&gt;one to many relationship&lt;/strong&gt; between a stateless session bean and the clients. In other words, one instance may manage different clients. Hence, there must be not field that represent a client state in a &lt;strong&gt;Stateless&lt;/strong&gt; EJB because there is no guarantee that a given client will get the same SLSB accross two invokations. Nevertheless, within a given invokation the client is guaranteed to be the only user.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;Consider the following exercises.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 1:&lt;/em&gt; Add a new method to the StudentService service that computes the standard deviation and use this method in the JAX-RS facade.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 2:&lt;/em&gt; Add a counter that is incremented each and every time a method is invoked. Print out the thread-id (and if possible the session-id) and explain why the so-called stateless beans must be without state. Add a rest service to interface this method.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h4 id=&quot;transactionality&quot;&gt;&lt;a id=&quot;trx&quot;&gt;&lt;/a&gt;Transactionality&lt;/h4&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://en.wikipedia.org/wiki/Database_transaction&quot; title=&quot;Transactions on wikipedia&quot;&gt;Transactions&lt;/a&gt; are important concepts when dealing with enterprise applications. It is of vital importance that whenever something goes wrong, the transaction is roll-backed. This preserves the &lt;a href=&quot;http://en.wikipedia.org/wiki/ACID&quot; title=&quot;ACID in wikipedia&quot;&gt;ACID&lt;/a&gt; properties. Managing database transactions with JDBC is complex to say the least. Remember that we often have to manage transactions over several databases and even between databases and messaging queues. If the processing of a message leads to a database exception, we might want to put the message back in the queue.&lt;/p&gt;
-
-&lt;p&gt;Lucky for us, JEE 6 manages (almost) everything by itself. By default a bean is transactional and each method either reuse a running transaction or creates a new one if necessary.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;By default the transaction (or transaction context) is propagated to other business methods that are called from within a transactional method.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;In JEE, there is two types of transaction management:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Bean Managed&lt;/strong&gt; : In this case the bean is annotated with &lt;code class=&quot;highlighter-rouge&quot;&gt;@TransactionManagement(TransactionManagementType.BEAN)&lt;/code&gt;. In this mode, the developer must manage the transaction himself.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Container Managed&lt;/strong&gt;: this is the default behavior and it corresponds to marking the bean &lt;code class=&quot;highlighter-rouge&quot;&gt;@TransactionManagement(TransactionManagementType.CONTAINER)&lt;/code&gt;. This mode is called &lt;strong&gt;Container Managed Transaction Demarcation&lt;/strong&gt;. This idea is that every public method is transactional and is marked as &lt;code class=&quot;highlighter-rouge&quot;&gt;@Required&lt;/code&gt;.&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The following snippet shows how to use bean demarcation:&lt;/p&gt;
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@MessageDriven&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mappedName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;MyQueue&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;nd&quot;&gt;@TransactionManagement&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TransactionManagementType&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;BEAN&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StudentRegistrationService&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MessageListener&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-	&lt;span class=&quot;nd&quot;&gt;@PersistenceContext&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;EntityManager&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;em&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-	&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-
-	&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Message&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;TextMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-		&lt;span class=&quot;n&quot;&gt;em&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getTransaction&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;begin&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-
-		&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TextMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;MESSAGE BEAN: Message received: &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Thread&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;currentThread&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-		&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JMSException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;em&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getTransaction&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;rollback&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-		&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;em&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getTransaction&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;commit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;and now the exact same class using container demarcation:&lt;/p&gt;
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@MessageDriven&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mappedName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;MyQueue&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StudentRegistrationService&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MessageListener&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-	&lt;span class=&quot;nd&quot;&gt;@PersistenceContext&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;EntityManager&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;em&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-	&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-
-	&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Message&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;TextMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-		&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TextMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;MESSAGE BEAN: Message received: &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Thread&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;currentThread&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-		&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JMSException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;em&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getTransaction&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;rollback&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-		&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Because the previous snippet relies on the default convention, it is equivalent to:&lt;/p&gt;
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@MessageDriven&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mappedName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;MyQueue&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;nd&quot;&gt;@TransactionManagement&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TransactionManagementType&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;CONTAINER&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;nd&quot;&gt;@TransactionAttribute&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TransactionAttributeType&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;REQUIRED&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StudentRegistrationService&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MessageListener&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-	&lt;span class=&quot;nd&quot;&gt;@Inject&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// Let's ignore this for the moment&lt;/span&gt;
-	&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;transient&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Logger&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-	&lt;span class=&quot;nd&quot;&gt;@PersistenceContext&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;EntityManager&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;em&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-	&lt;span class=&quot;nd&quot;&gt;@Resource&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// Let's ignore this for the moment&lt;/span&gt;
-	&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MessageDrivenContext&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mdbContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-	&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Message&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;TextMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-		&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TextMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;MESSAGE BEAN: Message received: &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Thread&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;currentThread&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-		&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JMSException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;em&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getTransaction&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;rollback&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-		&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;In other terms, it uses container managed transaction demarcation &lt;code class=&quot;highlighter-rouge&quot;&gt;@TransactionManagement(TransactionManagementType.CONTAINER)&lt;/code&gt;.
-Moreover, each and every public method either reuses an existing transaction or creates a new one if none has been started &lt;code class=&quot;highlighter-rouge&quot;&gt;@TransactionAttribute(TransactionAttributeType.REQUIRED)&lt;/code&gt;&lt;/p&gt;
-
-&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;@TransactionAttribute&lt;/code&gt; annotation can also be put directly on the method. Valid options are:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;REQUIRED&lt;/code&gt;: if there is an existing transaction then it reuses it, otherwise it creates a new one.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;REQUIRES_NEW&lt;/code&gt;: it always creates a new transaction&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;NEVER&lt;/code&gt;: if there is an existing transaction then it fails&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;MANDATORY&lt;/code&gt;: if there is an existing transaction then it reuses it, otherwise it fails&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;NOT_SUPPORTED&lt;/code&gt;: If there is a transaction then it suspends it and it does not propagate the transaction to other business methods, otherwise it does nothing.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;SUPPORTS&lt;/code&gt;: If a transaction exists then it works as for &lt;code class=&quot;highlighter-rouge&quot;&gt;REQUIRED&lt;/code&gt;, otherwise it works as for &lt;code class=&quot;highlighter-rouge&quot;&gt;NOT_SUPPORTED&lt;/code&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Consider the following exercises.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 3:&lt;/em&gt; Test the different types of transaction attribute and observe their respective behavior.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 4:&lt;/em&gt; Are the snippets 1 and 2 semantically equivalent?&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 5:&lt;/em&gt; Mix the two types of transaction management.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h4 id=&quot;security&quot;&gt;&lt;a id=&quot;secu&quot;&gt;&lt;/a&gt;Security&lt;/h4&gt;
-
-&lt;p&gt;Another great feature of EJBs is their ability for declarative authorization and the integration in the JAAS framework. JAAS is the Java Authentication and Authorization Service
-It provides unified services to access user directories for user authentication and their authorization. As the client is already authenticated, at the EJB level, only authorization matters.&lt;/p&gt;
-
-&lt;p&gt;After authentication, a principal (e.g., user name, role) is set in the context. This principal is used for authorization.&lt;/p&gt;
-
-&lt;p&gt;The main annotation is &lt;code class=&quot;highlighter-rouge&quot;&gt;@RolesAllowed&lt;/code&gt; followed by a list of authorized roles. As an example, look at the method &lt;code class=&quot;highlighter-rouge&quot;&gt;getDistribution&lt;/code&gt; of &lt;code class=&quot;highlighter-rouge&quot;&gt;StudentServiceJPAImpl.java&lt;/code&gt;. The method is only allowed for client that belongs to the group/role &lt;code class=&quot;highlighter-rouge&quot;&gt;user&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;Sometimes, a method of an EJB is not executed in the context of an authenticated user or the authenticated user has not enough credentials. If it is still important to run the method, you can use the &lt;code class=&quot;highlighter-rouge&quot;&gt;@RunAs&lt;/code&gt; annotation. This basically overrides the current security context (and the associated principal) similarly to &lt;code class=&quot;highlighter-rouge&quot;&gt;sudo&lt;/code&gt; for UNIX.&lt;/p&gt;
-
-&lt;p&gt;In any EJB, it is possible to get the current client session and therefore the principal:&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@Resource&lt;/span&gt; 
-&lt;span class=&quot;n&quot;&gt;SessionContext&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doSomething&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-	&lt;span class=&quot;c1&quot;&gt;// obtain the principal. &lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;Principal&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;principal&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getCallerPrincipal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-	&lt;span class=&quot;c1&quot;&gt;// obtain the name. &lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;callerPrincipal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-	&lt;span class=&quot;c1&quot;&gt;// Is the caller an admin?&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;isCallerInRole&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;admin&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 6:&lt;/em&gt; Change the method getDistribution to only allow client that belong to the &lt;code class=&quot;highlighter-rouge&quot;&gt;admin&lt;/code&gt; group. Log as a user and as an admin, check the servlet as well as the JAX-RS service. What do you observe?&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 7:&lt;/em&gt; Add a new Role to the application, and use it. Warning, some configurations are vendor specific.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 8:&lt;/em&gt; Create a service that uses &lt;code class=&quot;highlighter-rouge&quot;&gt;@RunAs&lt;/code&gt; to upgrade the credentials of a standard user in order to call another service that requires the admin level.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h4 id=&quot;-callbacks-and-interceptors&quot;&gt;&lt;a id=&quot;callbacks&quot;&gt;&lt;/a&gt; Callbacks and Interceptors&lt;/h4&gt;
-
-&lt;p&gt;Interceptors are used to enhance the business method invocations and the beans’ lifecycle events. Interceptors implements the AOP paradigm.&lt;/p&gt;
-
-&lt;p&gt;Interceptors are of two kinds:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;Lifecycle event interceptors such as &lt;code class=&quot;highlighter-rouge&quot;&gt;@PostConstruct&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;@PostActivate&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;@PrePassivate&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;@PreDestroy&lt;/code&gt; enable to add logic when the bean is created or destroyed.&lt;/li&gt;
-  &lt;li&gt;Call-based interceptors that relies on the &lt;code class=&quot;highlighter-rouge&quot;&gt;@AroundInvoke&lt;/code&gt; annotation.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;In the first case, adding the annotation before the method declaration is enough. It will then be called when the lifecycle event occurs.
-In the latter case, in addition to the annotation the developer must configure the &lt;code class=&quot;highlighter-rouge&quot;&gt;ejb-jar.xml&lt;/code&gt; file.&lt;/p&gt;
-
-&lt;p&gt;Here is a simple interceptor that prints out the time consumed by a method call:&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@AroundInvoke&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;intercept&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;InvocationContext&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Exception&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-   &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;start&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;currentTimeMillis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-      
-   &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;Object&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;proceed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-   &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;finally&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-   	 	&lt;span class=&quot;n&quot;&gt;StringBuilder&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;StringBuilder&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;******  &quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getMethod&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; took :&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;currentTimeMillis&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;start&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot; ms  ******&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-
-		&lt;span class=&quot;n&quot;&gt;mLogger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-   &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;In addition to the interceptor declaration, it must be activated by mean of either an annotation on the target EJB or via the &lt;code class=&quot;highlighter-rouge&quot;&gt;ejb-jar.xml&lt;/code&gt; file. If several interceptors are declared, then the order of declaration is the order of execution: the last is the most nested interceptor.&lt;/p&gt;
-
-&lt;p&gt;The following example presents the annotation based declaration.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@Stateless&lt;/span&gt;
-&lt;span class=&quot;nd&quot;&gt;@Interceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;({&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;PerformanceEJBInterceptor&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;})&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StudentServiceJPAImpl&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;StudentService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;StudentServiceRemote&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;In the following snippet, the interceptor is applied to all methods whose name is like &lt;code class=&quot;highlighter-rouge&quot;&gt;get*&lt;/code&gt; and EJB’s name is like &lt;code class=&quot;highlighter-rouge&quot;&gt;Student*&lt;/code&gt;. It is also possible to specify the parameters’ type in case of overloading.&lt;/p&gt;
-
-&lt;div class=&quot;language-xml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;assembly-descriptor&amp;gt;&lt;/span&gt;
- &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- Default interceptor that will apply to all methods for all beans in deployment --&amp;gt;&lt;/span&gt;
- &lt;span class=&quot;nt&quot;&gt;&amp;lt;interceptor-binding&amp;gt;&lt;/span&gt;
-      &lt;span class=&quot;nt&quot;&gt;&amp;lt;ejb-name&amp;gt;&lt;/span&gt;Student*&lt;span class=&quot;nt&quot;&gt;&amp;lt;/ejb-name&amp;gt;&lt;/span&gt;
-      &lt;span class=&quot;nt&quot;&gt;&amp;lt;method&amp;gt;&lt;/span&gt;
-           &lt;span class=&quot;nt&quot;&gt;&amp;lt;method-name&amp;gt;&lt;/span&gt;get*&lt;span class=&quot;nt&quot;&gt;&amp;lt;/method-name&amp;gt;&lt;/span&gt;
-      &lt;span class=&quot;nt&quot;&gt;&amp;lt;/method&amp;gt;&lt;/span&gt;
-      &lt;span class=&quot;nt&quot;&gt;&amp;lt;interceptor-class&amp;gt;&lt;/span&gt;ch.demo.business.interceptors.PerformanceEJBInterceptor&lt;span class=&quot;nt&quot;&gt;&amp;lt;/interceptor-class&amp;gt;&lt;/span&gt;      
-   &lt;span class=&quot;nt&quot;&gt;&amp;lt;/interceptor-binding&amp;gt;&lt;/span&gt;
-   ...
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/assembly-descriptor&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 9:&lt;/em&gt; Add an interceptor that for all public methods of &lt;code class=&quot;highlighter-rouge&quot;&gt;StudentServiceJPAImpl.java&lt;/code&gt; to increments an overall (common to all clients) usage counter using the annotation based approach.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 10:&lt;/em&gt; Do the same, but using the ``ejb-jar.xml`.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h4 id=&quot;-timers&quot;&gt;&lt;a id=&quot;timers&quot;&gt;&lt;/a&gt; Timers&lt;/h4&gt;
-
-&lt;p&gt;Some services are not directly linked to a client session. This is the case for batch processes that must run every x hours. To that end, EJB 3.1 provides the annotation &lt;code class=&quot;highlighter-rouge&quot;&gt;@Schedule&lt;/code&gt; to specify how often a service method must be called. This is similar to the CRON  feature on UNIX systems.&lt;/p&gt;
-
-&lt;p&gt;The following example runs the method &lt;code class=&quot;highlighter-rouge&quot;&gt;doSomethingUseful&lt;/code&gt; every 30 minutes.&lt;/p&gt;
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;	&lt;span class=&quot;nd&quot;&gt;@Schedule&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;minute&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;*/30&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;hour&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;*&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doSomethingUseful&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;  
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 11:&lt;/em&gt;  Add a scheduler that runs a method every minutes to print out the number of students in the database.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 12:&lt;/em&gt;  &lt;code class=&quot;highlighter-rouge&quot;&gt;@Schedule&lt;/code&gt; is often used in conjunction with &lt;code class=&quot;highlighter-rouge&quot;&gt;@RunAs&lt;/code&gt;. Why?&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h4 id=&quot;-asynchronous-calls&quot;&gt;&lt;a id=&quot;async&quot;&gt;&lt;/a&gt; Asynchronous calls&lt;/h4&gt;
-
-&lt;p&gt;Asynchronous calling means that the control is returned to the caller before the process has been completed. For instance, a batch job that loads 1000 customers description from one database, processes them and finally save them in another database. From a performances point of view, it is better to split the process in x batches and then to wait until every thing is finished. Firstly, if the asynchronous call is made to another EJB, it is possible to leverage the pool to have parallel treatments without managing multi-threading and race conditions. Secondly, as the different call may use different database connections, it will limit the database bottleneck.&lt;/p&gt;
-
-&lt;p&gt;To do this, JEE provides the &lt;code class=&quot;highlighter-rouge&quot;&gt;@Asynchronous&lt;/code&gt; annotation. Any method that returns either nothing (&lt;code class=&quot;highlighter-rouge&quot;&gt;void&lt;/code&gt;) or an instance of type &lt;code class=&quot;highlighter-rouge&quot;&gt;Future&amp;lt;T&amp;gt;&lt;/code&gt; can be run asynchronously.&lt;/p&gt;
-
-&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;Future&lt;/code&gt; interface exposes the method &lt;code class=&quot;highlighter-rouge&quot;&gt;get&lt;/code&gt; that blocks until the job is over.
-The following class, exposes the method &lt;code class=&quot;highlighter-rouge&quot;&gt;processJob&lt;/code&gt; that runs asynchronously.&lt;/p&gt;
-
-&lt;p&gt;The methods &lt;code class=&quot;highlighter-rouge&quot;&gt;processJobs&lt;/code&gt; starts 10 times the method processJob and put the resulting &lt;code class=&quot;highlighter-rouge&quot;&gt;Future&amp;lt;String&amp;gt;&lt;/code&gt; in an array. Then it iterates of the pool and wait until all calls have returned.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@Stateless&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;BatchProcessor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;processJobs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;Future&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Future&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;];&lt;/span&gt;
-	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;processJob&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Job #&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-	&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;pool&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;	
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-
-&lt;span class=&quot;nd&quot;&gt;@Asynchronous&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Future&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;processJob&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;jobName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;Thread&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;sleep&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;InterruptedException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;Thread&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;interrupted&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;IllegalStateException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;AsyncResult&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jobName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 13:&lt;/em&gt; Create an EJB that invoke an asynchronous method that runs 100 times. The asynchronous method should wait a random time between 5 and 10 seconds  before returning a the actual waiting time. Collect all the waiting times and compute the average.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&quot;singleton-beans&quot;&gt;Singleton Beans&lt;/h3&gt;
-
-&lt;p&gt;Singleton beans (&lt;code class=&quot;highlighter-rouge&quot;&gt;@Singleton&lt;/code&gt;) are special kind of EJBS that exist only in one instance in the container. This is for instance useful to initialize the application. Thus, &lt;code class=&quot;highlighter-rouge&quot;&gt;@Singleton&lt;/code&gt; can be associated with &lt;code class=&quot;highlighter-rouge&quot;&gt;@Startup&lt;/code&gt; to start the EJB during container’s startup.&lt;/p&gt;
-
-&lt;p&gt;As there is only one instance, it means the bean is meant to be shared. Therefore, it is important to specify the locking policy. There are two types of locking:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;Container managed concurrency management &lt;code class=&quot;highlighter-rouge&quot;&gt;@ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)&lt;/code&gt;. This is the default behavior and it is highly recommended to stick to it. Annotating a method (or the class) with &lt;code class=&quot;highlighter-rouge&quot;&gt;@Lock(LockType.READ)&lt;/code&gt; means that the method can be safely access concurrently. &lt;code class=&quot;highlighter-rouge&quot;&gt;@Lock(LockType.WRITE)&lt;/code&gt; requires the calls to the method to be serialized. The methods are &lt;code class=&quot;highlighter-rouge&quot;&gt;@Lock(LockType.WRITE)&lt;/code&gt; by default.&lt;/li&gt;
-  &lt;li&gt;Bean managed concurrency management &lt;code class=&quot;highlighter-rouge&quot;&gt;@ConcurrencyManagement(ConcurrencyManagementType.BEAN)&lt;/code&gt;. This requires the developer to use synchronized and volatile to achieve good concurrency.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;By default the class is marked as &lt;code class=&quot;highlighter-rouge&quot;&gt;@Lock(LockType.WRITE)&lt;/code&gt;, thus EVERY CALL is synchronized. This is probably not the expected behavior (at least most of the time) and produces a huge bottleneck. Make sure to set the proper lock policy on the class and to only put &lt;code class=&quot;highlighter-rouge&quot;&gt;@Lock(LockType.WRITE)&lt;/code&gt; where needed.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;The following bean initialize a shared variable during container startup and lock the access to the modification to only one thread (client) at a time.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@Singleton&lt;/span&gt;
-&lt;span class=&quot;nd&quot;&gt;@Startup&lt;/span&gt;
-&lt;span class=&quot;nd&quot;&gt;@Lock&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LockType&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;READ&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StatusBean&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-  &lt;span class=&quot;nd&quot;&gt;@PostConstruct&lt;/span&gt;
-  &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;init&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;status&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Ready&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-  &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getStatus&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-  
-  &lt;span class=&quot;nd&quot;&gt;@Lock&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LockType&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WRITE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;setStatus&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Status&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;this&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;status&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;newStatus&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-  &lt;span class=&quot;nd&quot;&gt;@Lock&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LockType&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;WRITE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;nd&quot;&gt;@AccessTimeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;360000&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-  &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;doTediousOperation&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-  &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 14:&lt;/em&gt; Write a singleton that reads the postal code from the database during startup, update them every 30 minutes. Take care of the concurrency aspects.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&quot;stateful-session-beans&quot;&gt;&lt;a id=&quot;sfsb&quot;&gt;&lt;/a&gt;Stateful Session Beans&lt;/h3&gt;
-
-&lt;p&gt;Unlike stateless session beans, stateful session beans maintain a state across several client invocation. This is because there is a one to one relationship between a client and a stateful session bean.&lt;/p&gt;
-
-&lt;p&gt;The following code snippet describes a stateful session bean that maintains a counter across several invocations.
-A stateful session bean is annotated with &lt;code class=&quot;highlighter-rouge&quot;&gt;@Stateful&lt;/code&gt;. As it is stateful, it maintains a session state and it is therefore important to set a timeout. Otherwise, the number of open session will raise and it will consume the server memory.
-The timeout is defined using the &lt;code class=&quot;highlighter-rouge&quot;&gt;@StatefulTimeout&lt;/code&gt; annotation.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;Because there is no instance sharing among several client, Stateful session beans are more resource-demanding than stateless session beans. Therefore, they should be used with great care.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@Stateful&lt;/span&gt;
-&lt;span class=&quot;nd&quot;&gt;@StatefulTimeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;unit&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TimeUnit&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;MINUTES&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;30&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StudentStatisticsServiceImpl&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;StudentStatisticsService&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-	&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;numberOfAccess&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-	&lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
-	&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getStatistics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;The student service has been invoked #&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;numberOfAccess&lt;/span&gt;
-				&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot; in this session&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-	&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;numberOfAccess&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++;&lt;/span&gt;
-	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;As a stateful session bean is not per se linked to an HTTP session, the application client code must ensure to remember which instance of the EJB is dedicated to which client.
-When used in conjunction with a Servlet, Stateful beans are often put in the HTTP session for further reuse.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;protected&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doGet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HttpServletRequest&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HttpServletResponse&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServletException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IOException&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;StudentStatisticsService&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;statistics&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;StudentStatisticsService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getAttribute&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;
-				&lt;span class=&quot;n&quot;&gt;StudentStatisticsService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-
-		&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;statistics&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-			&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-				&lt;span class=&quot;n&quot;&gt;InitialContext&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ctx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;InitialContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-				&lt;span class=&quot;n&quot;&gt;statistics&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;StudentStatisticsService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ctx&lt;/span&gt;
-						&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;lookup&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;java:global/JEE6-EAR/JEE6-EJB-0.0.1-SNAPSHOT/StudentStatisticsServiceImpl&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-				&lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setAttribute&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;StudentStatisticsService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;toString&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;statistics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NamingException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-				&lt;span class=&quot;k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;RuntimeException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-		&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-		&lt;span class=&quot;n&quot;&gt;statistics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;count&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-
-		&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getOutputStream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;There are #&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;studentService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getAll&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot; students in the database&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getOutputStream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;statistics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getStatistics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getOutputStream&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;println&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;studentService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getStatistics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Either the EJB is looked-up with JNDI and then put into the HTTP session or, when using CDI, the link is made based on the caller scope.
-The class &lt;code class=&quot;highlighter-rouge&quot;&gt;StudentServiceFacade.java&lt;/code&gt; describes how the injection automatically links the correct instance of a stateful session bean to a given based on the &lt;code class=&quot;highlighter-rouge&quot;&gt;@SessionScoped&lt;/code&gt; annotation.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@SessionScoped&lt;/span&gt;
-&lt;span class=&quot;nd&quot;&gt;@Path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/studentService&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StudentServiceFacade&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Serializable&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-	&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;serialVersionUID&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1318211294294344900L&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-	&lt;span class=&quot;nd&quot;&gt;@EJB&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;StudentService&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;studentService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-	&lt;span class=&quot;nd&quot;&gt;@EJB&lt;/span&gt;
-	&lt;span class=&quot;n&quot;&gt;StudentStatisticsService&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;studentServiceStatistics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-
-	&lt;span class=&quot;nd&quot;&gt;@GET&lt;/span&gt;
-	&lt;span class=&quot;nd&quot;&gt;@Produces&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;({&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;application/xml&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;application/json&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;})&lt;/span&gt;
-	&lt;span class=&quot;nd&quot;&gt;@Path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;session&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-	&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Response&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getSessionStatistics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;ok&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;studentServiceStatistics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getStatistics&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()).&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;build&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-	
-	&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Consider the following exercise.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 15:&lt;/em&gt; Show that two sessions share the same overall count but not the same per session count.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;As the container does not share the stateful instances, it might run out of memory and therefore it will try to save the state of the bean on disk (or database). This operation is called &lt;strong&gt;Passivation&lt;/strong&gt;. Afterwards, when the client comes back and requires its stateful instance, the container loads it from the disk. This operation is called &lt;strong&gt;Activation&lt;/strong&gt;.&lt;/p&gt;
-
-&lt;p&gt;Some operations such as initializing/cleaning File, a socket connection, or a database connection can be made before activation and/or after activation using the following 
-&lt;code class=&quot;highlighter-rouge&quot;&gt;@PrePassivate&lt;/code&gt; and the &lt;code class=&quot;highlighter-rouge&quot;&gt;@PostActivate&lt;/code&gt; annotations.&lt;/p&gt;
-
-&lt;p&gt;Consider the following exercises:&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 16:&lt;/em&gt; Stop the server and observe that the bean has been passivated.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 17:&lt;/em&gt; Start the server and observe that the bean has been activated.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;Whenever the user logs out and thus invalidate the HTTP Session, you might want to clean up the EJB state and release the resources. To achieve this, the client must call a method annotated with &lt;code class=&quot;highlighter-rouge&quot;&gt;@Remove&lt;/code&gt;. As soon as the client call is over the container can garbage the bean. The idea is simply to get ahead of the timeout.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 18:&lt;/em&gt; Implements two methods with &lt;code class=&quot;highlighter-rouge&quot;&gt;@Remove&lt;/code&gt; with two different behaviors. Check that both will discard the current instance. Hint: you can use &lt;code class=&quot;highlighter-rouge&quot;&gt;@PreDestroy&lt;/code&gt; to check the bean’s destruction.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;message-driven-beans&quot;&gt;Message Driven Beans&lt;/h2&gt;
-
-&lt;p&gt;Message driven beans (MDB) are very useful for asynchronous process and for decoupling the client from the processor. MDB implement a typical publish/subscribe architecture.&lt;/p&gt;
-
-&lt;p&gt;There are two kinds of objects, a MDB can listen to:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Topics&lt;/strong&gt;: pure publish/subscribe semantics. A new message will be processed by every listeners.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Queue&lt;/strong&gt;: more of a load balancer, once the message is consumed by one of the listeners, it
-is removed from the queue.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Although, there is, in JEE6, another mechanism for asynchronous processing, MDBs remain the best alternative if you do not want the client to be aware of the asynchronous logic and processor.&lt;/p&gt;
-
-&lt;p&gt;The idea is that there is a queue (or a topic) in between. Therefore, the client as no knowledge whatsoever of the message processor contract or semantics.&lt;/p&gt;
-
-&lt;p&gt;The first step is to configure a Queue Connection Factory as well as a Queue in the application server.&lt;/p&gt;
-
-&lt;p&gt;The following servlet gets  the connection factory as well as the queue injected. As always with dependency injection, the same result can be achieved using JNDI lookups.
-For each request to the servlet 100 messages are generated and put in the Queue called &lt;code class=&quot;highlighter-rouge&quot;&gt;MyQueue&lt;/code&gt;.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@WebServlet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/registration&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;RegistrationServlet&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;extends&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HttpServlet&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-	&lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-		
-	&lt;span class=&quot;nd&quot;&gt;@Resource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mappedName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;MyConnectionFactory&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-	&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ConnectionFactory&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connectionFactory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-	&lt;span class=&quot;nd&quot;&gt;@Resource&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mappedName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;MyQueue&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-	&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Queue&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;queue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-	&lt;span class=&quot;nd&quot;&gt;@Override&lt;/span&gt;
-	&lt;span class=&quot;kd&quot;&gt;protected&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;doGet&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;HttpServletRequest&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;request&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HttpServletResponse&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;response&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;throws&lt;/span&gt; 	&lt;span class=&quot;n&quot;&gt;ServletException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;IOException&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-		&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;Connection&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connectionFactory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;createConnection&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-
-			&lt;span class=&quot;n&quot;&gt;Session&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;session&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connection&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;createSession&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Session&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;AUTO_ACKNOWLEDGE&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;MessageProducer&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;messageProducer&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;session&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;createProducer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;queue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-
-			&lt;span class=&quot;n&quot;&gt;TextMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;session&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;createTextMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-
-			&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-				&lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;This is message &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;));&lt;/span&gt;
-				&lt;span class=&quot;n&quot;&gt;messageProducer&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;send&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-		&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JMSException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-			&lt;span class=&quot;k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;RuntimeException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-		&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The following MDB listens to &lt;code class=&quot;highlighter-rouge&quot;&gt;MyQueue&lt;/code&gt; (thanks to the annotation &lt;code class=&quot;highlighter-rouge&quot;&gt;@MessageDriven(mappedName = &quot;MyQueue&quot;)&lt;/code&gt; and because it implements the &lt;code class=&quot;highlighter-rouge&quot;&gt;MessageListener&lt;/code&gt; interface it takes a message when available.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@MessageDriven&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mappedName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;MyQueue&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StudentRegistrationService&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;implements&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MessageListener&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;o&quot;&gt;...&lt;/span&gt;
-
-	&lt;span class=&quot;nd&quot;&gt;@Resource&lt;/span&gt;
-	&lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;MessageDrivenContext&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mdbContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-	&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;onMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Message&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-		&lt;span class=&quot;n&quot;&gt;TextMessage&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-		&lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-			&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;inMessage&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;instanceof&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;TextMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-				&lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;TextMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-				&lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;MESSAGE BEAN: Message received: &quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;msg&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getText&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-				&lt;span class=&quot;n&quot;&gt;logger&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;warn&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Message of wrong type: &quot;&lt;/span&gt;
-						&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inMessage&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getClass&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getName&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;());&lt;/span&gt;
-			&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-		&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JMSException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-			&lt;span class=&quot;n&quot;&gt;mdbContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;setRollbackOnly&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-			&lt;span class=&quot;k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;RuntimeException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-		&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-	&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Here is a sample output. As you can see, the messages are processed according to their input order but not necessarily by the same EJB (worker).&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;INFO: Sending message: This is message 1
-INFO: Sending message: This is message 2
-INFO: Sending message: This is message 3
-INFO: MESSAGE BEAN: Message received: This is message 1
-INFO: MESSAGE BEAN: Message received: This is message 2
-INFO: Sending message: This is message 5
-INFO: Sending message: This is message 6
-INFO: MESSAGE BEAN: Message received: This is message 4
-INFO: MESSAGE BEAN: Message received: This is message 5
-...
-INFO: MESSAGE BEAN: Message received: This is message 100
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Consider the following exercises:&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 19:&lt;/em&gt; Compare Message Driven Beans and Session Beans with asynchronous calls.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 20:&lt;/em&gt; Print out the thread-id. What do you observe?&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 21:&lt;/em&gt; Create another MDB that consumes the same queue. What do you observe?&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;em&gt;Exercise 22:&lt;/em&gt; Do the same (2 consumers) but using a &lt;code class=&quot;highlighter-rouge&quot;&gt;Topic&lt;/code&gt; instead of a &lt;code class=&quot;highlighter-rouge&quot;&gt;Queue&lt;/code&gt;.&lt;/p&gt;
-&lt;/blockquote&gt;</content><author><name></name></author><summary type="html">I hereby start a series of tutorial on the major (IMHO) JEE 6 features. As a lecturer, I teach the JEE stack at the University of Geneva. This tutorial represents most of the topics that I cover during the EJB, CDI, and JPA lessons.</summary></entry><entry><title type="html">Context Dependency Injection and the Rich Object Model</title><link href="http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/12/05/servicelocator.html" rel="alternate" type="text/html" title="Context Dependency Injection and the Rich Object Model" /><published>2012-12-05T06:59:00+01:00</published><updated>2012-12-05T06:59:00+01:00</updated><id>http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/12/05/servicelocator</id><content type="html" xml:base="http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/12/05/servicelocator.html">&lt;p&gt;[Rich object model] vs [anemic object model] is long running debate. While the latter encourages to use simple and stupid objects with little or no business in them, the rich object model advocates for a clean object design with inheritance, polymorphism and so on.
-The anemic object model is very popular among JEE partitioners because, in the past, the specification did not provide any mean to invoke services in business objects. Therefore, the anemic pattern uses so called “managers” that maintain references to other “managers”. A direct benefit is the clear separation of concerns between the different kind of objects. Basically, it splits processing and data. As this is anti-object oriented, the abstract design of such system is often very different from the actual implementation.&lt;/p&gt;
-
-&lt;h2 id=&quot;the-portfolio-example&quot;&gt;The portfolio example&lt;/h2&gt;
-
-&lt;p&gt;As example, let us take a portfolio that contains a set of financial position. A financial position can be either a set of stock, or an amount in a given currency. To evaluate the actual portfolio value, we go through the positions and for each of them we ask the current quote for stock to the service &lt;code class=&quot;highlighter-rouge&quot;&gt;QuoteService&lt;/code&gt; or the current value of a given currency to the &lt;code class=&quot;highlighter-rouge&quot;&gt;CurrencyService&lt;/code&gt;.
-The next figure presents the “ideal” design.&lt;/p&gt;
-
-&lt;figure class=&quot;image&quot;&gt;&lt;pre&gt;
-  &lt;img src=&quot;/figures/portfolio-business.png&quot; alt=&quot;An object oriented class diagram of the Portfolio management component.&quot; /&gt;
-  &lt;figcaption&gt;An object oriented class diagram of the Portfolio management component.&lt;/figcaption&gt;
-&lt;/pre&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;To achieve this, one need to access services from within business objects. Since EJB 3.1,  Context and Dependency Injection (CDI) provides such a mechanism via the &lt;code class=&quot;highlighter-rouge&quot;&gt;@Inject&lt;/code&gt; annotation. The only requirement is that the object that requires the service as well as the service to inject are so called “managed beans”. The trick is that not all objects are meant to be managed. Furthermore, having managed lists of object is very tricky to say the least. Fortunately, the EJB 3.1 and more specifically the CDI 1.0 specification provide a way to solve this.
-In CDI, the main component is the bean manager. This manager keeps track of the beans to inject via @Inject and other means. Instead of relying on annotations to provide injection, it is possible to use the good old Service Locator pattern. CDI 1.0 exposes the bean manager on JNDI with the name &lt;code class=&quot;highlighter-rouge&quot;&gt;java:comp/BeanManager&lt;/code&gt;.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;ServiceLocator&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-   &lt;span class=&quot;nd&quot;&gt;@SuppressWarnings&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;unchecked&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-   &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;getInstance&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kd&quot;&gt;final&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;T&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;try&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-         &lt;span class=&quot;c1&quot;&gt;//Access to the current context.&lt;/span&gt;
-         &lt;span class=&quot;n&quot;&gt;InitialContext&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ctx&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;InitialContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
-         &lt;span class=&quot;c1&quot;&gt;//Resolve the bean manager&lt;/span&gt;
-         &lt;span class=&quot;n&quot;&gt;BeanManager&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;manager&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;BeanManager&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ctx&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;lookup&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;java:comp/BeanManager&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-         &lt;span class=&quot;c1&quot;&gt;//Retrieve all beans of that type&lt;/span&gt;
-         &lt;span class=&quot;n&quot;&gt;Set&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Bean&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;?&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;beans&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;manager&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getBeans&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-         &lt;span class=&quot;n&quot;&gt;Bean&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;bean&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Bean&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;manager&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;resolve&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;beans&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-         &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bean&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;CreationalContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;manager&lt;/span&gt;
-                  &lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;createCreationalContext&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bean&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;context&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;null&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-               &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;manager&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getReference&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;bean&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;context&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-            &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-         &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-      &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NamingException&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-         &lt;span class=&quot;k&quot;&gt;throw&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;RuntimeException&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-      &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;result&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The client code is very simple. It consists in calling the &lt;code class=&quot;highlighter-rouge&quot;&gt;ServiceLocator&lt;/code&gt;with the desired interface.
-For the sake of clarity, I did not show the ServiceLocator that takes a qualifier in addition to the interface. To add this feature, look at the &lt;code class=&quot;highlighter-rouge&quot;&gt;getBeans(Type beanType, Annotation... qualifiers)&lt;/code&gt; method.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;StockPos&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-   &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Long&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;qty&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;stockId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-   &lt;span class=&quot;n&quot;&gt;Double&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;evaluate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;StockQuoteService&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sqs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServiceLocator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getInstance&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;StockQuoteService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;qty&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sqs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getQuoteValue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stockId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-   &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Similarly, here is the code of the &lt;code class=&quot;highlighter-rouge&quot;&gt;CurrencyPos&lt;/code&gt; object.&lt;/p&gt;
-
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
-&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;CurrencyPos&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-
-   &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Double&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-   &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;String&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;currencyId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;;&lt;/span&gt;
-
-   &lt;span class=&quot;n&quot;&gt;Double&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;evaluate&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
-      &lt;span class=&quot;n&quot;&gt;CurrencyQuoteService&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sqs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ServiceLocator&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getInstance&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CurrencyQuoteService&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;class&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;amount&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sqs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;getQuoteValue&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;stockId&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
-   &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;some-thoughts-on-the-demeter-law&quot;&gt;Some thoughts on the Demeter law&lt;/h2&gt;
-
-&lt;p&gt;Let me be clear, I do &lt;strong&gt;not&lt;/strong&gt; recommend this approach everywhere. It is very important to not mix the objects responsabilities. Furthermore,
-in order to respect the Demeter law, a business must &lt;strong&gt;not&lt;/strong&gt; directly call something outside of the current component. Calls to other components are always to be done through so-called consumers to have clear components boundaries.
-For instance, putting to much intelligence in JPA entities that can be detached and serialized may cause problems on the client side.&lt;/p&gt;
-
-&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
-&lt;p&gt;In this post, I showed a solution to consume services that are exposed via the CDI BeanManager. These services can be pure POJOs or EJBs.
-Nevertheless, this approach must be used with great care as it can blur the components boundaries and responsabilities.&lt;/p&gt;</content><author><name></name></author><summary type="html">[Rich object model] vs [anemic object model] is long running debate. While the latter encourages to use simple and stupid objects with little or no business in them, the rich object model advocates for a clean object design with inheritance, polymorphism and so on. The anemic object model is very popular among JEE partitioners because, in the past, the specification did not provide any mean to invoke services in business objects. Therefore, the anemic pattern uses so called “managers” that maintain references to other “managers”. A direct benefit is the clear separation of concerns between the different kind of objects. Basically, it splits processing and data. As this is anti-object oriented, the abstract design of such system is often very different from the actual implementation.</summary></entry></feed>
+[5] Alister Scott. Introducing the software testing ice-cream cone (anti-pattern). http://watirmelon.com/2012/01/31/introducing-the-software-testing-ice-cream-cone/&lt;/p&gt;</content><author><name></name></author><summary type="html">Introduction</summary></entry></feed>
