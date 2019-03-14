@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://hostettler.net/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hostettler.net/" rel="alternate" type="text/html" /><updated>2019-03-14T15:51:53+01:00</updated><id>http://hostettler.net/feed.xml</id><title type="html">Steve Hostettler</title><subtitle>Steve Hostettler's personal blog about automatic testing, Java, Java EE, and Architecture.</subtitle><entry><title type="html">Microservice Architecture - Part 3 (Diving into microservices)</title><link href="http://hostettler.net/2019/03/04/microservice-architecture-part-3.html" rel="alternate" type="text/html" title="Microservice Architecture - Part 3 (Diving into microservices)" /><published>2019-03-04T22:51:20+01:00</published><updated>2019-03-04T22:51:20+01:00</updated><id>http://hostettler.net/2019/03/04/microservice-architecture-part-3</id><content type="html" xml:base="http://hostettler.net/2019/03/04/microservice-architecture-part-3.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://hostettler.net/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hostettler.net/" rel="alternate" type="text/html" /><updated>2019-03-14T15:57:49+01:00</updated><id>http://hostettler.net/feed.xml</id><title type="html">Steve Hostettler</title><subtitle>Steve Hostettler's personal blog about automatic testing, Java, Java EE, and Architecture.</subtitle><entry><title type="html">Microservice Architecture - Part 3 (Diving into microservices)</title><link href="http://hostettler.net/2019/03/04/microservice-architecture-part-3.html" rel="alternate" type="text/html" title="Microservice Architecture - Part 3 (Diving into microservices)" /><published>2019-03-04T22:51:20+01:00</published><updated>2019-03-04T22:51:20+01:00</updated><id>http://hostettler.net/2019/03/04/microservice-architecture-part-3</id><content type="html" xml:base="http://hostettler.net/2019/03/04/microservice-architecture-part-3.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;In this chapter, we will dive into the concept of microservices. First, we will discuss why the community came with yet another architecture paradigm. Secondly, we will 
 look at some definitions and the main properties of such an architecture. Then, we will detail some of the technologies microservice architecture leverage to deliver maximum value. 
 After that, we will analyse the pros and cons of this architecture.
@@ -363,20 +363,6 @@ By its very nature, microservice architecture are distributed and that comes wit
 One of these constraint is that all the non-functional features such as security, logging, testability and so on, have to take distribution into account.&lt;/p&gt;
 
 &lt;h2 id=&quot;getting-the-backend-components-to-run&quot;&gt;Getting the backend components to run&lt;/h2&gt;
-
-&lt;p&gt;If you wish to generate new certificates, you must regenerate the docker image &lt;code class=&quot;highlighter-rouge&quot;&gt;unige/web-sso&lt;/code&gt; . To do so, run the appropriate maven command:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;mvn clean &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-Ppackage-docker-image&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;figure class=&quot;console-output&quot;&gt;&lt;pre&gt;
-...
-[INFO] ------------------------------------------------------------------------
-[INFO] BUILD SUCCESS
-[INFO] ------------------------------------------------------------------------
-[INFO] Total time:  07:22 min
-[INFO] Finished at: 2019-03-06T21:18:13+01:00
-[INFO] --------------------------------------------------------------------
-&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;Now, let’s compile the UI&lt;/p&gt;
 
