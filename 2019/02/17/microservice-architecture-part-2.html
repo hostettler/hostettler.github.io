@@ -45,39 +45,11 @@
   </header>
 
   <div class="post-content e-content" itemprop="articleBody">
-    <p>In <a href="http://www.hostettler.net/2019/02/17/microservice-architecture-part-1.html">part 1</a>, we discussed how to compile and deploy the microservices. Remember that the microservices themselves are only a part of the microservice architecture. 
+    <p>In <a href="https://www.hostettler.net/2019/02/17/microservice-architecture-part-1.html">part 1</a>, we discussed how to compile and deploy the microservices. Remember that the microservices themselves are only a part of the microservice architecture. 
 By its very nature, microservice architecture are distributed and that comes with a lot of benefits and some constraints.
 One of these constraint is that all the non-functional features such as security, logging, testability and so on, have to take distribution into account.</p>
 
 <h2 id="getting-the-backend-components-to-run">Getting the backend components to run</h2>
-
-<p>We want the application to be accessible by a the following name <code class="highlighter-rouge">financial-app.com</code>. To that end we need the docker host ip address to be resolved to this hostname 
-and vice-versa. First, we must identify the docker host ip address. On windows, run the command <code class="highlighter-rouge">ipconfig</code>. On Linux, run the command <code class="highlighter-rouge">ifconfig</code>. 
-Look for an adapter called DockerNAT (or something similar).</p>
-
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>ipconfig</code></pre></figure>
-
-<figure class="console-output"><pre>
-Windows IP Configuration
-....
-Ethernet adapter vEthernet (DockerNAT) 2:
-
-   Connection-specific DNS Suffix  . :
-   Link-local IPv6 Address . . . . . : fe80::9d3f:55b9:4504:323f%19
-   IPv4 Address. . . . . . . . . . . : 192.168.240.1
-   Subnet Mask . . . . . . . . . . . : 255.255.255.0
-   Default Gateway . . . . . . . . . :
-</pre></figure>
-
-<p>So the ip-address is <code class="highlighter-rouge">192.168.240.1</code>, let’s add it to the hosts file. On Windows that file is located at <code class="highlighter-rouge">C:\Windows\System32\drivers\etc</code> and on Linux at <code class="highlighter-rouge">/etc/hosts</code></p>
-
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cat </span>C:<span class="se">\W</span>indows<span class="se">\S</span>ystem32<span class="se">\d</span>rivers<span class="se">\e</span>tc</code></pre></figure>
-
-<figure class="console-output"><pre>
-192.168.240.1 host.docker.internal
-192.168.240.1 gateway.docker.internal
-192.168.240.1 financial-app.com
-</pre></figure>
 
 <p>If you wish to generate new certificates, you must regenerate the docker image <code class="highlighter-rouge">unige/web-sso</code> . To do so, run the appropriate maven command:</p>
 
@@ -168,22 +140,22 @@ api-gateway         | 2019/03/12 20:02:36 [notice] 41#0: *139 [lua] init.lua:393
 api-gateway         | Key (cache_key)=(plugins:oidc::::) already exists., client: 192.168.128.15, server: kong_admin, request: "POST /plugins HTTP/1.1", host: "api-gateway:8001"               
 </pre></figure>
 
-<p>If everything goes according to plan, you know have a working application ecosystem at <code class="highlighter-rouge">https://financial-app.com</code> 
-Point your browser to <code class="highlighter-rouge">https://financial-app.com</code> and you’ll get an nice UI.</p>
+<p>If everything goes according to plan, you know have a working application ecosystem at <code class="highlighter-rouge">https://localhost</code> 
+Point your browser to <code class="highlighter-rouge">https://localhost</code> and you’ll get an nice UI.</p>
 <figure class="image"><pre>
   <img src="/figures/ui.png" alt="Angular 7.0 UI to the financial-app" />
   <figcaption>Angular 7.0 UI to the financial-app</figcaption>
 </pre>
 </figure>
 
-<p>Point it to the counterparty microservice at <code class="highlighter-rouge">https://financial-app.com/api/v1/counterparty</code>, the API-gateway will detect that you are not authenticated and will redirect you
+<p>Point it to the counterparty microservice at <code class="highlighter-rouge">https://localhost/api/v1/counterparty</code>, the API-gateway will detect that you are not authenticated and will redirect you
 to the SSO platform to be asked for credentials. Enter <code class="highlighter-rouge">user1/user1</code></p>
 <figure class="image"><pre>
   <img src="/figures/login.png" alt="Keycloack SSO login form" />
   <figcaption>Keycloack SSO login form</figcaption>
 </pre>
 </figure>
-<p>Once authenticated you get redirected to the orginal URL you requested (<code class="highlighter-rouge">https://financial-app.com/api/v1/counterparty</code>)</p>
+<p>Once authenticated you get redirected to the orginal URL you requested (<code class="highlighter-rouge">https://localhost/api/v1/counterparty</code>)</p>
 <figure class="image"><pre>
   <img src="/figures/counterparty-service.png" alt="JSON result of the counterparty  microservice that returns all counterparties." />
   <figcaption>JSON result of the counterparty  microservice that returns all counterparties.</figcaption>
