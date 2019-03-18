@@ -35,17 +35,14 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <h2 class="post_title">
+  Multi-Tenancy with EJB 3.1 and JPA 2.0
+  
+    <small>20 Nov 2012</small>
+  
+</h2>
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Multi-Tenancy with EJB 3.1 and JPA 2.0</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2012-11-20T05:18:00+01:00" itemprop="datePublished">Nov 20, 2012
-      </time></p>
-  </header>
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>Multi-tenancy is a recurrent non functional requirement. Indeed, many important IT-systems are meant to be shared among multiple tenants. The data are often distributed over several databases or schemas. This, for different reasons:</p>
+<p>Multi-tenancy is a recurrent non functional requirement. Indeed, many important IT-systems are meant to be shared among multiple tenants. The data are often distributed over several databases or schemas. This, for different reasons:</p>
 
 <ul>
   <li>Security: The data belong to different customers and some level of isolation is required;</li>
@@ -241,9 +238,29 @@ Furthermore, because the <code class="highlighter-rouge">EntityManager</code>is 
 <p>In this post, I showed how to leverage EJB 3.1 and JPA 2.0 standard features to provide multi-tenancy. The presented approach is thead-safe, it preserves transactionaly and does not induce 
 a significant overhead.</p>
 
-  </div><a class="u-url" href="/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html" hidden></a>
-</article>
 
+<script id="dsq-count-scr" src="//www-hostettler-net.disqus.com/count.js" async></script>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://www-hostettler-net.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>

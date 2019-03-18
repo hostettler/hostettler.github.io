@@ -35,17 +35,14 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <h2 class="post_title">
+  About Sessions, Conversations, and the Garbage Collector
+  
+    <small>10 Jun 2012</small>
+  
+</h2>
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">About Sessions, Conversations, and the Garbage Collector</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2012-06-10T18:51:00+02:00" itemprop="datePublished">Jun 10, 2012
-      </time></p>
-  </header>
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>A couple of days ago, I had a discussion with a developer about the notion of web conversation.
+<p>A couple of days ago, I had a discussion with a developer about the notion of web conversation.
 More precisely, about its utility. During this discussion, we ran into some basic misconceptions
 that, IMHO, no web developer must do. Conversation (or flows) are good features of the recent
 frameworks (Spring, JSF) because they allow to save information across several user requests without
@@ -95,9 +92,29 @@ As most of the users do not click on logout, you rely on the timeout to free the
 from managing the garbage collection. The code is therefore cleaner and more efficient.
 This can be done with JSF’s <code class="highlighter-rouge">@ConversationScoped</code> or with Spring Webflow’s <code class="highlighter-rouge">Conversation</code>.</p>
 
-  </div><a class="u-url" href="/java%20ee%206/jee6/java/session/conversation/garbage%20collector/2012/06/10/Sessions-GC-Conversations.html" hidden></a>
-</article>
 
+<script id="dsq-count-scr" src="//www-hostettler-net.disqus.com/count.js" async></script>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://www-hostettler-net.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>

@@ -35,17 +35,14 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <h2 class="post_title">
+  One to One relations in JPA 2.0
+  
+    <small>22 Mar 2012</small>
+  
+</h2>
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">One to One relations in JPA 2.0</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2012-03-22T10:41:00+01:00" itemprop="datePublished">Mar 22, 2012
-      </time></p>
-  </header>
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>Recently I came across the need to map a one 2 one relationship from the object model to the database using JPA 2.0.
+<p>Recently I came across the need to map a one 2 one relationship from the object model to the database using JPA 2.0.
 The case was pretty simple as the database was nicely organized but it raised the question: what if? What if I have to deal to a legacy system or a database administrator that has to follow strict company rules. Other reasons such as security or performances may interfere with simple designs. Hence, I had a look to the diverse ways to map a one 2 one relationship. I probably forgot several cases so please do not hesitate to discuss them in the comments.</p>
 
 <p>A one to one relationship consider that the objects involved in the relation are highly dependent. In Object Orientation, this corresponds to the an aggregation or a composition. In a relational model, the data can be either:</p>
@@ -250,9 +247,29 @@ Again, the data are joined according to the content of the <code class="highligh
 <h2 id="conclusion">Conclusion</h2>
 <p>JPA 2.0 offers many way to represent one to one relationships. This flexibility allows to handle many different scenarios that may happen when integrating legacy databases. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
 
-  </div><a class="u-url" href="/jpa%202.0/java%20ee%206/jee6/java/or%20mapping/java%20se/2012/03/22/one-to-one-relations-in-jpa-2-dot-0.html" hidden></a>
-</article>
 
+<script id="dsq-count-scr" src="//www-hostettler-net.disqus.com/count.js" async></script>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://www-hostettler-net.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>

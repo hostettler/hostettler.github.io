@@ -35,17 +35,14 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <h2 class="post_title">
+  Context Dependency Injection and the Rich Object Model
+  
+    <small>05 Dec 2012</small>
+  
+</h2>
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Context Dependency Injection and the Rich Object Model</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2012-12-05T06:59:00+01:00" itemprop="datePublished">Dec 5, 2012
-      </time></p>
-  </header>
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>[Rich object model] vs [anemic object model] is long running debate. While the latter encourages to use simple and stupid objects with little or no business in them, the rich object model advocates for a clean object design with inheritance, polymorphism and so on.
+<p>[Rich object model] vs [anemic object model] is long running debate. While the latter encourages to use simple and stupid objects with little or no business in them, the rich object model advocates for a clean object design with inheritance, polymorphism and so on.
 The anemic object model is very popular among JEE partitioners because, in the past, the specification did not provide any mean to invoke services in business objects. Therefore, the anemic pattern uses so called “managers” that maintain references to other “managers”. A direct benefit is the clear separation of concerns between the different kind of objects. Basically, it splits processing and data. As this is anti-object oriented, the abstract design of such system is often very different from the actual implementation.</p>
 
 <h2 id="the-portfolio-example">The portfolio example</h2>
@@ -134,9 +131,29 @@ For instance, putting to much intelligence in JPA entities that can be detached 
 <p>In this post, I showed a solution to consume services that are exposed via the CDI BeanManager. These services can be pure POJOs or EJBs.
 Nevertheless, this approach must be used with great care as it can blur the components boundaries and responsabilities.</p>
 
-  </div><a class="u-url" href="/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/12/05/servicelocator.html" hidden></a>
-</article>
 
+<script id="dsq-count-scr" src="//www-hostettler-net.disqus.com/count.js" async></script>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://www-hostettler-net.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>

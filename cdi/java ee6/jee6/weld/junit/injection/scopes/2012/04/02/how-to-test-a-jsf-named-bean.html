@@ -35,17 +35,14 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <h2 class="post_title">
+  How to simulate CDI scopes and injection in Java SE.
+  
+    <small>02 Apr 2012</small>
+  
+</h2>
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">How to simulate CDI scopes and injection in Java SE.</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2012-04-02T21:37:00+02:00" itemprop="datePublished">Apr 2, 2012
-      </time></p>
-  </header>
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>Unit testing managed beans is difficult outside of a container. Managed beans heavily rely on the notions of scopes and injection that do not exist outside of a container. In JEE6, both are handled by CDI (Context Dependency Injection). 
+<p>Unit testing managed beans is difficult outside of a container. Managed beans heavily rely on the notions of scopes and injection that do not exist outside of a container. In JEE6, both are handled by CDI (Context Dependency Injection). 
 <a href="http://www.jboss.org/arquillian.html">Arquillian</a> is a powerful solution to this problem. Nevertheless, sometimes for technical or even for political reasons, it is not possible to add a new component to the existing stack.
 While searching for alternatives, I came across several interesting articles (<a href="http://www.jtips.info/index.php?title=WeldSE/Scopes">here</a>, <a href="http://objectopia.com/2011/05/29/weld-junit-4-runner/">here</a> and <a href="http://danhaywood.com/2010/08/12/simulating-cdis-session-and-request-scope-in-a-j2se-app/">here</a>) that explain how to simulate such features in unit tests.</p>
 
@@ -179,9 +176,29 @@ mock implementations. In this case, we enable the alternative <code class="highl
 <p>Testing the JEE6 outside of the container is easier and easier. Long gone are the days of the EJB 2.1 untestability.
 Nevertheless, not everything is simple and we still have to do some tricks to get it working.</p>
 
-  </div><a class="u-url" href="/cdi/java%20ee6/jee6/weld/junit/injection/scopes/2012/04/02/how-to-test-a-jsf-named-bean.html" hidden></a>
-</article>
 
+<script id="dsq-count-scr" src="//www-hostettler-net.disqus.com/count.js" async></script>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://www-hostettler-net.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>

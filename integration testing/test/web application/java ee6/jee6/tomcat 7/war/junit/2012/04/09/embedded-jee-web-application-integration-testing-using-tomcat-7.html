@@ -35,17 +35,14 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <h2 class="post_title">
+  Embedded Web Application integration testing using Tomcat 7 and JUnit
+  
+    <small>09 Apr 2012</small>
+  
+</h2>
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Embedded Web Application integration testing using Tomcat 7 and JUnit</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2012-04-09T14:39:00+02:00" itemprop="datePublished">Apr 9, 2012
-      </time></p>
-  </header>
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>To follow up on my previous post about <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">how to programmatically build a web archive</a>, I propose to look at how to deploy this archive in a Tomcat instance that is embedded into a JUnit test.</p>
+<p>To follow up on my previous post about <a href="/blog/2012/04/05/programmatically-build-web-archives-using-shrinkwrap/">how to programmatically build a web archive</a>, I propose to look at how to deploy this archive in a Tomcat instance that is embedded into a JUnit test.</p>
 
 <p>As usual, the presented snippets are available in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> application. I will first look at the dependencies, then I will show how to configure Tomcat and finally how to start and stop the embedded instance.</p>
 
@@ -165,9 +162,29 @@ for each and every test case. This way, a failed test does not have repercussion
 <p>In this post, we have seen how to start an embedded version of Tomcat into a JUnit fixture. 
 The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
 
-  </div><a class="u-url" href="/integration%20testing/test/web%20application/java%20ee6/jee6/tomcat%207/war/junit/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7.html" hidden></a>
-</article>
 
+<script id="dsq-count-scr" src="//www-hostettler-net.disqus.com/count.js" async></script>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://www-hostettler-net.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>

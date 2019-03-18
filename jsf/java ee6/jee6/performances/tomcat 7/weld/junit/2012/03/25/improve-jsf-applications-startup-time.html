@@ -35,17 +35,14 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <h2 class="post_title">
+  On JEE 6 webapps startup time
+  
+    <small>25 Mar 2012</small>
+  
+</h2>
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">On JEE 6 webapps startup time</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2012-03-25T23:20:00+02:00" itemprop="datePublished">Mar 25, 2012
-      </time></p>
-  </header>
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>While working on Tomcat 7 embedded to automate my integration tests, I realized that my integration tests wasted much of the time in starting/stopping the server. Even if I do not start the integration tests as often as the unit tests, it becomes rapidly irritating. Furthermore, during development I tend to restart the server a couple of times per hour, especially at the beginning of the project. Sure hot deployment helps, but it is not always enough.</p>
+<p>While working on Tomcat 7 embedded to automate my integration tests, I realized that my integration tests wasted much of the time in starting/stopping the server. Even if I do not start the integration tests as often as the unit tests, it becomes rapidly irritating. Furthermore, during development I tend to restart the server a couple of times per hour, especially at the beginning of the project. Sure hot deployment helps, but it is not always enough.</p>
 
 <p>On my Mac Book Pro, a cold start took around 10s. Interestingly enough,  an empty Tomcat startups in less than a second. The problem comes from the fact that Tomcat 7 scans the classpath to find out annotations that declare Servlets using the <code class="highlighter-rouge">@WebServlet</code>. This, even if you do not use that feature. Don’t get me wrong, not having to configure XML is cool but I am not ready to pay such a high price for it. Especially as the only servlet I use, is the JSF one.</p>
 
@@ -116,9 +113,29 @@ As I use Weld and its <code class="highlighter-rouge">@Named</code>, <code class
 
 <p>To conclude, using these minor modifications I divided the startup time by three. This is very useful during development and integration tests when the server is started and stopped many times.</p>
 
-  </div><a class="u-url" href="/jsf/java%20ee6/jee6/performances/tomcat%207/weld/junit/2012/03/25/improve-jsf-applications-startup-time.html" hidden></a>
-</article>
 
+<script id="dsq-count-scr" src="//www-hostettler-net.disqus.com/count.js" async></script>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://www-hostettler-net.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>

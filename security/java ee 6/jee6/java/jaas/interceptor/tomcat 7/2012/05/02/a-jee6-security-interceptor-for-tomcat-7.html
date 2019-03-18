@@ -35,17 +35,14 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <h2 class="post_title">
+  A JEE6 security interceptor for Tomcat 7
+  
+    <small>02 May 2012</small>
+  
+</h2>
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">A JEE6 security interceptor for Tomcat 7</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2012-05-02T18:23:00+02:00" itemprop="datePublished">May 2, 2012
-      </time></p>
-  </header>
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>Security in Java EE is a well-known subject and JAAS, the framework that manages security, is
+<p>Security in Java EE is a well-known subject and JAAS, the framework that manages security, is
 stable and reliable. Nevertheless, its API is quite low level and not always very convenient. For
 that reason, there exist a number of frameworks that have been built on top of JAAS that provide
 nice abstractions and convenient tools. This is especially true for the JEE application servers such as <a href="http://glassfish.java.net/">Glassfish</a>, <a href="http://www.jboss.org/">JBoss</a> and the like.</p>
@@ -330,9 +327,29 @@ request) it has been set to an invalid principal.</p>
 <p>##Conclusion
 In this post, we have seen how to write a JEE6 interceptor to authorise access to service level methods in servlet containers. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
 
-  </div><a class="u-url" href="/security/java%20ee%206/jee6/java/jaas/interceptor/tomcat%207/2012/05/02/a-jee6-security-interceptor-for-tomcat-7.html" hidden></a>
-</article>
 
+<script id="dsq-count-scr" src="//www-hostettler-net.disqus.com/count.js" async></script>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://www-hostettler-net.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>

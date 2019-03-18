@@ -35,17 +35,14 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <h2 class="post_title">
+  Programmatically build web archives using ShrinkWrap
+  
+    <small>05 Apr 2012</small>
+  
+</h2>
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Programmatically build web archives using ShrinkWrap</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2012-04-05T09:09:00+02:00" itemprop="datePublished">Apr 5, 2012
-      </time></p>
-  </header>
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>While doing integration tests on web applications, it is important to restrict the application to the strict minimum necessary for any given test. It helps to improve the startup time as well as to reduce unexpected interactions.
+<p>While doing integration tests on web applications, it is important to restrict the application to the strict minimum necessary for any given test. It helps to improve the startup time as well as to reduce unexpected interactions.
 To that end, I use <a href="http://www.jboss.org/shrinkwrap">ShrinkWrap</a> from <a href="http://www.jboss.org/">JBoss</a> that is a very nice a simple API to build Java archives (e.g., JAR WAR, EAR). This post describes how to programmatically build a WAR file that can be deployed on an embedded server for integration
 testing. For more details on how to use this web archive in JUnit fixtures please refer to this <a href="/blog/2012/04/09/embedded-jee-web-application-integration-testing-using-tomcat-7/">article</a>. The following snippet gets the ShrinkWrap package from the JBoss repository. As I only use it for test purposes, I restricted its use to the test scope.</p>
 
@@ -137,9 +134,29 @@ a existing archive can be overwritten.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>We have seen how to use ShrinkWrap to programmatically build Web archives. This is especially useful to test smaller version of your web application during integration testing. It helps to test webapps with mock services and to improve the startup time. The examples used in this blog are to be found in the <a href="http://code.google.com/p/jee6-demo/">JEE-6-Demo</a> project on <a href="http://code.google.com">Google code hosting</a>.</p>
 
-  </div><a class="u-url" href="/shrinkwrap/java%20ee6/jee6/tomcat%207/war/2012/04/05/programmatically-build-web-archives-using-shrinkwrap.html" hidden></a>
-</article>
 
+<script id="dsq-count-scr" src="//www-hostettler-net.disqus.com/count.js" async></script>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://www-hostettler-net.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>

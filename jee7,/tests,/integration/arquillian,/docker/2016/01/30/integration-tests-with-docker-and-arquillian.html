@@ -35,17 +35,14 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <h2 class="post_title">
+  Integration Tests with Docker And Arquillian
+  
+    <small>30 Jan 2016</small>
+  
+</h2>
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Integration Tests with Docker And Arquillian</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2016-01-30T23:38:50+01:00" itemprop="datePublished">Jan 30, 2016
-      </time></p>
-  </header>
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>Last month I decided to add a touch of <a href="http://martinfowler.com/articles/microservices.html">microservices</a> to the JEE course I teach at the University of Geneva.
+<p>Last month I decided to add a touch of <a href="http://martinfowler.com/articles/microservices.html">microservices</a> to the JEE course I teach at the University of Geneva.
 I ended up with a couple of microservices and as expected I came across the challenge of their integration testing.
 This post is <strong>NOT</strong> specifically about microservices. It rathers focuses on the JEE integration testing experience I encountered while building the microservices. A dedicated blog post will follow on my journey through the building of microservices with JEE.</p>
 
@@ -241,9 +238,29 @@ The following test is composend of a package contaning the EJB under test (<code
 <h2 id="conclusion">Conclusion</h2>
 <p>Docker and Arquillian provide a nice and seamless way for JEE integration testing. Nevertheless, I had a hard time at the beginning because Arquillian error handling in case of undeployable test archive is not very good. In this case, make sure that you package your test correctly (in the method annotated <code class="highlighter-rouge">@Deployment</code>). In particular, double check <code class="highlighter-rouge">beans.xml</code>, <code class="highlighter-rouge">web.xml</code> and the JAR/WAR structure. It really helped me to unzip the deployed test archive to figure out what when wrong in my code.</p>
 
-  </div><a class="u-url" href="/jee7,/tests,/integration/arquillian,/docker/2016/01/30/integration-tests-with-docker-and-arquillian.html" hidden></a>
-</article>
 
+<script id="dsq-count-scr" src="//www-hostettler-net.disqus.com/count.js" async></script>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://www-hostettler-net.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>

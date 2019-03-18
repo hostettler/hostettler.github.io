@@ -35,17 +35,14 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <h2 class="post_title">
+  Communication between Java Enterprise Applications
+  
+    <small>26 Dec 2014</small>
+  
+</h2>
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Communication between Java Enterprise Applications</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2014-12-26T22:51:48+01:00" itemprop="datePublished">Dec 26, 2014
-      </time></p>
-  </header>
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>Recently I came across the following problem : How to propagate information from one enterprise application to another in a transparent manner? Transparent meaning without changing the API, that is without adding transversal information to the services’ parameters. The typical use case is to propagate information such as the language, applicative security roles information (not the JAAS role), or the session-id. Moreover, I would like the information to be “request scoped” and to be automatically cleaned up at the end of the request. This is important to avoid memory leak and to enforce isolation for security reasons. Let me add that I currently work with JEE6 on WebSphere 8.5.5.</p>
+<p>Recently I came across the following problem : How to propagate information from one enterprise application to another in a transparent manner? Transparent meaning without changing the API, that is without adding transversal information to the services’ parameters. The typical use case is to propagate information such as the language, applicative security roles information (not the JAAS role), or the session-id. Moreover, I would like the information to be “request scoped” and to be automatically cleaned up at the end of the request. This is important to avoid memory leak and to enforce isolation for security reasons. Let me add that I currently work with JEE6 on WebSphere 8.5.5.</p>
 
 <p>I did some research among blogs and forums and I found the following solutions:</p>
 
@@ -110,9 +107,29 @@
 
 <p>[3] IBM. Work area partition service. http://www-01.ibm.com/support/knowledgecenter/SSEQTJ_8.0.0/com.ibm.websphere.nd.multiplatform.doc/info/ae/workarea/concepts/cwa_partition.html</p>
 
-  </div><a class="u-url" href="/ears/jee/rmi/2014/12/26/communication-between-java-enterprise-applications.html" hidden></a>
-</article>
 
+<script id="dsq-count-scr" src="//www-hostettler-net.disqus.com/count.js" async></script>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://www-hostettler-net.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>

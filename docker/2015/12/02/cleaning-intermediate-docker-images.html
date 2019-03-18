@@ -35,17 +35,14 @@
 </header>
 <main class="page-content" aria-label="Content">
       <div class="wrapper">
-        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+        <h2 class="post_title">
+  Cleaning Intermediate Docker Images
+  
+    <small>02 Dec 2015</small>
+  
+</h2>
 
-  <header class="post-header">
-    <h1 class="post-title p-name" itemprop="name headline">Cleaning Intermediate Docker Images</h1>
-    <p class="post-meta">
-      <time class="dt-published" datetime="2015-12-02T01:56:34+01:00" itemprop="datePublished">Dec 2, 2015
-      </time></p>
-  </header>
-
-  <div class="post-content e-content" itemprop="articleBody">
-    <p>I recently started to use Docker. It is a great tool that significantly increases developer’s productivity. However, I regularly encounter disk space problems when developing new images. Indeed, I sometimes end up with dangling images and containers. Hereafter, a simple script that cleans up most of them.</p>
+<p>I recently started to use Docker. It is a great tool that significantly increases developer’s productivity. However, I regularly encounter disk space problems when developing new images. Indeed, I sometimes end up with dangling images and containers. Hereafter, a simple script that cleans up most of them.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
 docker rmi <span class="nt">-f</span> <span class="sb">`</span>docker images | <span class="nb">grep</span> <span class="s2">"^&lt;none&gt;"</span> | <span class="nb">cut</span> <span class="nt">-c41-52</span><span class="sb">`</span>
@@ -53,9 +50,29 @@ docker rmi <span class="k">$(</span>docker images <span class="nt">-q</span> <sp
 docker <span class="nb">rm</span> <span class="nt">-v</span> <span class="k">$(</span><span class="nb">echo</span> <span class="k">$(</span>docker ps <span class="nt">-q</span> <span class="nt">--no-trunc</span><span class="k">)</span> <span class="k">$(</span>docker ps <span class="nt">-a</span> <span class="nt">-q</span> <span class="nt">--no-trunc</span><span class="k">)</span> | <span class="nb">sed</span> <span class="s1">'s|\s|\n|g'</span>  | <span class="nb">sort</span> | <span class="nb">uniq</span> <span class="nt">-u</span><span class="k">)</span>
 </code></pre></div></div>
 
-  </div><a class="u-url" href="/docker/2015/12/02/cleaning-intermediate-docker-images.html" hidden></a>
-</article>
 
+<script id="dsq-count-scr" src="//www-hostettler-net.disqus.com/count.js" async></script>
+
+<div id="disqus_thread"></div>
+<script>
+
+/**
+*  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+*  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+s.src = 'https://www-hostettler-net.disqus.com/embed.js';
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
       </div>
     </main><footer class="site-footer h-card">
   <data class="u-url" href="/"></data>
