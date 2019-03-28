@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://hostettler.net/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hostettler.net/" rel="alternate" type="text/html" /><updated>2019-03-28T10:57:44+01:00</updated><id>http://hostettler.net/feed.xml</id><title type="html">Steve Hostettler</title><subtitle>Steve Hostettler's personal blog about automatic testing, Java, Java EE, and Architecture.</subtitle><entry><title type="html">Microservice Architecture - Part 3 (Diving into microservices)</title><link href="http://hostettler.net/2019/03/04/microservice-architecture-part-3.html" rel="alternate" type="text/html" title="Microservice Architecture - Part 3 (Diving into microservices)" /><published>2019-03-04T22:51:20+01:00</published><updated>2019-03-04T22:51:20+01:00</updated><id>http://hostettler.net/2019/03/04/microservice-architecture-part-3</id><content type="html" xml:base="http://hostettler.net/2019/03/04/microservice-architecture-part-3.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.5">Jekyll</generator><link href="http://hostettler.net/feed.xml" rel="self" type="application/atom+xml" /><link href="http://hostettler.net/" rel="alternate" type="text/html" /><updated>2019-03-28T11:26:01+01:00</updated><id>http://hostettler.net/feed.xml</id><title type="html">Steve Hostettler</title><subtitle>Steve Hostettler's personal blog about automatic testing, Java, Java EE, and Architecture.</subtitle><entry><title type="html">Microservice Architecture - Part 3 (Diving into microservices)</title><link href="http://hostettler.net/2019/03/04/microservice-architecture-part-3.html" rel="alternate" type="text/html" title="Microservice Architecture - Part 3 (Diving into microservices)" /><published>2019-03-04T22:51:20+01:00</published><updated>2019-03-04T22:51:20+01:00</updated><id>http://hostettler.net/2019/03/04/microservice-architecture-part-3</id><content type="html" xml:base="http://hostettler.net/2019/03/04/microservice-architecture-part-3.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;In &lt;a href=&quot;https://www.hostettler.net/2019/02/17/microservice-architecture-part-1.html&quot;&gt;Part 1&lt;/a&gt;, we configured, compiled, and deployed microservices. In &lt;a href=&quot;https://www.hostettler.net/2019/02/17/microservice-architecture-part-2.html&quot;&gt;Part 2&lt;/a&gt;, we configured and deployed non-functional services such
 as security, and logging.
 In this chapter, we will dive into the concept of microservices. First, we will discuss why the community came with yet another architecture paradigm. Secondly, we will 
@@ -33,7 +33,7 @@ need the same type of scalability or no scalability at all.&lt;/p&gt;
   &lt;li&gt;scalability happens at the monolith level&lt;/li&gt;
 &lt;/ul&gt;
 &lt;figure class=&quot;image&quot;&gt;&lt;pre&gt;
-  &lt;img src=&quot;/figures/monolith.png&quot; alt=&quot;Monolith architecture&quot; /&gt;
+  &lt;img src=&quot;/figures/Monolith.png&quot; alt=&quot;Monolith architecture&quot; /&gt;
   &lt;figcaption&gt;Monolith architecture&lt;/figcaption&gt;
 &lt;/pre&gt;
 &lt;/figure&gt;
@@ -69,7 +69,7 @@ A key point to understand is that microservices have not been invented in isolat
 &lt;p&gt;The term microservice has been coined around 2012 [2][3]. People trace it back to a workshop in Venice in 2011 but I was not able to find the proceedings.&lt;/p&gt;
 
 &lt;figure class=&quot;image&quot;&gt;&lt;pre&gt;
-  &lt;img src=&quot;/figures/microservices.png&quot; alt=&quot;Microservice architecture&quot; /&gt;
+  &lt;img src=&quot;/figures/microservices.PNG&quot; alt=&quot;Microservice architecture&quot; /&gt;
   &lt;figcaption&gt;Microservice architecture&lt;/figcaption&gt;
 &lt;/pre&gt;
 &lt;/figure&gt;
