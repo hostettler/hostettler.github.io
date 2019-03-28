@@ -15,7 +15,7 @@
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2019-02-17T22:51:20+01:00" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","headline":"Microservice Architecture - Part 1 (A running microservice architecture)","dateModified":"2019-02-17T22:51:20+01:00","url":"http://hostettler.net/2019/02/17/microservice-architecture-part-1.html","datePublished":"2019-02-17T22:51:20+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/2019/02/17/microservice-architecture-part-1.html"},"description":"Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers and container composition. All samples and a complete working application can be found here on GitHub","@context":"http://schema.org"}</script>
+{"@type":"BlogPosting","datePublished":"2019-02-17T22:51:20+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/2019/02/17/microservice-architecture-part-1.html"},"url":"http://hostettler.net/2019/02/17/microservice-architecture-part-1.html","description":"Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers and container composition. All samples and a complete working application can be found here on GitHub","headline":"Microservice Architecture - Part 1 (A running microservice architecture)","dateModified":"2019-02-17T22:51:20+01:00","@context":"http://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
 <body><header class="site-header" role="banner">
@@ -49,12 +49,12 @@ factories and innovative deployment options such as containers and container com
 
 <p>The following diagram represents the end-state of our microservice architecture. From a business perspective, it delivers <a href="https://en.wikipedia.org/wiki/Regulatory_technology">RegTech</a> services. 
 More specifically, it manages counterparties and financial instruments. It valuates a portfolio and finally provides some regulatory reporting.
-You do not need a deep financial knowledge, sufficient is to say that:</p>
+You do not need deep financial knowledge, sufficient is to say that:</p>
 <ul>
   <li>A counterparty is an individual or a company participating in a financial transaction. For more <a href="https://www.investopedia.com/terms/c/counterparty.asp">details</a>.</li>
-  <li>A financial instrument  is an asset that can be traded such as stocks, loans, and so on. For more <a href="https://www.investopedia.com/terms/f/financialinstrument.asp">details</a>.</li>
+  <li>A financial instrument  is an asset that can be traded such as stocks, loans, and the likes. For more <a href="https://www.investopedia.com/terms/f/financialinstrument.asp">details</a>.</li>
   <li>Portfolio valuation is the action of evaluating the net value of a set of assets. For more <a href="https://www.investopedia.com/terms/a/assetvaluation.asp">details</a>.</li>
-  <li>Financial institutions must comply to a set of regulations such as delivering monthly report to state their financial health.</li>
+  <li>Financial institutions must comply to a set of regulations such as delivering monthly reports to state their financial health.</li>
 </ul>
 
 <figure class="image"><pre>
@@ -66,11 +66,11 @@ You do not need a deep financial knowledge, sufficient is to say that:</p>
 <p>Besides, these “business” services, the architecture delivers a set of non-functional services such as:</p>
 <ul>
   <li>A Central logging mechanism to deal with the distributed nature of the architecture. It relies on a <a href="https://github.com/gliderlabs/logspout">Logspout</a> companion container that sends the logs from all the containers to a concentrator called <a href="https://www.elastic.co">Logstash</a> that in turn 
-sends them to a database optimized for searching called <a href="https://www.elastic.co">ElasticSearch</a>. Finally, <a href="https://www.elastic.co">Kibana</a> provides vizualization and analysis of the logs.</li>
+sends them to a database optimized for searching called <a href="https://www.elastic.co">ElasticSearch</a>. Finally, <a href="https://www.elastic.co">Kibana</a> provides visualization and analysis of the logs.</li>
   <li>A Message broker to increase service decoupling and scalability. <a href="https://kafka.apache.org/">Kafka</a> in this case.</li>
-  <li>An API-Gateway that provides routing, load-balancing and SSO to the micro-services by integrating an indentity manager called <a href="https://www.keycloak.org/">Keycloack</a>. Furthermore,  <a href="https://konghq.com/kong/">Kong</a> delivers API-Gateway services (e.g., security, API composition and aggregation)
-The API-Gateway also shields the user from knowing the ugly details of the network topology. It also protects the backend by establishing a clear front vs back network separation. 
-Furthermore, it exposes static resources and finally, it provides TLS termination.</li>
+  <li>An API-Gateway that provides routing, load-balancing and SSO to the micro-services by integrating an identity manager called <a href="https://www.keycloak.org/">Keycloack</a>. Furthermore,  <a href="https://konghq.com/kong/">Kong</a> delivers API-Gateway services (e.g., security, API composition and aggregation)
+The API-Gateway also shields the user from knowing the ugly details of the network topology. Furthermore, it protects the backend by establishing a clear front vs back network separation,
+ it exposes static resources and finally, it provides TLS termination.</li>
 </ul>
 
 <p>From a technology perspective, Microservices are implemented using JEE 8  microservice and its microprofile. More specifically, <a href="https://thorntail.io/">Thorntail</a> [3]. 
@@ -79,19 +79,19 @@ Furthermore, microservices are packaged as <a href="https://www.docker.com/">Doc
 <p>This chapter describes step by step how to compile and deploy the microservices themselves.
 <a href="https://www.hostettler.net/2019/02/17/microservice-architecture-part-2.html">Part 2</a> describes how to setup non-functional services such as SSO (Single Sign On), API concentration, and logging. Because of its
 distributed nature, in 
-a microservice architecture, non-functional infratructure is as important than the actual services.
+a microservice architecture, the non-functional infrastructure is as important than the actual services.
 <a href="https://www.hostettler.net/2019/03/04/microservice-architecture-part-3.html">Part 3</a> dives deeper in what a microservice architecture actually is, its benefits and drawbacks, and some details on the related technologies.
-Part 5 focuses on the software factory, putting everything together and testing the result. 
-Then Part 6 does the autopsy of a microservice, detailling the associated design patterns.</p>
+Part 4 focuses on the software factory, putting everything together and testing the result. 
+Finally, Part 5 does the autopsy of a microservice, detailing the associated design patterns.</p>
 
 <h1 id="pre-requisites">Pre-requisites</h1>
 
 <div class="alert alert-info" role="alert"><i class="fa fa-info-circle"></i> <b>Note: </b> This series of blog post leverages a lot of different technologies. Please take the time to install everything properly. It will save time later on. </div>
 
-<p>To execute the samples you will need to install and to configure the following tools:</p>
+<p>To execute the samples, you will need to install and to configure the following tools:</p>
 <ul>
-  <li>a “reasonnably” powerfull computer with Linux (whatever recent distribution) or Windows (min. Windows 10) to support Docker. Mac is ok as well but it requires some additional steps that will not be described here.</li>
-  <li>a working Docker environnment to deploy the services locally.</li>
+  <li>a “reasonably” powerful computer with Linux (whatever recent distribution) or Windows (min. Windows 10) to support Docker. Mac is ok as well, but it requires some additional steps that will not be described here.</li>
+  <li>a working Docker environment to deploy the services locally.</li>
   <li>a <a href="https://jdk.java.net/11/">JDK 11</a> to compile and run the services</li>
   <li>a Git client for collaboration</li>
   <li><a href="https://nodejs.org/">NodeJS</a> and the <a href="https://angular.io/guide/quickstart">Angular tooling</a></li>
@@ -106,11 +106,11 @@ Then Part 6 does the autopsy of a microservice, detailling the associated design
   <li>a great deal of patience and coffee</li>
 </ul>
 
-<div class="alert alert-info" role="alert"><i class="fa fa-info-circle"></i> <b>Note: </b> We will start a lot of containers, please grant at 6GB RAM and 6GB swap to your docker-machine </div>
+<div class="alert alert-info" role="alert"><i class="fa fa-info-circle"></i> <b>Note: </b> We will start a lot of containers, please grant at least 6GB RAM and 6GB swap to your docker-machine </div>
 
 <h2 id="getting-the-backend-components-to-run">Getting the backend components to run</h2>
-<p>First thing first, let’s checkout the code and compile everything. Before you start complaining, 
-yes this section is tedious but we have to have the environment set up before diving into the wonderful world of microservices.
+<p>First things first, let’s checkout the code and compile everything. Before you start complaining, 
+yes, this section is tedious but we have to have the environment set up before diving into the wonderful world of microservices.
 Let’s start by cloning the code from <a href="https://github.com/hostettler/microservices.git">GitHub</a>.</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>git clone https://github.com/hostettler/microservices.git</code></pre></figure>
@@ -150,7 +150,7 @@ we use Apache Maven. Maven is an opiniated build tool:</p>
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Opinionated Software is a software product that believes a certain way of approaching a business process is inherently
  better and provides software crafted around that approach.
 </code></pre></div></div>
-<p>Namely, following its opinion make our life easier and requires less efforts. For more information and tutorials please refer to this <a href="https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html">Maven Tutorial</a>. The output of the build process is a set of “JAR” files (i.e., a JAVA library) that are stored in your local <code class="highlighter-rouge">~/.m2</code> repository for later use.</p>
+<p>Namely, following its opinion makes our life easier and requires less efforts. For more information and tutorials please refer to this <a href="https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html">Maven Tutorial</a>. The output of the build process is a set of “JAR” files (i.e., JAVA library) that are stored in your local <code class="highlighter-rouge">~/.m2</code> repository for later use.</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span><span class="nb">cd </span>microservices/
 <span class="nv">$ </span>mvn clean <span class="nb">install</span></code></pre></figure>
@@ -190,15 +190,15 @@ we use Apache Maven. Maven is an opiniated build tool:</p>
 
 <div class="alert alert-success" role="alert"><i class="fa fa-check-square"></i> <b>Tip: </b> Congratulations, you compiled the microservices. </div>
 
-<p>At this point, you compiled all of the Java code and you created maven artifacts for each microservice (Java Archives a.k.a. JARs). But as we will see in the next chapters, a micro-service architecture is much more than a bunch of micro-services. We will need a lot of additional 3rd party tools and services.
+<p>At this point, you have manage to compile all of the Java code and you have created maven artifacts for each microservice (Java Archives a.k.a. JARs). However,  as we continue, we will see in the next chapters that a micro-service architecture is much more than a bunch of micro-services. We will need a lot of additional 3rd party tools and services.
 These additional services (e.g., logging, security) are usually provided as container images that runs on Docker. 
-To be able to run the microservices along side this “3rd” party tools, we need to package the microservice as Docker images.</p>
+To be able to run the microservices along side these “3rd” party tools, we need to package the microservice as Docker images.</p>
 
-<p>Simply put, Docker provides lightweight virtualization. It has a smaller footprint that usual Virtual Machine approaches.
-Compared to Virtual Box, VM Ware and the others, the main difference is that the OS system layer is not replicated in each container but rather shared.</p>
+<p>Simply put, Docker provides lightweight virtualization. It has a smaller footprint compare to the usual Virtual Machine approaches (Virtual Box, VM Ware).
+The main difference is that the OS system layer is not replicated in each container but rather shared.</p>
 
 <p>Docker containers run Docker images that are merely lightweight Linux systems with additional softwares. For more about <a href="https://www.docker.com/">Docker</a>
-Let’s first check whether docker is properly installed.</p>
+Let’s first check whether Docker is properly installed.</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>docker <span class="nt">-v</span></code></pre></figure>
 
@@ -221,7 +221,20 @@ This message shows that your installation appears to be working correctly.
 ...
 </pre></figure>
 
-<p>So the docker daemon is up and running. Let’s create the docker images for the microservices. This step will reuse the
+<p>Before we continue, let’s have a look at a docker survival kit:</p>
+<ul>
+  <li><code class="highlighter-rouge">docker ps</code> displays all the running containers.</li>
+  <li><code class="highlighter-rouge">docker ps -a</code>displays all stopped container (not running but still using some resources).</li>
+</ul>
+
+<p>Based on that :</p>
+<ul>
+  <li>we can kill all running containers by running <code class="highlighter-rouge">docker kill $(docker ps -q)</code></li>
+  <li>remove all stopped containers by running <code class="highlighter-rouge">docker rm $(docker ps -a -q)</code></li>
+  <li>finally <code class="highlighter-rouge">docker system prune</code> cleans up all dangling data.</li>
+</ul>
+
+<p>So the Docker daemon is up and running. Let’s create the Docker images for the microservices. This step will reuse the
 JAR files created previously and package them along a Linux system so that every image can be run independently.</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash">mvn <span class="nb">install</span> <span class="nt">-Ppackage-docker-image</span></code></pre></figure>
@@ -244,7 +257,7 @@ INFO] ------------------------------------------------------------------------
 [INFO] ------------------------------------------------------------------------
 </pre></figure>
 
-<p>All the docker images for the microservices have been created. Let’s double check:</p>
+<p>All the Docker images for the microservices have been created. Let’s double check:</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span>docker image <span class="nb">ls</span> | <span class="nb">grep </span>unige</code></pre></figure>
 
@@ -256,9 +269,9 @@ unige/counterparty-service     latest    1789c8543673        2 minutes ago      
 unige/api-gateway              latest    b355613b0bbd        32 hours ago         371MB
 </pre></figure>
 
-<div class="alert alert-success" role="alert"><i class="fa fa-check-square"></i> <b>Tip: </b> You now have Docker images for your microservices. So at this point, we have docker images for the microservices and the api-gateway. </div>
+<div class="alert alert-success" role="alert"><i class="fa fa-check-square"></i> <b>Tip: </b> You now have Docker images for your microservices. At this point, we have Docker images for the microservices and for the api-gateway. </div>
 
-<p>Let’s start a docker container with the counterparty microservice and let’s map the port <code class="highlighter-rouge">8080</code> of the container to the port <code class="highlighter-rouge">10080</code> of the host.
+<p>Let’s start a Docker container with the counterparty microservice and map the port <code class="highlighter-rouge">8080</code> of the container to the port <code class="highlighter-rouge">10080</code> of the host.
 In principle, this will start a Linux OS and then start the microservice as the first process (PID 1). This container provides all the service, you would
 expect from any Linux system such as network, security, and isolation.</p>
 
@@ -268,7 +281,7 @@ expect from any Linux system such as network, security, and isolation.</p>
 2019-02-26 22:28:06,527 INFO  [org.jboss.as.server] (main) WFLYSRV0010: Deployed "counterparty-service-0.2.0-SNAPSHOT.war" (runtime-name : "counterparty-service-0.2.0-SNAPSHOT.war")
 2019-02-26 22:28:06,569 INFO  [org.wildfly.swarm] (main) THORN99999: Thorntail is Ready
 </pre></figure>
-<div class="alert alert-success" role="alert"><i class="fa fa-check-square"></i> <b>Tip: </b> open a browser and navigate to http://localhost:10080/counterparies It will display a long list of counterparties. </div>
+<div class="alert alert-success" role="alert"><i class="fa fa-check-square"></i> <b>Tip: </b> Open a browser and navigate to http://localhost:10080/counterparies It will display a long list of counterparties. </div>
 <p>This demonstrates that a web services is listening on port <code class="highlighter-rouge">10080</code> of <code class="highlighter-rouge">localhost</code>. More specifically, we started a container with the image of the counterparty microservice. The port <code class="highlighter-rouge">8080</code> is mapped to port <code class="highlighter-rouge">10080</code> so that we can test it.
 Furthermore, we named the container <code class="highlighter-rouge">myCounterpartyService</code>.</p>
 
@@ -280,9 +293,9 @@ Furthermore, we named the container <code class="highlighter-rouge">myCounterpar
 CONTAINER ID        IMAGE                               COMMAND                  CREATED             STATUS              PORTS                     NAMES
 dfb9acf07d79        unige/counterparty-service:latest   "/bin/sh -c 'java -D…"   42 seconds ago      Up 40 seconds       0.0.0.0:10080-&gt;8080/tcp   myCounterpartyService
 </pre></figure>
-<p>So there is one running container name <code class="highlighter-rouge">myCounterpartyService</code> that listen on port <code class="highlighter-rouge">10080</code> of <code class="highlighter-rouge">localhost</code>.</p>
+<p>As you can see,  there is one running container name <code class="highlighter-rouge">myCounterpartyService</code> that listen on port <code class="highlighter-rouge">10080</code> of <code class="highlighter-rouge">localhost</code>.</p>
 
-<p>Let’s test it by connecting to <code class="highlighter-rouge">http://localhost:10080/counterparties/724500J4K3Q60O9QLF45</code> either using a browser or the <code class="highlighter-rouge">curl</code> command line. <code class="highlighter-rouge">counterparties</code> is the context name of the service and <code class="highlighter-rouge">724500J4K3Q60O9QLF45</code>is the id of particular counterparty we want the details on.</p>
+<p>Let’s test it by connecting to <code class="highlighter-rouge">http://localhost:10080/counterparties/724500J4K3Q60O9QLF45</code> either by using a browser or the <code class="highlighter-rouge">curl</code> command line. <code class="highlighter-rouge">counterparties</code> is the context name of the service and <code class="highlighter-rouge">724500J4K3Q60O9QLF45</code>is the id of one particular counterparty we want the details on.</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash">curl <span class="nt">-X</span> GET http://localhost:10080/counterparties/724500J4K3Q60O9QLF45</code></pre></figure>
 
@@ -303,7 +316,7 @@ CONTAINER ID        IMAGE                  COMMAND          CREATED     STATUS  
 </pre></figure>
 
 <p>So far we only ran one service, to run all the microservices (plus the message broker) we will compose the images by using <code class="highlighter-rouge">docker-compose</code>.
-<code class="highlighter-rouge">docker-compose</code> is a way to script a series of complex docker configuration to provide a coherent ecosystem.</p>
+<code class="highlighter-rouge">docker-compose</code> is a way to script a series of complex Docker configuration to provide a coherent ecosystem.</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nb">cd </span>docker-compose/
 docker-compose <span class="nt">-f</span> docker-compose-microservices.yml up</code></pre></figure>
@@ -327,7 +340,7 @@ aea66ab35500        unige/instrument-service:latest   "/bin/sh -c 'java -D…"  
 f197de9c79fe        zookeeper:3.4.9                   "/docker-entrypoint.…"   33 hours ago         Up 4 minutes        2888/tcp, 0.0.0.0:2181-&gt;2181/tcp, 3888/tcp          zookeeper
 </pre></figure>
 
-<p>No we can test the microservices. Let’s check again that we can query counterparties.</p>
+<p>Now we are ready to test the microservices. Let’s check again that we can query counterparties.</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash">curl <span class="nt">-X</span> GET http://localhost:10080/counterparties/724500J4K3Q60O9QLF45</code></pre></figure>
 
@@ -345,7 +358,7 @@ f197de9c79fe        zookeeper:3.4.9                   "/docker-entrypoint.…"  
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash">curl <span class="nt">-X</span> POST http://localhost:11080/instrument/propagateAllInstruments</code></pre></figure>
 
-<p>This is then actual result of the valuation of the portfolio.</p>
+<p>This is the actual result of the valuation of the portfolio.</p>
 
 <figure class="highlight"><pre><code class="language-bash" data-lang="bash">curl <span class="nt">-X</span> GET http://localhost:12080/valuation?currency<span class="o">=</span>USD</code></pre></figure>
 
