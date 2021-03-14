@@ -2,22 +2,24 @@
 <html lang="en"><head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
 <title>Object-XML Mapping with JAXB &amp; MOXy | Steve Hostettler</title>
-<meta name="generator" content="Jekyll v3.8.5" />
+<meta name="generator" content="Jekyll v3.8.7" />
 <meta property="og:title" content="Object-XML Mapping with JAXB &amp; MOXy" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Object-Relational mapping is around for a while and its last incarnation, JPA 2.0, is easy to use yet powerful and adapted to most of the real-life situations. A problem that is similar to Object-Relational mapping (ORM) is Object-XML mapping (OXM). More precisely, it aims at mapping XML schemas to JAVA classes. JAXB (JSR 222) specifies how to maps classes to xml schemas. In this post, I demonstrate the ease of use of this approach using MOXy. MOXy is the Eclipse implementation of JAXB and I found it really easy to use." />
 <meta property="og:description" content="Object-Relational mapping is around for a while and its last incarnation, JPA 2.0, is easy to use yet powerful and adapted to most of the real-life situations. A problem that is similar to Object-Relational mapping (ORM) is Object-XML mapping (OXM). More precisely, it aims at mapping XML schemas to JAVA classes. JAXB (JSR 222) specifies how to maps classes to xml schemas. In this post, I demonstrate the ease of use of this approach using MOXy. MOXy is the Eclipse implementation of JAXB and I found it really easy to use." />
-<link rel="canonical" href="http://hostettler.net/java%20ee%206/jee6/java/xml/moxy/object%20xml%20mapping/java%20se/jaxb/2012/05/24/moxy.html" />
-<meta property="og:url" content="http://hostettler.net/java%20ee%206/jee6/java/xml/moxy/object%20xml%20mapping/java%20se/jaxb/2012/05/24/moxy.html" />
+<link rel="canonical" href="http://localhost:4000/java%20ee%206/jee6/java/xml/moxy/object%20xml%20mapping/java%20se/jaxb/2012/05/24/moxy.html" />
+<meta property="og:url" content="http://localhost:4000/java%20ee%206/jee6/java/xml/moxy/object%20xml%20mapping/java%20se/jaxb/2012/05/24/moxy.html" />
 <meta property="og:site_name" content="Steve Hostettler" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2012-05-24T19:17:00+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Object-XML Mapping with JAXB &amp; MOXy" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","datePublished":"2012-05-24T19:17:00+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/java%20ee%206/jee6/java/xml/moxy/object%20xml%20mapping/java%20se/jaxb/2012/05/24/moxy.html"},"url":"http://hostettler.net/java%20ee%206/jee6/java/xml/moxy/object%20xml%20mapping/java%20se/jaxb/2012/05/24/moxy.html","description":"Object-Relational mapping is around for a while and its last incarnation, JPA 2.0, is easy to use yet powerful and adapted to most of the real-life situations. A problem that is similar to Object-Relational mapping (ORM) is Object-XML mapping (OXM). More precisely, it aims at mapping XML schemas to JAVA classes. JAXB (JSR 222) specifies how to maps classes to xml schemas. In this post, I demonstrate the ease of use of this approach using MOXy. MOXy is the Eclipse implementation of JAXB and I found it really easy to use.","headline":"Object-XML Mapping with JAXB &amp; MOXy","dateModified":"2012-05-24T19:17:00+02:00","@context":"http://schema.org"}</script>
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/java%20ee%206/jee6/java/xml/moxy/object%20xml%20mapping/java%20se/jaxb/2012/05/24/moxy.html"},"@type":"BlogPosting","url":"http://localhost:4000/java%20ee%206/jee6/java/xml/moxy/object%20xml%20mapping/java%20se/jaxb/2012/05/24/moxy.html","headline":"Object-XML Mapping with JAXB &amp; MOXy","dateModified":"2012-05-24T19:17:00+02:00","datePublished":"2012-05-24T19:17:00+02:00","description":"Object-Relational mapping is around for a while and its last incarnation, JPA 2.0, is easy to use yet powerful and adapted to most of the real-life situations. A problem that is similar to Object-Relational mapping (ORM) is Object-XML mapping (OXM). More precisely, it aims at mapping XML schemas to JAVA classes. JAXB (JSR 222) specifies how to maps classes to xml schemas. In this post, I demonstrate the ease of use of this approach using MOXy. MOXy is the Eclipse implementation of JAXB and I found it really easy to use.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Steve Hostettler" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
@@ -81,32 +83,32 @@ Code. The following snippet shows a simple model that represents a student.</p>
 are marshaled if not null and in the second they are simply ignored. The only tricky part is that transient fields (in the Java sense) are ignored. For instance, this is the case of the <code class="highlighter-rouge">gender</code> property.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@XmlRootElement</span>
-<span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="n">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+<span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="nc">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="nc">Serializable</span> <span class="o">{</span>
 
-    <span class="kd">private</span> <span class="n">Long</span> <span class="n">id</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
 
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">lastName</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">lastName</span><span class="o">;</span>
 
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">firstName</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">firstName</span><span class="o">;</span>
 
-    <span class="kd">private</span> <span class="n">Date</span> <span class="n">birthDate</span><span class="o">;</span>
-
-    <span class="nd">@XmlTransient</span>
-    <span class="kd">private</span> <span class="n">PhoneNumber</span> <span class="n">phoneNumber</span><span class="o">;</span>
-
-    <span class="kd">private</span> <span class="kd">transient</span> <span class="n">Gender</span> <span class="n">gender</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Date</span> <span class="n">birthDate</span><span class="o">;</span>
 
     <span class="nd">@XmlTransient</span>
-    <span class="kd">private</span> <span class="n">Address</span> <span class="n">address</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">PhoneNumber</span> <span class="n">phoneNumber</span><span class="o">;</span>
+
+    <span class="kd">private</span> <span class="kd">transient</span> <span class="nc">Gender</span> <span class="n">gender</span><span class="o">;</span>
 
     <span class="nd">@XmlTransient</span>
-    <span class="kd">private</span> <span class="n">List</span><span class="o">&lt;</span><span class="n">Grade</span><span class="o">&gt;</span> <span class="n">grades</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Address</span> <span class="n">address</span><span class="o">;</span>
+
+    <span class="nd">@XmlTransient</span>
+    <span class="kd">private</span> <span class="nc">List</span><span class="o">&lt;</span><span class="nc">Grade</span><span class="o">&gt;</span> <span class="n">grades</span><span class="o">;</span>
 
     <span class="o">...</span>
     
     <span class="nd">@XmlTransient</span>
-    <span class="kd">private</span> <span class="n">Badge</span> <span class="n">badge</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Badge</span> <span class="n">badge</span><span class="o">;</span>
     <span class="o">...</span>
 <span class="o">}</span>
 </code></pre></div></div>
@@ -114,27 +116,27 @@ are marshaled if not null and in the second they are simply ignored. The only tr
 <p>Let us now test the mapping. The code below, creates a new <code class="highlighter-rouge">Student</code> and fills the associated
 fields. The second part of the snippet marshals the object into XML and streams it to <code class="highlighter-rouge">System.out</code>.</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">Student</span> <span class="n">student</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Student</span><span class="o">(</span><span class="s">"Lion Hearth"</span><span class="o">,</span> <span class="s">"Richard"</span><span class="o">,</span> <span class="k">new</span> <span class="n">Date</span><span class="o">());</span>
-    <span class="n">Address</span> <span class="n">address</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Address</span><span class="o">();</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nc">Student</span> <span class="n">student</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Student</span><span class="o">(</span><span class="s">"Lion Hearth"</span><span class="o">,</span> <span class="s">"Richard"</span><span class="o">,</span> <span class="k">new</span> <span class="nc">Date</span><span class="o">());</span>
+    <span class="nc">Address</span> <span class="n">address</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Address</span><span class="o">();</span>
     <span class="n">address</span><span class="o">.</span><span class="na">setCity</span><span class="o">(</span><span class="s">"Carouge"</span><span class="o">);</span>
     <span class="n">address</span><span class="o">.</span><span class="na">setNumber</span><span class="o">(</span><span class="s">"7"</span><span class="o">);</span>
     <span class="n">address</span><span class="o">.</span><span class="na">setPostalCode</span><span class="o">(</span><span class="s">"1227"</span><span class="o">);</span>
     <span class="n">address</span><span class="o">.</span><span class="na">setStreet</span><span class="o">(</span><span class="s">"Drize"</span><span class="o">);</span>
     <span class="n">student</span><span class="o">.</span><span class="na">setAddress</span><span class="o">(</span><span class="n">address</span><span class="o">);</span>
-    <span class="n">Badge</span> <span class="n">b</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Badge</span><span class="o">();</span>
+    <span class="nc">Badge</span> <span class="n">b</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Badge</span><span class="o">();</span>
     <span class="n">b</span><span class="o">.</span><span class="na">setSecurityLevel</span><span class="o">(</span><span class="mi">30L</span><span class="o">);</span>
     <span class="n">b</span><span class="o">.</span><span class="na">setStudent</span><span class="o">(</span><span class="n">student</span><span class="o">);</span>
     <span class="n">student</span><span class="o">.</span><span class="na">setBadge</span><span class="o">(</span><span class="n">b</span><span class="o">);</span>
-    <span class="n">student</span><span class="o">.</span><span class="na">setPhoneNumber</span><span class="o">(</span><span class="k">new</span> <span class="n">PhoneNumber</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">));</span>
-    <span class="k">for</span> <span class="o">(</span><span class="n">Discipline</span> <span class="n">d</span> <span class="o">:</span> <span class="n">Discipline</span><span class="o">.</span><span class="na">values</span><span class="o">())</span> <span class="o">{</span>
-        <span class="n">Grade</span> <span class="n">g</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Grade</span><span class="o">(</span><span class="n">d</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
+    <span class="n">student</span><span class="o">.</span><span class="na">setPhoneNumber</span><span class="o">(</span><span class="k">new</span> <span class="nc">PhoneNumber</span><span class="o">(</span><span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">,</span> <span class="mi">0</span><span class="o">));</span>
+    <span class="k">for</span> <span class="o">(</span><span class="nc">Discipline</span> <span class="n">d</span> <span class="o">:</span> <span class="nc">Discipline</span><span class="o">.</span><span class="na">values</span><span class="o">())</span> <span class="o">{</span>
+        <span class="nc">Grade</span> <span class="n">g</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Grade</span><span class="o">(</span><span class="n">d</span><span class="o">,</span> <span class="mi">10</span><span class="o">);</span>
         <span class="n">student</span><span class="o">.</span><span class="na">getGrades</span><span class="o">().</span><span class="na">add</span><span class="o">(</span><span class="n">g</span><span class="o">);</span>
     <span class="o">}</span>
     
-    <span class="n">JAXBContext</span> <span class="n">jaxbContext</span> <span class="o">=</span> <span class="n">JAXBContext</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="n">Student</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>       
-    <span class="n">Marshaller</span> <span class="n">marshaller</span> <span class="o">=</span> <span class="n">jaxbContext</span><span class="o">.</span><span class="na">createMarshaller</span><span class="o">();</span>
-    <span class="n">marshaller</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">Marshaller</span><span class="o">.</span><span class="na">JAXB_FORMATTED_OUTPUT</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-    <span class="n">marshaller</span><span class="o">.</span><span class="na">marshal</span><span class="o">(</span><span class="n">student</span><span class="o">,</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">);</span>
+    <span class="nc">JAXBContext</span> <span class="n">jaxbContext</span> <span class="o">=</span> <span class="nc">JAXBContext</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="nc">Student</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>       
+    <span class="nc">Marshaller</span> <span class="n">marshaller</span> <span class="o">=</span> <span class="n">jaxbContext</span><span class="o">.</span><span class="na">createMarshaller</span><span class="o">();</span>
+    <span class="n">marshaller</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="nc">Marshaller</span><span class="o">.</span><span class="na">JAXB_FORMATTED_OUTPUT</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+    <span class="n">marshaller</span><span class="o">.</span><span class="na">marshal</span><span class="o">(</span><span class="n">student</span><span class="o">,</span> <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">);</span>
 </code></pre></div></div>
 
 <p>Finally, the result looks like the XML below. As you can see, it is pretty easy and straight-forward
@@ -200,31 +202,31 @@ the XML and the schemas. Namespaces can be specified at different levels. For mo
 The following example maps an address.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@XmlRootElement</span>
-<span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="n">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+<span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="nc">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="nc">Serializable</span> <span class="o">{</span>
 
     <span class="o">...</span>
 
-    <span class="kd">private</span> <span class="n">Address</span> <span class="n">address</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Address</span> <span class="n">address</span><span class="o">;</span>
 
 <span class="o">}</span>
 </code></pre></div></div>
 <p>To that end, it is sufficient to add the following annotations to the Address type.</p>
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@XmlRootElement</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"address"</span><span class="o">)</span>
-<span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="n">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Address</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+<span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="nc">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Address</span> <span class="kd">implements</span> <span class="nc">Serializable</span> <span class="o">{</span>
     <span class="o">...</span>
     <span class="cm">/** house number. */</span>
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">number</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">number</span><span class="o">;</span>
 
     <span class="cm">/** the name of the street. */</span>
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">street</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">street</span><span class="o">;</span>
 
     <span class="cm">/** the city name. */</span>
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">city</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">city</span><span class="o">;</span>
 
     <span class="cm">/** the postal code. */</span>
-    <span class="kd">private</span> <span class="n">String</span> <span class="n">postalCode</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">String</span> <span class="n">postalCode</span><span class="o">;</span>
     <span class="o">...</span>
 <span class="o">}</span>
 </code></pre></div></div>
@@ -248,31 +250,31 @@ The following example maps an address.</p>
 graphs. Of course, since XML are trees, we must avoid cycles. The solution is to annotate the reverse mapping (<code class="highlighter-rouge">Student student</code> in this case) with <code class="highlighter-rouge">@XMLTransient</code> causing the property to be ignored by JAXB.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@XmlRootElement</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"student"</span><span class="o">)</span>
-<span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="n">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+<span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="nc">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Student</span> <span class="kd">implements</span> <span class="nc">Serializable</span> <span class="o">{</span>
 
     <span class="o">...</span>
 
-    <span class="kd">private</span> <span class="n">Badge</span> <span class="n">badge</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Badge</span> <span class="n">badge</span><span class="o">;</span>
 
 <span class="o">}</span>
 </code></pre></div></div>
 
 <p>The following type describes the <code class="highlighter-rouge">Badge</code> that has a reverse mapping to <code class="highlighter-rouge">Student</code>.</p>
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@XmlRootElement</span><span class="o">(</span><span class="n">name</span> <span class="o">=</span> <span class="s">"badge"</span><span class="o">)</span>
-<span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="n">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Badge</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+<span class="nd">@XmlAccessorType</span><span class="o">(</span><span class="nc">XmlAccessType</span><span class="o">.</span><span class="na">FIELD</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">Badge</span> <span class="kd">implements</span> <span class="nc">Serializable</span> <span class="o">{</span>
 
     <span class="cm">/** The unique id. */</span>
-    <span class="kd">private</span> <span class="n">Long</span> <span class="n">id</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">id</span><span class="o">;</span>
 
     <span class="cm">/** The student's security level. */</span>
     <span class="nd">@XmlAttribute</span>
-    <span class="kd">private</span> <span class="n">Long</span> <span class="n">securityLevel</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Long</span> <span class="n">securityLevel</span><span class="o">;</span>
 
     <span class="cm">/** The student that owns this badge. */</span>
     <span class="nd">@XmlTransient</span>
-    <span class="kd">private</span> <span class="n">Student</span> <span class="n">student</span><span class="o">;</span>
+    <span class="kd">private</span> <span class="nc">Student</span> <span class="n">student</span><span class="o">;</span>
 </code></pre></div></div>
 <p>And finally, here is the result.</p>
 
@@ -316,23 +318,23 @@ removing the <code class="highlighter-rouge">@XmlTransient</code> annotation on 
 <p>Sometimes, it is difficult to map a given type to a given XML structure. This is the case of the <code class="highlighter-rouge">PhoneNumber</code> type in our example. To that end, it is possible to define a <code class="highlighter-rouge">XMLJavaTypeAdatper</code>
 that will convert XML to object and objects to XML manually. The adapter is not very difficult to implement. It is composed of two methods that respectively unmarshal from XML and marshal to XML.</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PhoneNumberAdapter</span> <span class="kd">extends</span> <span class="n">XmlAdapter</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">PhoneNumber</span><span class="o">&gt;</span> <span class="o">{</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">PhoneNumberAdapter</span> <span class="kd">extends</span> <span class="nc">XmlAdapter</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">,</span> <span class="nc">PhoneNumber</span><span class="o">&gt;</span> <span class="o">{</span>
 
     <span class="nd">@Override</span>
-    <span class="kd">public</span> <span class="n">PhoneNumber</span> <span class="nf">unmarshal</span><span class="o">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">value</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="n">PhoneNumber</span><span class="o">.</span><span class="na">getAsObject</span><span class="o">((</span><span class="n">String</span><span class="o">)</span> <span class="n">value</span><span class="o">);</span>
+    <span class="kd">public</span> <span class="nc">PhoneNumber</span> <span class="nf">unmarshal</span><span class="o">(</span><span class="kd">final</span> <span class="nc">String</span> <span class="n">value</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">PhoneNumber</span><span class="o">.</span><span class="na">getAsObject</span><span class="o">((</span><span class="nc">String</span><span class="o">)</span> <span class="n">value</span><span class="o">);</span>
     <span class="o">}</span>
 
     <span class="nd">@Override</span>
-    <span class="kd">public</span> <span class="n">String</span> <span class="nf">marshal</span><span class="o">(</span><span class="kd">final</span> <span class="n">PhoneNumber</span> <span class="n">value</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span> <span class="o">{</span>
-        <span class="k">return</span> <span class="n">PhoneNumber</span><span class="o">.</span><span class="na">getAsString</span><span class="o">((</span><span class="n">PhoneNumber</span><span class="o">)</span> <span class="n">value</span><span class="o">);</span>
+    <span class="kd">public</span> <span class="nc">String</span> <span class="nf">marshal</span><span class="o">(</span><span class="kd">final</span> <span class="nc">PhoneNumber</span> <span class="n">value</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="nc">PhoneNumber</span><span class="o">.</span><span class="na">getAsString</span><span class="o">((</span><span class="nc">PhoneNumber</span><span class="o">)</span> <span class="n">value</span><span class="o">);</span>
     <span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div></div>
 <p>Then, it is required to annotated the property with this adapter:</p>
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="o">...</span>
-    <span class="nd">@XmlJavaTypeAdapter</span><span class="o">(</span><span class="n">PhoneNumberAdapter</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
-    <span class="kd">private</span> <span class="n">PhoneNumber</span> <span class="n">mPhoneNumber</span><span class="o">;</span>
+    <span class="nd">@XmlJavaTypeAdapter</span><span class="o">(</span><span class="nc">PhoneNumberAdapter</span><span class="o">.</span><span class="na">class</span><span class="o">)</span>
+    <span class="kd">private</span> <span class="nc">PhoneNumber</span> <span class="n">mPhoneNumber</span><span class="o">;</span>
     <span class="o">...</span>
 </code></pre></div></div>
 
@@ -350,11 +352,11 @@ that will convert XML to object and objects to XML manually. The adapter is not 
 <p>As mentioned previously, we assumed that you have total control over the schema. Nevertheless, it can
 be useful to be able to produce this schema. This is done by the following snippet.</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">SchemaOutputResolver</span> <span class="n">sor</span> <span class="o">=</span> <span class="k">new</span> <span class="n">SchemaOutputResolver</span><span class="o">()</span> <span class="o">{</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">SchemaOutputResolver</span> <span class="n">sor</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">SchemaOutputResolver</span><span class="o">()</span> <span class="o">{</span>
     <span class="nd">@Override</span>
-    <span class="kd">public</span> <span class="n">Result</span> <span class="nf">createOutput</span><span class="o">(</span><span class="kd">final</span> <span class="n">String</span> <span class="n">namespaceUri</span><span class="o">,</span>
-            <span class="kd">final</span> <span class="n">String</span> <span class="n">suggestedFileName</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">IOException</span> <span class="o">{</span>
-        <span class="n">Result</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StreamResult</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">);</span>
+    <span class="kd">public</span> <span class="nc">Result</span> <span class="nf">createOutput</span><span class="o">(</span><span class="kd">final</span> <span class="nc">String</span> <span class="n">namespaceUri</span><span class="o">,</span>
+            <span class="kd">final</span> <span class="nc">String</span> <span class="n">suggestedFileName</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">IOException</span> <span class="o">{</span>
+        <span class="nc">Result</span> <span class="n">result</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">StreamResult</span><span class="o">(</span><span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">);</span>
         <span class="n">result</span><span class="o">.</span><span class="na">setSystemId</span><span class="o">(</span><span class="s">"System.out"</span><span class="o">);</span>
         <span class="k">return</span> <span class="n">result</span><span class="o">;</span>
     <span class="o">}</span>
@@ -365,18 +367,18 @@ be useful to be able to produce this schema. This is done by the following snipp
 <h2 id="write-xml">Write XML</h2>
 <p>Writing XML is fairly easy, just populate the objects that you want to marshal and then
 use the following code:</p>
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">JAXBContext</span> <span class="n">jaxbContext</span> <span class="o">=</span> <span class="n">JAXBContext</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="n">Student</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>       
-<span class="n">Marshaller</span> <span class="n">marshaller</span> <span class="o">=</span> <span class="n">jaxbContext</span><span class="o">.</span><span class="na">createMarshaller</span><span class="o">();</span>
-<span class="n">marshaller</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="n">Marshaller</span><span class="o">.</span><span class="na">JAXB_FORMATTED_OUTPUT</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
-<span class="n">marshaller</span><span class="o">.</span><span class="na">marshal</span><span class="o">(</span><span class="n">student</span><span class="o">,</span> <span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">);</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">JAXBContext</span> <span class="n">jaxbContext</span> <span class="o">=</span> <span class="nc">JAXBContext</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="nc">Student</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>       
+<span class="nc">Marshaller</span> <span class="n">marshaller</span> <span class="o">=</span> <span class="n">jaxbContext</span><span class="o">.</span><span class="na">createMarshaller</span><span class="o">();</span>
+<span class="n">marshaller</span><span class="o">.</span><span class="na">setProperty</span><span class="o">(</span><span class="nc">Marshaller</span><span class="o">.</span><span class="na">JAXB_FORMATTED_OUTPUT</span><span class="o">,</span> <span class="kc">true</span><span class="o">);</span>
+<span class="n">marshaller</span><span class="o">.</span><span class="na">marshal</span><span class="o">(</span><span class="n">student</span><span class="o">,</span> <span class="nc">System</span><span class="o">.</span><span class="na">out</span><span class="o">);</span>
 </code></pre></div></div>
 
 <h2 id="read-xml">Read XML</h2>
 <p>The reverse operation is as easy and straightforward (provided that use the same schema):</p>
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">InputStream</span> <span class="n">stream</span> <span class="o">=</span> <span class="n">StudentOXTest</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="s">"/student.xml"</span><span class="o">);</span>
-<span class="n">JAXBContext</span> <span class="n">jaxbContext</span> <span class="o">=</span> <span class="n">JAXBContext</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="n">Student</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
-<span class="n">Unmarshaller</span> <span class="n">unmarshaller</span> <span class="o">=</span> <span class="n">jaxbContext</span><span class="o">.</span><span class="na">createUnmarshaller</span><span class="o">();</span>
-<span class="n">Student</span> <span class="n">student</span> <span class="o">=</span> <span class="o">(</span><span class="n">Student</span><span class="o">)</span> <span class="n">unmarshaller</span><span class="o">.</span><span class="na">unmarshal</span><span class="o">(</span><span class="n">stream</span><span class="o">);</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">InputStream</span> <span class="n">stream</span> <span class="o">=</span> <span class="nc">StudentOXTest</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">getResourceAsStream</span><span class="o">(</span><span class="s">"/student.xml"</span><span class="o">);</span>
+<span class="nc">JAXBContext</span> <span class="n">jaxbContext</span> <span class="o">=</span> <span class="nc">JAXBContext</span><span class="o">.</span><span class="na">newInstance</span><span class="o">(</span><span class="nc">Student</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+<span class="nc">Unmarshaller</span> <span class="n">unmarshaller</span> <span class="o">=</span> <span class="n">jaxbContext</span><span class="o">.</span><span class="na">createUnmarshaller</span><span class="o">();</span>
+<span class="nc">Student</span> <span class="n">student</span> <span class="o">=</span> <span class="o">(</span><span class="nc">Student</span><span class="o">)</span> <span class="n">unmarshaller</span><span class="o">.</span><span class="na">unmarshal</span><span class="o">(</span><span class="n">stream</span><span class="o">);</span>
 </code></pre></div></div>
 
 <h2 id="conclusion">Conclusion</h2>

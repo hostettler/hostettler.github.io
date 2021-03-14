@@ -2,22 +2,24 @@
 <html lang="en"><head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
 <title>Programmatically build web archives using ShrinkWrap | Steve Hostettler</title>
-<meta name="generator" content="Jekyll v3.8.5" />
+<meta name="generator" content="Jekyll v3.8.7" />
 <meta property="og:title" content="Programmatically build web archives using ShrinkWrap" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="In this blog post, I show how to programmatically build a web archive for test purposes." />
 <meta property="og:description" content="In this blog post, I show how to programmatically build a web archive for test purposes." />
-<link rel="canonical" href="http://hostettler.net/shrinkwrap/java%20ee6/jee6/tomcat%207/war/2012/04/05/programmatically-build-web-archives-using-shrinkwrap.html" />
-<meta property="og:url" content="http://hostettler.net/shrinkwrap/java%20ee6/jee6/tomcat%207/war/2012/04/05/programmatically-build-web-archives-using-shrinkwrap.html" />
+<link rel="canonical" href="http://localhost:4000/shrinkwrap/java%20ee6/jee6/tomcat%207/war/2012/04/05/programmatically-build-web-archives-using-shrinkwrap.html" />
+<meta property="og:url" content="http://localhost:4000/shrinkwrap/java%20ee6/jee6/tomcat%207/war/2012/04/05/programmatically-build-web-archives-using-shrinkwrap.html" />
 <meta property="og:site_name" content="Steve Hostettler" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2012-04-05T09:09:00+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Programmatically build web archives using ShrinkWrap" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","datePublished":"2012-04-05T09:09:00+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/shrinkwrap/java%20ee6/jee6/tomcat%207/war/2012/04/05/programmatically-build-web-archives-using-shrinkwrap.html"},"url":"http://hostettler.net/shrinkwrap/java%20ee6/jee6/tomcat%207/war/2012/04/05/programmatically-build-web-archives-using-shrinkwrap.html","description":"In this blog post, I show how to programmatically build a web archive for test purposes.","headline":"Programmatically build web archives using ShrinkWrap","dateModified":"2012-04-05T09:09:00+02:00","@context":"http://schema.org"}</script>
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/shrinkwrap/java%20ee6/jee6/tomcat%207/war/2012/04/05/programmatically-build-web-archives-using-shrinkwrap.html"},"@type":"BlogPosting","url":"http://localhost:4000/shrinkwrap/java%20ee6/jee6/tomcat%207/war/2012/04/05/programmatically-build-web-archives-using-shrinkwrap.html","headline":"Programmatically build web archives using ShrinkWrap","dateModified":"2012-04-05T09:09:00+02:00","datePublished":"2012-04-05T09:09:00+02:00","description":"In this blog post, I show how to programmatically build a web archive for test purposes.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Steve Hostettler" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
@@ -79,43 +81,43 @@ testing. For more details on how to use this web archive in JUnit fixtures pleas
 
 <p>The first step is to crate a web archive a.k.a. a WAR file. As we want to produce a WAR file, we use the <code class="highlighter-rouge">WebArchive.class</code> parameter
 to the <code class="highlighter-rouge">ShrinkWrap.create</code> method. It is also possible to produce JAR (<code class="highlighter-rouge">JavaArchive.class</code>) and EAR (<code class="highlighter-rouge">EnterpriseArchive.class</code>).</p>
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">WebArchive</span> <span class="n">archive</span> <span class="o">=</span> <span class="n">ShrinkWrap</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="n">WebArchive</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">"test.war"</span><span class="o">);</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">WebArchive</span> <span class="n">archive</span> <span class="o">=</span> <span class="nc">ShrinkWrap</span><span class="o">.</span><span class="na">create</span><span class="o">(</span><span class="nc">WebArchive</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="s">"test.war"</span><span class="o">);</span>
 </code></pre></div></div>
 <p>The next step to build a WAR is to provide the <code class="highlighter-rouge">web.xml</code> for you project. Again this can a be a simplified version of the web descriptor to improve startup time or limit dependencies. In the following example, the files are taken from a maven directory structure.</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">WEBAPP_SRC</span> <span class="o">=</span> <span class="s">"src/main/webapp"</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">WEBAPP_SRC</span> <span class="o">=</span> <span class="s">"src/main/webapp"</span><span class="o">;</span>
 
-<span class="n">archive</span><span class="o">.</span><span class="na">setWebXML</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"WEB-INF/web.xml"</span><span class="o">))</span>
+<span class="n">archive</span><span class="o">.</span><span class="na">setWebXML</span><span class="o">(</span><span class="k">new</span> <span class="nc">File</span><span class="o">(</span><span class="no">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"WEB-INF/web.xml"</span><span class="o">))</span>
 </code></pre></div></div>
 <p>Now that we have a web descriptor, let’s add some classes that are required to run the application. To not having to add each single class individually, it is possible to a complete package to the archive.</p>
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">archive</span><span class="o">.</span><span class="na">addPackage</span><span class="o">(</span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Package</span><span class="o">.</span><span class="na">getPackage</span><span class="o">(</span><span class="s">"ch.demo.web"</span><span class="o">))</span>
 </code></pre></div></div>
 
 <p>It is also possible to add individual classes:</p>
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">archive</span><span class="o">.</span><span class="na">addClasses</span><span class="o">(</span><span class="n">Student</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="n">Address</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">archive</span><span class="o">.</span><span class="na">addClasses</span><span class="o">(</span><span class="nc">Student</span><span class="o">.</span><span class="na">class</span><span class="o">,</span> <span class="nc">Address</span><span class="o">.</span><span class="na">class</span><span class="o">);</span>
 </code></pre></div></div>
 
 <p>For JSF applications, we add add the <code class="highlighter-rouge">faces-config.xml</code>.</p>
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">archive</span><span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"WEB-INF/faces-config.xml"</span><span class="o">))</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">archive</span><span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="k">new</span> <span class="nc">File</span><span class="o">(</span><span class="no">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"WEB-INF/faces-config.xml"</span><span class="o">))</span>
 </code></pre></div></div>
 
 <p>And similarly, let’s add the CDI descriptor into <code class="highlighter-rouge">WEB-INF</code>. As we do not need to create a specific ``beans.xml`,
 we add an empty descriptor:</p>
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">archive</span><span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="n">EmptyAsset</span><span class="o">.</span><span class="na">INSTANCE</span><span class="o">,</span> <span class="s">"beans.xml"</span><span class="o">)</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">archive</span><span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="nc">EmptyAsset</span><span class="o">.</span><span class="na">INSTANCE</span><span class="o">,</span> <span class="s">"beans.xml"</span><span class="o">)</span>
 </code></pre></div></div>
 
 <p>Let’s finally add standard web resources such as <code class="highlighter-rouge">xhtml</code> files or static files:</p>
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">archive</span><span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"login.xhtml"</span><span class="o">));</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">archive</span><span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="nc">File</span><span class="o">(</span><span class="no">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"login.xhtml"</span><span class="o">));</span>
 </code></pre></div></div>
 
 <p>As ShrinkWrap uses <a href="http://en.wikipedia.org/wiki/Method_chaining">Method Chaining</a>, it is possible to chain <code class="highlighter-rouge">add</code> class to fill the archive.</p>
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">archive</span><span class="o">.</span><span class="na">setWebXML</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"WEB-INF/web.xml"</span><span class="o">))</span>
-	<span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="n">EmptyAsset</span><span class="o">.</span><span class="na">INSTANCE</span><span class="o">,</span> <span class="s">"beans.xml"</span><span class="o">)</span>
-	<span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"WEB-INF/faces-config.xml"</span><span class="o">))</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">archive</span><span class="o">.</span><span class="na">setWebXML</span><span class="o">(</span><span class="k">new</span> <span class="nc">File</span><span class="o">(</span><span class="no">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"WEB-INF/web.xml"</span><span class="o">))</span>
+	<span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="nc">EmptyAsset</span><span class="o">.</span><span class="na">INSTANCE</span><span class="o">,</span> <span class="s">"beans.xml"</span><span class="o">)</span>
+	<span class="o">.</span><span class="na">addAsWebInfResource</span><span class="o">(</span><span class="k">new</span> <span class="nc">File</span><span class="o">(</span><span class="no">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"WEB-INF/faces-config.xml"</span><span class="o">))</span>
 	<span class="o">.</span><span class="na">addPackage</span><span class="o">(</span><span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">Package</span><span class="o">.</span><span class="na">getPackage</span><span class="o">(</span><span class="s">"ch.demo.web"</span><span class="o">))</span>
-	<span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"login.xhtml"</span><span class="o">))</span>
-	<span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"index.jsp"</span><span class="o">))</span>
-	<span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"xhtml/listStudents.xhtml"</span><span class="o">),</span> <span class="s">"xhtml/listStudents.xhtml"</span><span class="o">);</span>
+	<span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="nc">File</span><span class="o">(</span><span class="no">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"login.xhtml"</span><span class="o">))</span>
+	<span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="nc">File</span><span class="o">(</span><span class="no">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"index.jsp"</span><span class="o">))</span>
+	<span class="o">.</span><span class="na">addAsWebResource</span><span class="o">(</span><span class="k">new</span> <span class="nc">File</span><span class="o">(</span><span class="no">WEBAPP_SRC</span><span class="o">,</span> <span class="s">"xhtml/listStudents.xhtml"</span><span class="o">),</span> <span class="s">"xhtml/listStudents.xhtml"</span><span class="o">);</span>
 </code></pre></div></div>
 
 <p>Please note that when using maven to execute the tests, most of the required libraries are already on the classpath. Therefore, we often do not need to add any library or jars to the web archive.</p>
@@ -125,10 +127,10 @@ we add an empty descriptor:</p>
 <p>After having built the package, we need to export it either as a war or as an exploded directory.
 The following snippet produces a WAR file named after the archive. The second parameter states whether
 a existing archive can be overwritten.</p>
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">new</span> <span class="n">ZipExporterImpl</span><span class="o">(</span><span class="n">archive</span><span class="o">).</span><span class="na">exportTo</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">archive</span><span class="o">.</span><span class="na">getName</span><span class="o">()),</span> <span class="kc">true</span><span class="o">);</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">new</span> <span class="nc">ZipExporterImpl</span><span class="o">(</span><span class="n">archive</span><span class="o">).</span><span class="na">exportTo</span><span class="o">(</span><span class="k">new</span> <span class="nc">File</span><span class="o">(</span><span class="n">archive</span><span class="o">.</span><span class="na">getName</span><span class="o">()),</span> <span class="kc">true</span><span class="o">);</span>
 </code></pre></div></div>
 <p>Alternatively it is possible to produce an exploded archive:</p>
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">new</span> <span class="n">ExplodedExporterImpl</span><span class="o">(</span><span class="n">archive</span><span class="o">).</span><span class="na">exportExploded</span><span class="o">(</span><span class="k">new</span> <span class="n">File</span><span class="o">(</span><span class="n">archive</span><span class="o">.</span><span class="na">getName</span><span class="o">()));</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">new</span> <span class="nc">ExplodedExporterImpl</span><span class="o">(</span><span class="n">archive</span><span class="o">).</span><span class="na">exportExploded</span><span class="o">(</span><span class="k">new</span> <span class="nc">File</span><span class="o">(</span><span class="n">archive</span><span class="o">.</span><span class="na">getName</span><span class="o">()));</span>
 </code></pre></div></div>
 
 <h2 id="conclusion">Conclusion</h2>

@@ -2,22 +2,24 @@
 <html lang="en"><head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
 <title>Microservice Architecture - Part 1 (A running microservice architecture) | Steve Hostettler</title>
-<meta name="generator" content="Jekyll v3.8.5" />
+<meta name="generator" content="Jekyll v3.8.7" />
 <meta property="og:title" content="Microservice Architecture - Part 1 (A running microservice architecture)" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers and container composition. All samples and a complete working application can be found here on GitHub" />
 <meta property="og:description" content="Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers and container composition. All samples and a complete working application can be found here on GitHub" />
-<link rel="canonical" href="http://hostettler.net/2019/02/17/microservice-architecture-part-1.html" />
-<meta property="og:url" content="http://hostettler.net/2019/02/17/microservice-architecture-part-1.html" />
+<link rel="canonical" href="http://localhost:4000/2019/02/17/microservice-architecture-part-1.html" />
+<meta property="og:url" content="http://localhost:4000/2019/02/17/microservice-architecture-part-1.html" />
 <meta property="og:site_name" content="Steve Hostettler" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2019-02-17T22:51:20+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Microservice Architecture - Part 1 (A running microservice architecture)" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","datePublished":"2019-02-17T22:51:20+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/2019/02/17/microservice-architecture-part-1.html"},"url":"http://hostettler.net/2019/02/17/microservice-architecture-part-1.html","description":"Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers and container composition. All samples and a complete working application can be found here on GitHub","headline":"Microservice Architecture - Part 1 (A running microservice architecture)","dateModified":"2019-02-17T22:51:20+01:00","@context":"http://schema.org"}</script>
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2019/02/17/microservice-architecture-part-1.html"},"@type":"BlogPosting","url":"http://localhost:4000/2019/02/17/microservice-architecture-part-1.html","headline":"Microservice Architecture - Part 1 (A running microservice architecture)","dateModified":"2019-02-17T22:51:20+01:00","datePublished":"2019-02-17T22:51:20+01:00","description":"Introduction This series of blog posts aims at helping students at the University of Geneva to develop their first application following micro-service principles. Besides explaining the concepts and implementation details of micro-service architecture, we will as well discuss software development practices such as software factories and innovative deployment options such as containers and container composition. All samples and a complete working application can be found here on GitHub","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Steve Hostettler" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
@@ -271,18 +273,18 @@ unige/api-gateway              latest    b355613b0bbd        32 hours ago       
 
 <div class="alert alert-success" role="alert"><i class="fa fa-check-square"></i> <b>Tip: </b> You now have Docker images for your microservices. At this point, we have Docker images for the microservices and for the api-gateway. </div>
 
-<p>Let’s start a Docker container with the counterparty microservice and map the port <code class="highlighter-rouge">8080</code> of the container to the port <code class="highlighter-rouge">10080</code> of the host.
+<p>Let’s start a Docker container with the counterparty microservice and map the port <code class="highlighter-rouge">28080</code> of the container to the port <code class="highlighter-rouge">10080</code> of the host.
 In principle, this will start a Linux OS and then start the microservice as the first process (PID 1). This container provides all the service, you would
 expect from any Linux system such as network, security, and isolation.</p>
 
-<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span> docker run <span class="nt">--name</span> myCounterpartyService <span class="nt">-p</span> 10080:8080 unige/counterparty-service:latest</code></pre></figure>
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash"><span class="nv">$ </span> docker run <span class="nt">--name</span> myCounterpartyService <span class="nt">-p</span> 10080:28080 unige/counterparty-service:latest</code></pre></figure>
 
 <figure class="console-output"><pre class="console-output">
 2019-02-26 22:28:06,527 INFO  [org.jboss.as.server] (main) WFLYSRV0010: Deployed "counterparty-service-0.2.0-SNAPSHOT.war" (runtime-name : "counterparty-service-0.2.0-SNAPSHOT.war")
 2019-02-26 22:28:06,569 INFO  [org.wildfly.swarm] (main) THORN99999: Thorntail is Ready
 </pre></figure>
 <div class="alert alert-success" role="alert"><i class="fa fa-check-square"></i> <b>Tip: </b> Open a browser and navigate to http://localhost:10080/counterparies It will display a long list of counterparties. </div>
-<p>This demonstrates that a web services is listening on port <code class="highlighter-rouge">10080</code> of <code class="highlighter-rouge">localhost</code>. More specifically, we started a container with the image of the counterparty microservice. The port <code class="highlighter-rouge">8080</code> is mapped to port <code class="highlighter-rouge">10080</code> so that we can test it.
+<p>This demonstrates that a web services is listening on port <code class="highlighter-rouge">10080</code> of <code class="highlighter-rouge">localhost</code>. More specifically, we started a container with the image of the counterparty microservice. The port <code class="highlighter-rouge">28080</code> is mapped to port <code class="highlighter-rouge">10080</code> so that we can test it.
 Furthermore, we named the container <code class="highlighter-rouge">myCounterpartyService</code>.</p>
 
 <p>As it is a fully running Linux system, you can connect to the container to inspect it. In another console, we can run a <code class="highlighter-rouge">docker ps</code> command to list running containers.</p>

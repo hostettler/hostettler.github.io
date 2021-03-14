@@ -2,22 +2,24 @@
 <html lang="en"><head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
 <title>JEE6 Tutorial | Steve Hostettler</title>
-<meta name="generator" content="Jekyll v3.8.5" />
+<meta name="generator" content="Jekyll v3.8.7" />
 <meta property="og:title" content="JEE6 Tutorial" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="I hereby start a series of tutorial on the major (IMHO) JEE 6 features. As a lecturer, I teach the JEE stack at the University of Geneva. This tutorial represents most of the topics that I cover during the EJB, CDI, and JPA lessons." />
 <meta property="og:description" content="I hereby start a series of tutorial on the major (IMHO) JEE 6 features. As a lecturer, I teach the JEE stack at the University of Geneva. This tutorial represents most of the topics that I cover during the EJB, CDI, and JPA lessons." />
-<link rel="canonical" href="http://hostettler.net/2012/12/31/jee6-tutorial.html" />
-<meta property="og:url" content="http://hostettler.net/2012/12/31/jee6-tutorial.html" />
+<link rel="canonical" href="http://localhost:4000/2012/12/31/jee6-tutorial.html" />
+<meta property="og:url" content="http://localhost:4000/2012/12/31/jee6-tutorial.html" />
 <meta property="og:site_name" content="Steve Hostettler" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2012-12-31T09:43:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="JEE6 Tutorial" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","datePublished":"2012-12-31T09:43:00+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/2012/12/31/jee6-tutorial.html"},"url":"http://hostettler.net/2012/12/31/jee6-tutorial.html","description":"I hereby start a series of tutorial on the major (IMHO) JEE 6 features. As a lecturer, I teach the JEE stack at the University of Geneva. This tutorial represents most of the topics that I cover during the EJB, CDI, and JPA lessons.","headline":"JEE6 Tutorial","dateModified":"2012-12-31T09:43:00+01:00","@context":"http://schema.org"}</script>
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/2012/12/31/jee6-tutorial.html"},"@type":"BlogPosting","url":"http://localhost:4000/2012/12/31/jee6-tutorial.html","headline":"JEE6 Tutorial","dateModified":"2012-12-31T09:43:00+01:00","datePublished":"2012-12-31T09:43:00+01:00","description":"I hereby start a series of tutorial on the major (IMHO) JEE 6 features. As a lecturer, I teach the JEE stack at the University of Geneva. This tutorial represents most of the topics that I cover during the EJB, CDI, and JPA lessons.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Steve Hostettler" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
@@ -275,16 +277,16 @@ it is a so-called <strong>Managed Bean</strong>. By this, it means that the cont
 <p>The following snippet describes a Stateless Session bean that computes a grade distribution. The method is secured and only authorized to client that have the role <code class="highlighter-rouge">user</code> through the <code class="highlighter-rouge">@RolesAllowed({ "user" })</code> annotation.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Stateless</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceJPAImpl</span> <span class="kd">implements</span> <span class="n">StudentService</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceJPAImpl</span> <span class="kd">implements</span> <span class="nc">StudentService</span> <span class="o">{</span>
 <span class="o">...</span>
     <span class="nd">@Override</span>
     <span class="nd">@RolesAllowed</span><span class="o">({</span> <span class="s">"user"</span> <span class="o">})</span> <span class="c1">// This a role-based security.</span>
-    <span class="kd">public</span> <span class="kd">final</span> <span class="n">Integer</span><span class="o">[]</span> <span class="nf">getDistribution</span><span class="o">(</span><span class="kd">final</span> <span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
+    <span class="kd">public</span> <span class="kd">final</span> <span class="nc">Integer</span><span class="o">[]</span> <span class="nf">getDistribution</span><span class="o">(</span><span class="kd">final</span> <span class="kt">int</span> <span class="n">n</span><span class="o">)</span> <span class="o">{</span>
     	<span class="n">numberOfAccess</span><span class="o">++;</span>
-        <span class="n">Integer</span><span class="o">[]</span> <span class="n">grades</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Integer</span><span class="o">[</span><span class="n">n</span><span class="o">];</span>
+        <span class="nc">Integer</span><span class="o">[]</span> <span class="n">grades</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Integer</span><span class="o">[</span><span class="n">n</span><span class="o">];</span>
 
-        <span class="k">for</span> <span class="o">(</span><span class="n">Student</span> <span class="n">s</span> <span class="o">:</span> <span class="k">this</span><span class="o">.</span><span class="na">getAll</span><span class="o">())</span> <span class="o">{</span>
-            <span class="n">grades</span><span class="o">[(</span><span class="n">s</span><span class="o">.</span><span class="na">getAvgGrade</span><span class="o">().</span><span class="na">intValue</span><span class="o">()</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span> <span class="o">/</span> <span class="o">(</span><span class="n">TOTAL</span> <span class="o">/</span> <span class="n">n</span><span class="o">)]++;</span>
+        <span class="k">for</span> <span class="o">(</span><span class="nc">Student</span> <span class="n">s</span> <span class="o">:</span> <span class="k">this</span><span class="o">.</span><span class="na">getAll</span><span class="o">())</span> <span class="o">{</span>
+            <span class="n">grades</span><span class="o">[(</span><span class="n">s</span><span class="o">.</span><span class="na">getAvgGrade</span><span class="o">().</span><span class="na">intValue</span><span class="o">()</span> <span class="o">-</span> <span class="mi">1</span><span class="o">)</span> <span class="o">/</span> <span class="o">(</span><span class="no">TOTAL</span> <span class="o">/</span> <span class="n">n</span><span class="o">)]++;</span>
         <span class="o">}</span>
         <span class="k">return</span> <span class="n">grades</span><span class="o">;</span>
     <span class="o">}</span>
@@ -297,7 +299,7 @@ remote (invokable from another JVM) or both. In the previous case, it is a local
 invokable locally.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Local</span>
-<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StudentService</span> <span class="kd">extends</span> <span class="n">Serializable</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StudentService</span> <span class="kd">extends</span> <span class="nc">Serializable</span> <span class="o">{</span>
 	<span class="cm">/**
 	 * @return an array that contains the distribution of the grades. It
 	 *         partitions the grades in "n" parts.
@@ -311,14 +313,14 @@ invokable locally.</p>
 Of course, the interface may be different and may exposes different services locally and remotely.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Remote</span>
-<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StudentServiceRemote</span> <span class="kd">extends</span> <span class="n">Serializable</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">StudentServiceRemote</span> <span class="kd">extends</span> <span class="nc">Serializable</span> <span class="o">{</span>
 
     <span class="cm">/**
      * @param lastname
      *            of the student
      * @return the student with the given lastname.
      */</span>
-    <span class="n">Student</span> <span class="nf">getStudentByLastName</span><span class="o">(</span><span class="n">String</span> <span class="n">lastname</span><span class="o">);</span>
+    <span class="nc">Student</span> <span class="nf">getStudentByLastName</span><span class="o">(</span><span class="nc">String</span> <span class="n">lastname</span><span class="o">);</span>
 
 <span class="o">}</span>
 </code></pre></div></div>
@@ -326,7 +328,7 @@ Of course, the interface may be different and may exposes different services loc
 <p>The implementation must be changed as follow to be remotely invokable:</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Stateless</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceJPAImpl</span> <span class="kd">implements</span> <span class="n">StudentService</span><span class="o">,</span> <span class="n">StudentServiceRemote</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceJPAImpl</span> <span class="kd">implements</span> <span class="nc">StudentService</span><span class="o">,</span> <span class="nc">StudentServiceRemote</span> <span class="o">{</span>
 <span class="o">...</span>
 </code></pre></div></div>
 
@@ -338,17 +340,17 @@ facade. <a href="http://en.wikipedia.org/wiki/Dependency_injection" title="Depen
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@ApplicationScoped</span> <span class="c1">// This sets the scope to application level</span>
 <span class="nd">@Path</span><span class="o">(</span><span class="s">"/studentService"</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceFacade</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceFacade</span> <span class="kd">implements</span> <span class="nc">Serializable</span> <span class="o">{</span>
 <span class="o">...</span>
 	<span class="nd">@EJB</span>
-	<span class="n">StudentService</span> <span class="n">studentService</span><span class="o">;</span>
+	<span class="nc">StudentService</span> <span class="n">studentService</span><span class="o">;</span>
 
 	<span class="nd">@GET</span>
 	<span class="nd">@Produces</span><span class="o">({</span> <span class="s">"application/xml"</span><span class="o">,</span> <span class="s">"application/json"</span> <span class="o">})</span>
 	<span class="nd">@Path</span><span class="o">(</span><span class="s">"distribution"</span><span class="o">)</span>
-	<span class="kd">public</span> <span class="n">Response</span> <span class="nf">getDistribution</span><span class="o">()</span> <span class="o">{</span>
-		<span class="n">Integer</span><span class="o">[]</span> <span class="n">distrib</span> <span class="o">=</span> <span class="n">studentService</span><span class="o">.</span><span class="na">getDistribution</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
-		<span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span><span class="k">new</span> <span class="n">DistributionDto</span><span class="o">(</span><span class="n">distrib</span><span class="o">)).</span><span class="na">build</span><span class="o">();</span>
+	<span class="kd">public</span> <span class="nc">Response</span> <span class="nf">getDistribution</span><span class="o">()</span> <span class="o">{</span>
+		<span class="nc">Integer</span><span class="o">[]</span> <span class="n">distrib</span> <span class="o">=</span> <span class="n">studentService</span><span class="o">.</span><span class="na">getDistribution</span><span class="o">(</span><span class="mi">10</span><span class="o">);</span>
+		<span class="k">return</span> <span class="nc">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span><span class="k">new</span> <span class="nc">DistributionDto</span><span class="o">(</span><span class="n">distrib</span><span class="o">)).</span><span class="na">build</span><span class="o">();</span>
 	<span class="o">}</span>
 <span class="o">}</span>
 </code></pre></div></div>
@@ -416,26 +418,26 @@ public class StudentServlet extends HttpServlet {
 
 <p>The following snippet shows how to use bean demarcation:</p>
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@MessageDriven</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">"MyQueue"</span><span class="o">)</span>
-<span class="nd">@TransactionManagement</span><span class="o">(</span><span class="n">TransactionManagementType</span><span class="o">.</span><span class="na">BEAN</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+<span class="nd">@TransactionManagement</span><span class="o">(</span><span class="nc">TransactionManagementType</span><span class="o">.</span><span class="na">BEAN</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="nc">MessageListener</span> <span class="o">{</span>
 
 	<span class="nd">@PersistenceContext</span>
-	<span class="n">EntityManager</span> <span class="n">em</span><span class="o">;</span>
+	<span class="nc">EntityManager</span> <span class="n">em</span><span class="o">;</span>
 
 	<span class="o">...</span>
 
-	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
-		<span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="nc">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
+		<span class="nc">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
 
 		<span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">begin</span><span class="o">();</span>
 
 		<span class="k">try</span> <span class="o">{</span>
 			<span class="o">...</span>
-			<span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
+			<span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="nc">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
 			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"MESSAGE BEAN: Message received: "</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
-			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
 			<span class="o">...</span>
-		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
 			<span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">rollback</span><span class="o">();</span>
 			<span class="o">...</span>
 		<span class="o">}</span>
@@ -446,22 +448,22 @@ public class StudentServlet extends HttpServlet {
 
 <p>and now the exact same class using container demarcation:</p>
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@MessageDriven</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">"MyQueue"</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="nc">MessageListener</span> <span class="o">{</span>
 
 	<span class="nd">@PersistenceContext</span>
-	<span class="n">EntityManager</span> <span class="n">em</span><span class="o">;</span>
+	<span class="nc">EntityManager</span> <span class="n">em</span><span class="o">;</span>
 
 	<span class="o">...</span>
 
-	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
-		<span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="nc">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
+		<span class="nc">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
 		<span class="k">try</span> <span class="o">{</span>
 			<span class="o">...</span>
-			<span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
+			<span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="nc">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
 			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"MESSAGE BEAN: Message received: "</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
-			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
 			<span class="o">...</span>
-		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
 			<span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">rollback</span><span class="o">();</span>
 			<span class="o">...</span>
 		<span class="o">}</span>
@@ -471,28 +473,28 @@ public class StudentServlet extends HttpServlet {
 
 <p>Because the previous snippet relies on the default convention, it is equivalent to:</p>
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@MessageDriven</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">"MyQueue"</span><span class="o">)</span>
-<span class="nd">@TransactionManagement</span><span class="o">(</span><span class="n">TransactionManagementType</span><span class="o">.</span><span class="na">CONTAINER</span><span class="o">)</span>
-<span class="nd">@TransactionAttribute</span><span class="o">(</span><span class="n">TransactionAttributeType</span><span class="o">.</span><span class="na">REQUIRED</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+<span class="nd">@TransactionManagement</span><span class="o">(</span><span class="nc">TransactionManagementType</span><span class="o">.</span><span class="na">CONTAINER</span><span class="o">)</span>
+<span class="nd">@TransactionAttribute</span><span class="o">(</span><span class="nc">TransactionAttributeType</span><span class="o">.</span><span class="na">REQUIRED</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="nc">MessageListener</span> <span class="o">{</span>
 
 	<span class="nd">@Inject</span> <span class="c1">// Let's ignore this for the moment</span>
-	<span class="kd">private</span> <span class="kd">transient</span> <span class="n">Logger</span> <span class="n">logger</span><span class="o">;</span>
+	<span class="kd">private</span> <span class="kd">transient</span> <span class="nc">Logger</span> <span class="n">logger</span><span class="o">;</span>
 
 	<span class="nd">@PersistenceContext</span>
-	<span class="n">EntityManager</span> <span class="n">em</span><span class="o">;</span>
+	<span class="nc">EntityManager</span> <span class="n">em</span><span class="o">;</span>
 
 	<span class="nd">@Resource</span> <span class="c1">// Let's ignore this for the moment</span>
-	<span class="kd">private</span> <span class="n">MessageDrivenContext</span> <span class="n">mdbContext</span><span class="o">;</span>
+	<span class="kd">private</span> <span class="nc">MessageDrivenContext</span> <span class="n">mdbContext</span><span class="o">;</span>
 
-	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
-		<span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="nc">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
+		<span class="nc">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
 		<span class="k">try</span> <span class="o">{</span>
 			<span class="o">...</span>
-			<span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
+			<span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="nc">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
 			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"MESSAGE BEAN: Message received: "</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
-			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
+			<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="nc">Thread</span><span class="o">.</span><span class="na">currentThread</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
 			<span class="o">...</span>
-		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
 			<span class="n">em</span><span class="o">.</span><span class="na">getTransaction</span><span class="o">().</span><span class="na">rollback</span><span class="o">();</span>
 			<span class="o">...</span>
 		<span class="o">}</span>
@@ -541,13 +543,13 @@ It provides unified services to access user directories for user authentication 
 <p>In any EJB, it is possible to get the current client session and therefore the principal:</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Resource</span> 
-<span class="n">SessionContext</span> <span class="n">ctx</span><span class="o">;</span>
+<span class="nc">SessionContext</span> <span class="n">ctx</span><span class="o">;</span>
 
 <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSomething</span><span class="o">()</span> <span class="o">{</span>
 	<span class="c1">// obtain the principal. </span>
-	<span class="n">Principal</span> <span class="n">principal</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getCallerPrincipal</span><span class="o">();</span>
+	<span class="nc">Principal</span> <span class="n">principal</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="na">getCallerPrincipal</span><span class="o">();</span>
 	<span class="c1">// obtain the name. </span>
-	<span class="n">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">callerPrincipal</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span>
+	<span class="nc">String</span> <span class="n">name</span> <span class="o">=</span> <span class="n">callerPrincipal</span><span class="o">.</span><span class="na">getName</span><span class="o">();</span>
 	<span class="c1">// Is the caller an admin?</span>
 	<span class="n">ctx</span><span class="o">.</span><span class="na">isCallerInRole</span><span class="o">(</span><span class="s">"admin"</span><span class="o">)</span>
 <span class="o">}</span>
@@ -581,17 +583,17 @@ In the latter case, in addition to the annotation the developer must configure t
 <p>Here is a simple interceptor that prints out the time consumed by a method call:</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@AroundInvoke</span>
-<span class="kd">public</span> <span class="n">Object</span> <span class="nf">intercept</span><span class="o">(</span><span class="n">InvocationContext</span> <span class="n">ctx</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">Exception</span>
+<span class="kd">public</span> <span class="nc">Object</span> <span class="nf">intercept</span><span class="o">(</span><span class="nc">InvocationContext</span> <span class="n">ctx</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">Exception</span>
 <span class="o">{</span>
-   <span class="kt">long</span> <span class="n">start</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
+   <span class="kt">long</span> <span class="n">start</span> <span class="o">=</span> <span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">();</span>
       
    <span class="k">try</span> <span class="o">{</span>
-		<span class="n">Object</span> <span class="n">value</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">proceed</span><span class="o">();</span>
+		<span class="nc">Object</span> <span class="n">value</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">proceed</span><span class="o">();</span>
    <span class="o">}</span> <span class="k">finally</span> <span class="o">{</span>
-   	 	<span class="n">StringBuilder</span> <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuilder</span><span class="o">(</span><span class="s">"******  "</span><span class="o">);</span>
+   	 	<span class="nc">StringBuilder</span> <span class="n">str</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">StringBuilder</span><span class="o">(</span><span class="s">"******  "</span><span class="o">);</span>
 		<span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">context</span><span class="o">.</span><span class="na">getMethod</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
 		<span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">" took :"</span><span class="o">);</span>
-		<span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="n">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()</span> <span class="o">-</span> <span class="n">start</span><span class="o">);</span>
+		<span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="nc">System</span><span class="o">.</span><span class="na">currentTimeMillis</span><span class="o">()</span> <span class="o">-</span> <span class="n">start</span><span class="o">);</span>
 		<span class="n">str</span><span class="o">.</span><span class="na">append</span><span class="o">(</span><span class="s">" ms  ******"</span><span class="o">);</span>
 
 		<span class="n">mLogger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="n">str</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
@@ -604,8 +606,8 @@ In the latter case, in addition to the annotation the developer must configure t
 <p>The following example presents the annotation based declaration.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Stateless</span>
-<span class="nd">@Interceptor</span><span class="o">({</span><span class="n">PerformanceEJBInterceptor</span><span class="o">.</span><span class="na">class</span><span class="o">})</span>
-<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">StudentServiceJPAImpl</span> <span class="kd">implements</span> <span class="n">StudentService</span><span class="o">,</span> <span class="n">StudentServiceRemote</span> <span class="o">{</span>
+<span class="nd">@Interceptor</span><span class="o">({</span><span class="nc">PerformanceEJBInterceptor</span><span class="o">.</span><span class="na">class</span><span class="o">})</span>
+<span class="kd">public</span> <span class="kd">final</span> <span class="kd">class</span> <span class="nc">StudentServiceJPAImpl</span> <span class="kd">implements</span> <span class="nc">StudentService</span><span class="o">,</span> <span class="nc">StudentServiceRemote</span> <span class="o">{</span>
 </code></pre></div></div>
 
 <p>In the following snippet, the interceptor is applied to all methods whose name is like <code class="highlighter-rouge">get*</code> and EJB’s name is like <code class="highlighter-rouge">Student*</code>. It is also possible to specify the parameters’ type in case of overloading.</p>
@@ -665,7 +667,7 @@ The following class, exposes the method <code class="highlighter-rouge">processJ
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">BatchProcessor</span> <span class="o">{</span>
 
 <span class="kd">public</span> <span class="kt">void</span> <span class="nf">processJobs</span><span class="o">()</span> <span class="o">{</span>
-	<span class="n">Future</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;[]</span> <span class="n">pool</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Future</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;[</span><span class="mi">10</span><span class="o">];</span>
+	<span class="nc">Future</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;[]</span> <span class="n">pool</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">Future</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;[</span><span class="mi">10</span><span class="o">];</span>
 	<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
 		<span class="n">pool</span><span class="o">[</span><span class="n">i</span><span class="o">]</span> <span class="o">=</span> <span class="n">processJob</span><span class="o">(</span><span class="s">"Job #"</span> <span class="o">+</span> <span class="n">i</span><span class="o">);</span>
 	<span class="o">}</span>
@@ -677,15 +679,15 @@ The following class, exposes the method <code class="highlighter-rouge">processJ
 
 
 <span class="nd">@Asynchronous</span>
-<span class="kd">public</span> <span class="n">Future</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="nf">processJob</span><span class="o">(</span><span class="n">String</span> <span class="n">jobName</span><span class="o">)</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="nc">Future</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;</span> <span class="nf">processJob</span><span class="o">(</span><span class="nc">String</span> <span class="n">jobName</span><span class="o">)</span> <span class="o">{</span>
 
     <span class="k">try</span> <span class="o">{</span>
-        <span class="n">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">10000</span><span class="o">);</span>
-    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
-        <span class="n">Thread</span><span class="o">.</span><span class="na">interrupted</span><span class="o">();</span>
+        <span class="nc">Thread</span><span class="o">.</span><span class="na">sleep</span><span class="o">(</span><span class="mi">10000</span><span class="o">);</span>
+    <span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">InterruptedException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+        <span class="nc">Thread</span><span class="o">.</span><span class="na">interrupted</span><span class="o">();</span>
         <span class="k">throw</span> <span class="k">new</span> <span class="nf">IllegalStateException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
     <span class="o">}</span>
-    <span class="k">return</span> <span class="k">new</span> <span class="n">AsyncResult</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;(</span><span class="n">jobName</span><span class="o">);</span>
+    <span class="k">return</span> <span class="k">new</span> <span class="nc">AsyncResult</span><span class="o">&lt;</span><span class="nc">String</span><span class="o">&gt;(</span><span class="n">jobName</span><span class="o">);</span>
 
 <span class="o">}</span>
 
@@ -713,25 +715,25 @@ The following class, exposes the method <code class="highlighter-rouge">processJ
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Singleton</span>
 <span class="nd">@Startup</span>
-<span class="nd">@Lock</span><span class="o">(</span><span class="n">LockType</span><span class="o">.</span><span class="na">READ</span><span class="o">)</span>
+<span class="nd">@Lock</span><span class="o">(</span><span class="nc">LockType</span><span class="o">.</span><span class="na">READ</span><span class="o">)</span>
 <span class="kd">public</span> <span class="kd">class</span> <span class="nc">StatusBean</span> <span class="o">{</span>
-  <span class="kd">private</span> <span class="n">String</span> <span class="n">status</span><span class="o">;</span>
+  <span class="kd">private</span> <span class="nc">String</span> <span class="n">status</span><span class="o">;</span>
 
   <span class="nd">@PostConstruct</span>
   <span class="kt">void</span> <span class="n">init</span> <span class="o">{</span>
     <span class="k">this</span><span class="o">.</span><span class="na">status</span> <span class="o">=</span> <span class="s">"Ready"</span><span class="o">;</span>
   <span class="o">}</span>
 
-  <span class="kd">public</span> <span class="n">String</span> <span class="nf">getStatus</span><span class="o">()</span> <span class="o">{</span>
+  <span class="kd">public</span> <span class="nc">String</span> <span class="nf">getStatus</span><span class="o">()</span> <span class="o">{</span>
     <span class="k">return</span> <span class="k">this</span><span class="o">.</span><span class="na">status</span><span class="o">;</span>
   <span class="o">}</span>
   
-  <span class="nd">@Lock</span><span class="o">(</span><span class="n">LockType</span><span class="o">.</span><span class="na">WRITE</span><span class="o">)</span>
-  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setStatus</span><span class="o">(</span><span class="n">String</span> <span class="k">new</span> <span class="n">Status</span><span class="o">)</span> <span class="o">{</span>
+  <span class="nd">@Lock</span><span class="o">(</span><span class="nc">LockType</span><span class="o">.</span><span class="na">WRITE</span><span class="o">)</span>
+  <span class="kd">public</span> <span class="kt">void</span> <span class="nf">setStatus</span><span class="o">(</span><span class="nc">String</span> <span class="k">new</span> <span class="nc">Status</span><span class="o">)</span> <span class="o">{</span>
     <span class="k">this</span><span class="o">.</span><span class="na">status</span> <span class="o">=</span> <span class="n">newStatus</span><span class="o">;</span>
   <span class="o">}</span>
 
-  <span class="nd">@Lock</span><span class="o">(</span><span class="n">LockType</span><span class="o">.</span><span class="na">WRITE</span><span class="o">)</span>
+  <span class="nd">@Lock</span><span class="o">(</span><span class="nc">LockType</span><span class="o">.</span><span class="na">WRITE</span><span class="o">)</span>
   <span class="nd">@AccessTimeout</span><span class="o">(</span><span class="n">value</span><span class="o">=</span><span class="mi">360000</span><span class="o">)</span>
   <span class="kd">public</span> <span class="kt">void</span> <span class="n">doTediousOperation</span> <span class="o">{</span>
     <span class="o">...</span>
@@ -756,13 +758,13 @@ The timeout is defined using the <code class="highlighter-rouge">@StatefulTimeou
 </blockquote>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Stateful</span>
-<span class="nd">@StatefulTimeout</span><span class="o">(</span><span class="n">unit</span> <span class="o">=</span> <span class="n">TimeUnit</span><span class="o">.</span><span class="na">MINUTES</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">30</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentStatisticsServiceImpl</span> <span class="kd">implements</span> <span class="n">StudentStatisticsService</span> <span class="o">{</span>
+<span class="nd">@StatefulTimeout</span><span class="o">(</span><span class="n">unit</span> <span class="o">=</span> <span class="nc">TimeUnit</span><span class="o">.</span><span class="na">MINUTES</span><span class="o">,</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">30</span><span class="o">)</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentStatisticsServiceImpl</span> <span class="kd">implements</span> <span class="nc">StudentStatisticsService</span> <span class="o">{</span>
 
-	<span class="kd">private</span> <span class="n">Long</span> <span class="n">numberOfAccess</span> <span class="o">=</span> <span class="mi">0</span><span class="n">l</span><span class="o">;</span>
+	<span class="kd">private</span> <span class="nc">Long</span> <span class="n">numberOfAccess</span> <span class="o">=</span> <span class="mi">0</span><span class="n">l</span><span class="o">;</span>
 
 	<span class="nd">@Override</span>
-	<span class="kd">public</span> <span class="n">String</span> <span class="nf">getStatistics</span><span class="o">()</span> <span class="o">{</span>
+	<span class="kd">public</span> <span class="nc">String</span> <span class="nf">getStatistics</span><span class="o">()</span> <span class="o">{</span>
 		<span class="k">return</span> <span class="s">"The student service has been invoked #"</span> <span class="o">+</span> <span class="n">numberOfAccess</span>
 				<span class="o">+</span> <span class="s">" in this session"</span><span class="o">;</span>
 	<span class="o">}</span>
@@ -777,17 +779,17 @@ The timeout is defined using the <code class="highlighter-rouge">@StatefulTimeou
 When used in conjunction with a Servlet, Stateful beans are often put in the HTTP session for further reuse.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Override</span>
-<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">)</span> <span class="kd">throws</span> <span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
-		<span class="n">StudentStatisticsService</span> <span class="n">statistics</span> <span class="o">=</span> <span class="o">(</span><span class="n">StudentStatisticsService</span><span class="o">)</span> <span class="n">request</span><span class="o">.</span><span class="na">getSession</span><span class="o">().</span><span class="na">getAttribute</span><span class="o">(</span>
-				<span class="n">StudentStatisticsService</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
+<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="nc">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="nc">HttpServletResponse</span> <span class="n">response</span><span class="o">)</span> <span class="kd">throws</span> <span class="nc">ServletException</span><span class="o">,</span> <span class="nc">IOException</span> <span class="o">{</span>
+		<span class="nc">StudentStatisticsService</span> <span class="n">statistics</span> <span class="o">=</span> <span class="o">(</span><span class="nc">StudentStatisticsService</span><span class="o">)</span> <span class="n">request</span><span class="o">.</span><span class="na">getSession</span><span class="o">().</span><span class="na">getAttribute</span><span class="o">(</span>
+				<span class="nc">StudentStatisticsService</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">toString</span><span class="o">());</span>
 
 		<span class="k">if</span> <span class="o">(</span><span class="n">statistics</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
 			<span class="k">try</span> <span class="o">{</span>
-				<span class="n">InitialContext</span> <span class="n">ctx</span> <span class="o">=</span> <span class="k">new</span> <span class="n">InitialContext</span><span class="o">();</span>
-				<span class="n">statistics</span> <span class="o">=</span> <span class="o">(</span><span class="n">StudentStatisticsService</span><span class="o">)</span> <span class="n">ctx</span>
+				<span class="nc">InitialContext</span> <span class="n">ctx</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">InitialContext</span><span class="o">();</span>
+				<span class="n">statistics</span> <span class="o">=</span> <span class="o">(</span><span class="nc">StudentStatisticsService</span><span class="o">)</span> <span class="n">ctx</span>
 						<span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="s">"java:global/JEE6-EAR/JEE6-EJB-0.0.1-SNAPSHOT/StudentStatisticsServiceImpl"</span><span class="o">);</span>
-				<span class="n">request</span><span class="o">.</span><span class="na">getSession</span><span class="o">().</span><span class="na">setAttribute</span><span class="o">(</span><span class="n">StudentStatisticsService</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">toString</span><span class="o">(),</span> <span class="n">statistics</span><span class="o">);</span>
-			<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">NamingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+				<span class="n">request</span><span class="o">.</span><span class="na">getSession</span><span class="o">().</span><span class="na">setAttribute</span><span class="o">(</span><span class="nc">StudentStatisticsService</span><span class="o">.</span><span class="na">class</span><span class="o">.</span><span class="na">toString</span><span class="o">(),</span> <span class="n">statistics</span><span class="o">);</span>
+			<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">NamingException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
 				<span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
 			<span class="o">}</span>
 
@@ -806,22 +808,22 @@ The class <code class="highlighter-rouge">StudentServiceFacade.java</code> descr
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@SessionScoped</span>
 <span class="nd">@Path</span><span class="o">(</span><span class="s">"/studentService"</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceFacade</span> <span class="kd">implements</span> <span class="n">Serializable</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentServiceFacade</span> <span class="kd">implements</span> <span class="nc">Serializable</span> <span class="o">{</span>
 
 	<span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">serialVersionUID</span> <span class="o">=</span> <span class="mi">1318211294294344900L</span><span class="o">;</span>
 
 	<span class="nd">@EJB</span>
-	<span class="n">StudentService</span> <span class="n">studentService</span><span class="o">;</span>
+	<span class="nc">StudentService</span> <span class="n">studentService</span><span class="o">;</span>
 
 	<span class="nd">@EJB</span>
-	<span class="n">StudentStatisticsService</span> <span class="n">studentServiceStatistics</span><span class="o">;</span>
+	<span class="nc">StudentStatisticsService</span> <span class="n">studentServiceStatistics</span><span class="o">;</span>
 
 
 	<span class="nd">@GET</span>
 	<span class="nd">@Produces</span><span class="o">({</span> <span class="s">"application/xml"</span><span class="o">,</span> <span class="s">"application/json"</span> <span class="o">})</span>
 	<span class="nd">@Path</span><span class="o">(</span><span class="s">"session"</span><span class="o">)</span>
-	<span class="kd">public</span> <span class="n">Response</span> <span class="nf">getSessionStatistics</span><span class="o">()</span> <span class="o">{</span>
-		<span class="k">return</span> <span class="n">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span><span class="n">studentServiceStatistics</span><span class="o">.</span><span class="na">getStatistics</span><span class="o">()).</span><span class="na">build</span><span class="o">();</span>
+	<span class="kd">public</span> <span class="nc">Response</span> <span class="nf">getSessionStatistics</span><span class="o">()</span> <span class="o">{</span>
+		<span class="k">return</span> <span class="nc">Response</span><span class="o">.</span><span class="na">ok</span><span class="o">(</span><span class="n">studentServiceStatistics</span><span class="o">.</span><span class="na">getStatistics</span><span class="o">()).</span><span class="na">build</span><span class="o">();</span>
 	<span class="o">}</span>
 	
 	<span class="o">...</span>
@@ -877,33 +879,33 @@ is removed from the queue.</li>
 For each request to the servlet 100 messages are generated and put in the Queue called <code class="highlighter-rouge">MyQueue</code>.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@WebServlet</span><span class="o">(</span><span class="s">"/registration"</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RegistrationServlet</span> <span class="kd">extends</span> <span class="n">HttpServlet</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">RegistrationServlet</span> <span class="kd">extends</span> <span class="nc">HttpServlet</span> <span class="o">{</span>
 
 	<span class="o">...</span>
 		
 	<span class="nd">@Resource</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">"MyConnectionFactory"</span><span class="o">)</span>
-	<span class="kd">private</span> <span class="n">ConnectionFactory</span> <span class="n">connectionFactory</span><span class="o">;</span>
+	<span class="kd">private</span> <span class="nc">ConnectionFactory</span> <span class="n">connectionFactory</span><span class="o">;</span>
 
 	<span class="nd">@Resource</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">"MyQueue"</span><span class="o">)</span>
-	<span class="kd">private</span> <span class="n">Queue</span> <span class="n">queue</span><span class="o">;</span>
+	<span class="kd">private</span> <span class="nc">Queue</span> <span class="n">queue</span><span class="o">;</span>
 
 	<span class="nd">@Override</span>
-	<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="n">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="n">HttpServletResponse</span> <span class="n">response</span><span class="o">)</span> <span class="kd">throws</span> 	<span class="n">ServletException</span><span class="o">,</span> <span class="n">IOException</span> <span class="o">{</span>
+	<span class="kd">protected</span> <span class="kt">void</span> <span class="nf">doGet</span><span class="o">(</span><span class="nc">HttpServletRequest</span> <span class="n">request</span><span class="o">,</span> <span class="nc">HttpServletResponse</span> <span class="n">response</span><span class="o">)</span> <span class="kd">throws</span> 	<span class="nc">ServletException</span><span class="o">,</span> <span class="nc">IOException</span> <span class="o">{</span>
 
 		<span class="k">try</span> <span class="o">{</span>
-			<span class="n">Connection</span> <span class="n">connection</span><span class="o">;</span>
+			<span class="nc">Connection</span> <span class="n">connection</span><span class="o">;</span>
 			<span class="n">connection</span> <span class="o">=</span> <span class="n">connectionFactory</span><span class="o">.</span><span class="na">createConnection</span><span class="o">();</span>
 
-			<span class="n">Session</span> <span class="n">session</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createSession</span><span class="o">(</span><span class="kc">false</span><span class="o">,</span> <span class="n">Session</span><span class="o">.</span><span class="na">AUTO_ACKNOWLEDGE</span><span class="o">);</span>
-			<span class="n">MessageProducer</span> <span class="n">messageProducer</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createProducer</span><span class="o">(</span><span class="n">queue</span><span class="o">);</span>
+			<span class="nc">Session</span> <span class="n">session</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="na">createSession</span><span class="o">(</span><span class="kc">false</span><span class="o">,</span> <span class="nc">Session</span><span class="o">.</span><span class="na">AUTO_ACKNOWLEDGE</span><span class="o">);</span>
+			<span class="nc">MessageProducer</span> <span class="n">messageProducer</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createProducer</span><span class="o">(</span><span class="n">queue</span><span class="o">);</span>
 
-			<span class="n">TextMessage</span> <span class="n">message</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createTextMessage</span><span class="o">();</span>
+			<span class="nc">TextMessage</span> <span class="n">message</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="na">createTextMessage</span><span class="o">();</span>
 
 			<span class="k">for</span> <span class="o">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="o">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="o">;</span> <span class="n">i</span><span class="o">++)</span> <span class="o">{</span>
 				<span class="n">message</span><span class="o">.</span><span class="na">setText</span><span class="o">(</span><span class="s">"This is message "</span> <span class="o">+</span> <span class="o">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="o">));</span>
 				<span class="n">messageProducer</span><span class="o">.</span><span class="na">send</span><span class="o">(</span><span class="n">message</span><span class="o">);</span>
 			<span class="o">}</span>
-		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
 			<span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
 		<span class="o">}</span>
 	<span class="o">}</span>
@@ -914,24 +916,24 @@ For each request to the servlet 100 messages are generated and put in the Queue 
 <p>The following MDB listens to <code class="highlighter-rouge">MyQueue</code> (thanks to the annotation <code class="highlighter-rouge">@MessageDriven(mappedName = "MyQueue")</code> and because it implements the <code class="highlighter-rouge">MessageListener</code> interface it takes a message when available.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@MessageDriven</span><span class="o">(</span><span class="n">mappedName</span> <span class="o">=</span> <span class="s">"MyQueue"</span><span class="o">)</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="n">MessageListener</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">StudentRegistrationService</span> <span class="kd">implements</span> <span class="nc">MessageListener</span> <span class="o">{</span>
     <span class="o">...</span>
 
 	<span class="nd">@Resource</span>
-	<span class="kd">private</span> <span class="n">MessageDrivenContext</span> <span class="n">mdbContext</span><span class="o">;</span>
+	<span class="kd">private</span> <span class="nc">MessageDrivenContext</span> <span class="n">mdbContext</span><span class="o">;</span>
 
-	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="n">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
-		<span class="n">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
+	<span class="kd">public</span> <span class="kt">void</span> <span class="nf">onMessage</span><span class="o">(</span><span class="nc">Message</span> <span class="n">inMessage</span><span class="o">)</span> <span class="o">{</span>
+		<span class="nc">TextMessage</span> <span class="n">msg</span> <span class="o">=</span> <span class="kc">null</span><span class="o">;</span>
 
 		<span class="k">try</span> <span class="o">{</span>
-			<span class="k">if</span> <span class="o">(</span><span class="n">inMessage</span> <span class="k">instanceof</span> <span class="n">TextMessage</span><span class="o">)</span> <span class="o">{</span>
-				<span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="n">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
+			<span class="k">if</span> <span class="o">(</span><span class="n">inMessage</span> <span class="k">instanceof</span> <span class="nc">TextMessage</span><span class="o">)</span> <span class="o">{</span>
+				<span class="n">msg</span> <span class="o">=</span> <span class="o">(</span><span class="nc">TextMessage</span><span class="o">)</span> <span class="n">inMessage</span><span class="o">;</span>
 				<span class="n">logger</span><span class="o">.</span><span class="na">info</span><span class="o">(</span><span class="s">"MESSAGE BEAN: Message received: "</span> <span class="o">+</span> <span class="n">msg</span><span class="o">.</span><span class="na">getText</span><span class="o">());</span>
 			<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
 				<span class="n">logger</span><span class="o">.</span><span class="na">warn</span><span class="o">(</span><span class="s">"Message of wrong type: "</span>
 						<span class="o">+</span> <span class="n">inMessage</span><span class="o">.</span><span class="na">getClass</span><span class="o">().</span><span class="na">getName</span><span class="o">());</span>
 			<span class="o">}</span>
-		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="n">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
+		<span class="o">}</span> <span class="k">catch</span> <span class="o">(</span><span class="nc">JMSException</span> <span class="n">e</span><span class="o">)</span> <span class="o">{</span>
 			<span class="n">mdbContext</span><span class="o">.</span><span class="na">setRollbackOnly</span><span class="o">();</span>
 			<span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="n">e</span><span class="o">);</span>
 		<span class="o">}</span>

@@ -2,22 +2,24 @@
 <html lang="en"><head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
 <title>Multi-Tenancy with EJB 3.1 and JPA 2.0 | Steve Hostettler</title>
-<meta name="generator" content="Jekyll v3.8.5" />
+<meta name="generator" content="Jekyll v3.8.7" />
 <meta property="og:title" content="Multi-Tenancy with EJB 3.1 and JPA 2.0" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="In this post, we look at how to simulate multi-tenancy with several datasources using JPA 2.0" />
 <meta property="og:description" content="In this post, we look at how to simulate multi-tenancy with several datasources using JPA 2.0" />
-<link rel="canonical" href="http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html" />
-<meta property="og:url" content="http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html" />
+<link rel="canonical" href="http://localhost:4000/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html" />
+<meta property="og:url" content="http://localhost:4000/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html" />
 <meta property="og:site_name" content="Steve Hostettler" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2012-11-20T05:18:00+01:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Multi-Tenancy with EJB 3.1 and JPA 2.0" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","datePublished":"2012-11-20T05:18:00+01:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html"},"url":"http://hostettler.net/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html","description":"In this post, we look at how to simulate multi-tenancy with several datasources using JPA 2.0","headline":"Multi-Tenancy with EJB 3.1 and JPA 2.0","dateModified":"2012-11-20T05:18:00+01:00","@context":"http://schema.org"}</script>
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html"},"@type":"BlogPosting","url":"http://localhost:4000/cdi/java%20ee6/jee6/ejb%203.1/jpa%202.0/multi-tenancy/multi-site/entity%20manager/2012/11/20/multi-tenancy.html","headline":"Multi-Tenancy with EJB 3.1 and JPA 2.0","dateModified":"2012-11-20T05:18:00+01:00","datePublished":"2012-11-20T05:18:00+01:00","description":"In this post, we look at how to simulate multi-tenancy with several datasources using JPA 2.0","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Steve Hostettler" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
@@ -105,12 +107,12 @@ Please note that this only works for JTA-based persistence-units. Otherwise, the
 <p>Here is the client code. In order to preserve thread-safety and transactionality, Data access objects are EJBs (<code class="highlighter-rouge">@Stateless</code>, <code class="highlighter-rouge">@Stateful</code>, <code class="highlighter-rouge">@Singleton</code>). The presented solution uses an entity manager that is wrapped and then injected using <code class="highlighter-rouge">@Inject</code> or <code class="highlighter-rouge">@EJB</code>.  Thread-safety, transactionnality and performances are guaranted by the <code class="highlighter-rouge">EJB 3.1</code> and <code class="highlighter-rouge">JPA 2.0</code> specification as explained in the section <code class="highlighter-rouge">Thread-safety and Transactionality</code>. As shown below, the <code class="highlighter-rouge">MultiTenancyWrapper</code> delegates to a real entity manager and implements the <code class="highlighter-rouge">EntityManager</code> interface. Therefore, its use is very similar to a normal <code class="highlighter-rouge">EntityManager</code> injected via <code class="highlighter-rouge">@PersistenceContext</code>.</p>
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@Stateless</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyEJB</span> <span class="kd">implements</span> <span class="n">MyEJBLocal</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyEJB</span> <span class="kd">implements</span> <span class="nc">MyEJBLocal</span> <span class="o">{</span>
 
    <span class="nd">@Inject</span>
-   <span class="kd">private</span> <span class="n">MultiTenancyWrapper</span> <span class="n">emWrapper</span><span class="o">;</span>
+   <span class="kd">private</span> <span class="nc">MultiTenancyWrapper</span> <span class="n">emWrapper</span><span class="o">;</span>
 
-   <span class="nd">@TransactionAttribute</span><span class="o">(</span><span class="n">TransactionAttributeType</span><span class="o">.</span><span class="na">REQUIRED</span><span class="o">)</span>
+   <span class="nd">@TransactionAttribute</span><span class="o">(</span><span class="nc">TransactionAttributeType</span><span class="o">.</span><span class="na">REQUIRED</span><span class="o">)</span>
    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">doSomething</span><span class="o">()</span> <span class="o">{</span>
       <span class="n">emWrapper</span><span class="o">.</span><span class="na">findAll</span><span class="o">(...);</span>
    <span class="o">}</span>
@@ -127,11 +129,11 @@ The main difference being the use of <code class="highlighter-rouge">@Inject</co
 
 <p>Using the session context that is specific to the caller bean (and thus the caller request/session) enables transparent support for thread-safety, security and transactionality.</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="n">ejb</span><span class="o">;</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">package</span> <span class="nn">ejb</span><span class="o">;</span>
 
 <span class="kn">import</span> <span class="nn">javax.persistence.EntityManager</span><span class="o">;</span>
 
-<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">MultiTenanEntityManagertWrapper</span> <span class="kd">extends</span> <span class="n">EntityManager</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">interface</span> <span class="nc">MultiTenanEntityManagertWrapper</span> <span class="kd">extends</span> <span class="nc">EntityManager</span> <span class="o">{</span>
 
 <span class="o">}</span>
 </code></pre></div></div>
@@ -140,28 +142,28 @@ The main difference being the use of <code class="highlighter-rouge">@Inject</co
 
 <div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
 <span class="nd">@Stateless</span>
-<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MultiTenanEntityManagertWrapperImpl</span> <span class="kd">implements</span> <span class="n">MultiTenanEntityManagertWrapper</span> <span class="o">{</span>
+<span class="kd">public</span> <span class="kd">class</span> <span class="nc">MultiTenanEntityManagertWrapperImpl</span> <span class="kd">implements</span> <span class="nc">MultiTenanEntityManagertWrapper</span> <span class="o">{</span>
    
-   <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="n">String</span> <span class="n">JNDI_ENV</span> <span class="o">=</span> <span class="s">"java:comp/env/persistence/"</span><span class="o">;</span>
+   <span class="kd">private</span> <span class="kd">static</span> <span class="kd">final</span> <span class="nc">String</span> <span class="no">JNDI_ENV</span> <span class="o">=</span> <span class="s">"java:comp/env/persistence/"</span><span class="o">;</span>
 
    <span class="nd">@Resource</span>
-   <span class="n">SessionContext</span> <span class="n">context</span><span class="o">;</span>
+   <span class="nc">SessionContext</span> <span class="n">context</span><span class="o">;</span>
 
    
-   <span class="kd">private</span> <span class="n">EntityManager</span> <span class="nf">getMultiTenantEntityManager</span><span class="o">()</span> <span class="o">{</span>
+   <span class="kd">private</span> <span class="nc">EntityManager</span> <span class="nf">getMultiTenantEntityManager</span><span class="o">()</span> <span class="o">{</span>
       <span class="c1">//Extract the name of the current user.</span>
-      <span class="n">Principal</span> <span class="n">p</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getCallerPrincipal</span><span class="o">();</span>
+      <span class="nc">Principal</span> <span class="n">p</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="na">getCallerPrincipal</span><span class="o">();</span>
 
       <span class="c1">//Lookup the tenant name for the current user</span>
       <span class="c1">//This is application specific</span>
-      <span class="n">Users</span> <span class="n">u</span> <span class="o">=</span> <span class="n">Users</span><span class="o">.</span><span class="na">getUser</span><span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
+      <span class="nc">Users</span> <span class="n">u</span> <span class="o">=</span> <span class="nc">Users</span><span class="o">.</span><span class="na">getUser</span><span class="o">(</span><span class="n">p</span><span class="o">.</span><span class="na">getName</span><span class="o">());</span>
 
       <span class="c1">//Produces either TENANT1 or TENANT2      </span>
-      <span class="n">String</span> <span class="n">tenantName</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="na">getSite</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
+      <span class="nc">String</span> <span class="n">tenantName</span> <span class="o">=</span> <span class="n">u</span><span class="o">.</span><span class="na">getSite</span><span class="o">().</span><span class="na">toString</span><span class="o">();</span>
 
-      <span class="n">String</span> <span class="n">jndiName</span> <span class="o">=</span> <span class="k">new</span> <span class="n">StringBuffer</span><span class="o">(</span><span class="n">JNDI_ENV</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">tenantName</span><span class="o">).</span><span class="na">toString</span><span class="o">();</span>
+      <span class="nc">String</span> <span class="n">jndiName</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">StringBuffer</span><span class="o">(</span><span class="no">JNDI_ENV</span><span class="o">).</span><span class="na">append</span><span class="o">(</span><span class="n">tenantName</span><span class="o">).</span><span class="na">toString</span><span class="o">();</span>
       <span class="c1">//Lookup the entity manager</span>
-      <span class="n">EntityManager</span> <span class="n">manager</span> <span class="o">=</span> <span class="o">(</span><span class="n">EntityManager</span><span class="o">)</span> <span class="n">context</span><span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="n">jndiName</span><span class="o">);</span>
+      <span class="nc">EntityManager</span> <span class="n">manager</span> <span class="o">=</span> <span class="o">(</span><span class="nc">EntityManager</span><span class="o">)</span> <span class="n">context</span><span class="o">.</span><span class="na">lookup</span><span class="o">(</span><span class="n">jndiName</span><span class="o">);</span>
       
       <span class="k">if</span> <span class="o">(</span><span class="n">manager</span> <span class="o">==</span> <span class="kc">null</span><span class="o">)</span> <span class="o">{</span>
          <span class="k">throw</span> <span class="k">new</span> <span class="nf">RuntimeException</span><span class="o">(</span><span class="s">"Tenant unknown"</span><span class="o">);</span>
@@ -172,19 +174,19 @@ The main difference being the use of <code class="highlighter-rouge">@Inject</co
 
    <span class="c1">//The delegates</span>
    <span class="nd">@Override</span>
-   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">persist</span><span class="o">(</span><span class="n">Object</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
+   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">persist</span><span class="o">(</span><span class="nc">Object</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">getMultiTenantEntityManager</span><span class="o">().</span><span class="na">persist</span><span class="o">(</span><span class="n">entity</span><span class="o">);</span>
    <span class="o">}</span>
 
 
    <span class="nd">@Override</span>
-   <span class="kd">public</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">T</span> <span class="nf">merge</span><span class="o">(</span><span class="n">T</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
+   <span class="kd">public</span> <span class="o">&lt;</span><span class="no">T</span><span class="o">&gt;</span> <span class="no">T</span> <span class="nf">merge</span><span class="o">(</span><span class="no">T</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
       <span class="k">return</span> <span class="nf">getMultiTenantEntityManager</span><span class="o">().</span><span class="na">merge</span><span class="o">(</span><span class="n">entity</span><span class="o">);</span>
    <span class="o">}</span>
 
 
    <span class="nd">@Override</span>
-   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">remove</span><span class="o">(</span><span class="n">Object</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
+   <span class="kd">public</span> <span class="kt">void</span> <span class="nf">remove</span><span class="o">(</span><span class="nc">Object</span> <span class="n">entity</span><span class="o">)</span> <span class="o">{</span>
       <span class="n">getMultiTenantEntityManager</span><span class="o">().</span><span class="na">remove</span><span class="o">(</span><span class="n">entity</span><span class="o">);</span>
    <span class="o">}</span>
 

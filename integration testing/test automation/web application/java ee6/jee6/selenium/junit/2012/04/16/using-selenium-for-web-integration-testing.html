@@ -2,22 +2,24 @@
 <html lang="en"><head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.5.0 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.7.1 -->
 <title>Using Selenium for web integration testing | Steve Hostettler</title>
-<meta name="generator" content="Jekyll v3.8.5" />
+<meta name="generator" content="Jekyll v3.8.7" />
 <meta property="og:title" content="Using Selenium for web integration testing" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Following up on my previous posts (here and here about integration testing of JEE web applications, I will present how to write smoke tests using Selenium. The idea is to detect whether important regressions have been introduced. This is especially useful to detect configuration and navigation problems. I’ve split the test in three parts: starting and stopping the container. Embedded Tomcat 7 in our case. This is described here; building the WAR file to test. To that end, you can look at this post that describes how to build such a test archive using Shrinkwrap; finally, we must build the test case. This is the goal of this post." />
 <meta property="og:description" content="Following up on my previous posts (here and here about integration testing of JEE web applications, I will present how to write smoke tests using Selenium. The idea is to detect whether important regressions have been introduced. This is especially useful to detect configuration and navigation problems. I’ve split the test in three parts: starting and stopping the container. Embedded Tomcat 7 in our case. This is described here; building the WAR file to test. To that end, you can look at this post that describes how to build such a test archive using Shrinkwrap; finally, we must build the test case. This is the goal of this post." />
-<link rel="canonical" href="http://hostettler.net/integration%20testing/test%20automation/web%20application/java%20ee6/jee6/selenium/junit/2012/04/16/using-selenium-for-web-integration-testing.html" />
-<meta property="og:url" content="http://hostettler.net/integration%20testing/test%20automation/web%20application/java%20ee6/jee6/selenium/junit/2012/04/16/using-selenium-for-web-integration-testing.html" />
+<link rel="canonical" href="http://localhost:4000/integration%20testing/test%20automation/web%20application/java%20ee6/jee6/selenium/junit/2012/04/16/using-selenium-for-web-integration-testing.html" />
+<meta property="og:url" content="http://localhost:4000/integration%20testing/test%20automation/web%20application/java%20ee6/jee6/selenium/junit/2012/04/16/using-selenium-for-web-integration-testing.html" />
 <meta property="og:site_name" content="Steve Hostettler" />
 <meta property="og:type" content="article" />
 <meta property="article:published_time" content="2012-04-16T18:57:00+02:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Using Selenium for web integration testing" />
 <script type="application/ld+json">
-{"@type":"BlogPosting","datePublished":"2012-04-16T18:57:00+02:00","mainEntityOfPage":{"@type":"WebPage","@id":"http://hostettler.net/integration%20testing/test%20automation/web%20application/java%20ee6/jee6/selenium/junit/2012/04/16/using-selenium-for-web-integration-testing.html"},"url":"http://hostettler.net/integration%20testing/test%20automation/web%20application/java%20ee6/jee6/selenium/junit/2012/04/16/using-selenium-for-web-integration-testing.html","description":"Following up on my previous posts (here and here about integration testing of JEE web applications, I will present how to write smoke tests using Selenium. The idea is to detect whether important regressions have been introduced. This is especially useful to detect configuration and navigation problems. I’ve split the test in three parts: starting and stopping the container. Embedded Tomcat 7 in our case. This is described here; building the WAR file to test. To that end, you can look at this post that describes how to build such a test archive using Shrinkwrap; finally, we must build the test case. This is the goal of this post.","headline":"Using Selenium for web integration testing","dateModified":"2012-04-16T18:57:00+02:00","@context":"http://schema.org"}</script>
+{"mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/integration%20testing/test%20automation/web%20application/java%20ee6/jee6/selenium/junit/2012/04/16/using-selenium-for-web-integration-testing.html"},"@type":"BlogPosting","url":"http://localhost:4000/integration%20testing/test%20automation/web%20application/java%20ee6/jee6/selenium/junit/2012/04/16/using-selenium-for-web-integration-testing.html","headline":"Using Selenium for web integration testing","dateModified":"2012-04-16T18:57:00+02:00","datePublished":"2012-04-16T18:57:00+02:00","description":"Following up on my previous posts (here and here about integration testing of JEE web applications, I will present how to write smoke tests using Selenium. The idea is to detect whether important regressions have been introduced. This is especially useful to detect configuration and navigation problems. I’ve split the test in three parts: starting and stopping the container. Embedded Tomcat 7 in our case. This is described here; building the WAR file to test. To that end, you can look at this post that describes how to build such a test archive using Shrinkwrap; finally, we must build the test case. This is the goal of this post.","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
-<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://hostettler.net/feed.xml" title="Steve Hostettler" /></head>
+<link rel="stylesheet" href="/assets/main.css"><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Steve Hostettler" /></head>
 <body><header class="site-header" role="banner">
 
   <div class="wrapper"><a class="site-title" rel="author" href="/">Steve Hostettler</a><nav class="site-nav">
@@ -91,7 +93,7 @@ browser in a new window. I prefer to have the continuous integration running hea
 <p>First, let’s build a new headless driver. This object simulates the browser. It manages the HTTP part as
 well as parsing the HTML and the javascript code that is returned.</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">WebDriver</span> <span class="n">driver</span> <span class="o">=</span> <span class="k">new</span> <span class="n">HtmlUnitDriver</span><span class="o">();</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">WebDriver</span> <span class="n">driver</span> <span class="o">=</span> <span class="k">new</span> <span class="nc">HtmlUnitDriver</span><span class="o">();</span>
 </code></pre></div></div>
 
 <p>The next step is to ask the driver to load the home page that we want to test. For
@@ -107,7 +109,7 @@ First, it locates a HTML element of type <code class="highlighter-rouge">input</
 attribute  <code class="highlighter-rouge">id</code> set to <code class="highlighter-rouge">username</code>. If this web element is not present, the driver will raise an exception.
 This allows to easily detect whether a widget has been accidentally removed.</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">WebElement</span> <span class="n">username</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">"//input[contains(@id,'username')]"</span><span class="o">));</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">WebElement</span> <span class="n">username</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">"//input[contains(@id,'username')]"</span><span class="o">));</span>
 </code></pre></div></div>
 
 <p>Now we can interact with the previous element. For instance, to simulate a user that types in its username (<code class="highlighter-rouge">admin</code>).</p>
@@ -115,13 +117,13 @@ This allows to easily detect whether a widget has been accidentally removed.</p>
 </code></pre></div></div>
 
 <p>After that, Let’s do the same for the web element called <code class="highlighter-rouge">password</code>.</p>
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">WebElement</span> <span class="n">password</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">"//input[contains(@id,'password')]"</span><span class="o">));</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">WebElement</span> <span class="n">password</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">"//input[contains(@id,'password')]"</span><span class="o">));</span>
 <span class="n">password</span><span class="o">.</span><span class="na">sendKeys</span><span class="o">(</span><span class="s">"admin"</span><span class="o">);</span>
 </code></pre></div></div>
 
 <p>Finally, we locate a button called <code class="highlighter-rouge">login</code>and we simulate a click on it.</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">WebElement</span> <span class="n">login</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">"//button[contains(@id,'login')]"</span><span class="o">));</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">WebElement</span> <span class="n">login</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">"//button[contains(@id,'login')]"</span><span class="o">));</span>
 <span class="n">login</span><span class="o">.</span><span class="na">click</span><span class="o">();</span>
 </code></pre></div></div>
 
@@ -129,20 +131,20 @@ This allows to easily detect whether a widget has been accidentally removed.</p>
 The following assertion checks that the string <code class="highlighter-rouge">Student list</code> exists somewhere is the returned
 HTML source code.</p>
 
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">"Student list"</span><span class="o">));</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">"Student list"</span><span class="o">));</span>
 </code></pre></div></div>
 
 <p>With this approach, it is also very easy to do trivial security testing. For instance, let’s check that
 the application redirects (or forwards) the user to the login page upon unsuccessful login.</p>
-<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">WebElement</span> <span class="n">username</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">"//input[contains(@id,'username')]"</span><span class="o">));</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nc">WebElement</span> <span class="n">username</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">"//input[contains(@id,'username')]"</span><span class="o">));</span>
 <span class="n">username</span><span class="o">.</span><span class="na">sendKeys</span><span class="o">(</span><span class="s">"foo"</span><span class="o">);</span>
-<span class="n">WebElement</span> <span class="n">password</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">"//input[contains(@id,'password')]"</span><span class="o">));</span>
+<span class="nc">WebElement</span> <span class="n">password</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">"//input[contains(@id,'password')]"</span><span class="o">));</span>
 <span class="n">password</span><span class="o">.</span><span class="na">sendKeys</span><span class="o">(</span><span class="s">"foo"</span><span class="o">);</span>
-<span class="n">WebElement</span> <span class="n">login</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="n">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">"//button[contains(@id,'login')]"</span><span class="o">));</span>
+<span class="nc">WebElement</span> <span class="n">login</span> <span class="o">=</span> <span class="n">driver</span><span class="o">.</span><span class="na">findElement</span><span class="o">(</span><span class="nc">By</span><span class="o">.</span><span class="na">xpath</span><span class="o">(</span><span class="s">"//button[contains(@id,'login')]"</span><span class="o">));</span>
 <span class="n">login</span><span class="o">.</span><span class="na">click</span><span class="o">();</span>
-<span class="n">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">"username"</span><span class="o">));</span>
-<span class="n">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">"password"</span><span class="o">));</span>
-<span class="n">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">"login"</span><span class="o">));</span>
+<span class="nc">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">"username"</span><span class="o">));</span>
+<span class="nc">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">"password"</span><span class="o">));</span>
+<span class="nc">Assert</span><span class="o">.</span><span class="na">assertTrue</span><span class="o">(</span><span class="n">driver</span><span class="o">.</span><span class="na">getPageSource</span><span class="o">().</span><span class="na">contains</span><span class="o">(</span><span class="s">"login"</span><span class="o">));</span>
 </code></pre></div></div>
 
 <h2 id="conclusion">Conclusion</h2>
